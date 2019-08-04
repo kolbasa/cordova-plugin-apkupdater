@@ -1,0 +1,23 @@
+{
+  "name": "ApkUpdater",
+  "version": "1.0.0",
+  "description": "TODO",
+  "cordova": {
+    "id": "cordova-plugin-apkupdater",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "Michael Jedich",
+  "license": "MIT"
+}

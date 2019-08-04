@@ -1,0 +1,41 @@
+package de.kolbasa.apkupdater.downloader.progress;
+
+import java.util.Locale;
+
+public abstract class AbstractProgress {
+
+    private int bytes;
+    private int bytesWritten;
+    private float percent;
+
+    AbstractProgress(int bytes) {
+        this.bytes = bytes;
+    }
+
+    AbstractProgress(final AbstractProgress copy) {
+        this.bytes = copy.getBytesWritten();
+        this.bytesWritten = copy.getBytesWritten();
+        this.percent = copy.getPercent();
+    }
+
+    public int getBytes() {
+        return bytes;
+    }
+
+    public int getBytesWritten() {
+        return bytesWritten;
+    }
+
+    public float getPercent() {
+        return percent;
+    }
+
+    public void setBytesWritten(int downloadedSize) {
+        this.bytesWritten = downloadedSize;
+        if (bytes > 0) {
+            float percent = ((((float) downloadedSize) / bytes) * 100);
+            this.percent = Float.valueOf(String.format(Locale.ENGLISH, "%.2f", percent));
+        }
+    }
+
+}
