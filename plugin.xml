@@ -46,7 +46,7 @@
             </provider>
         </config-file>
 
-        <source-file src="res/xml/apkupdater_paths.xml" target-dir="res/xml"/>
+        <source-file src="res/apkupdater_paths.xml" target-dir="res/xml"/>
         <source-file src="src/de/kolbasa/apkupdater/ApkUpdater.java" target-dir="src/de/kolbasa/apkupdater"/>
         <source-file src="src/de/kolbasa/apkupdater/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater"/>
         <source-file src="src/de/kolbasa/apkupdater/Event.java" target-dir="src/de/kolbasa/apkupdater"/>
