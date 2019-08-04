@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-apkupdater" version="1.0.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
+        id="cordova-plugin-apkupdater" version="1.0.0">
 
     <name>Apk Updater</name>
-    <description>TODO</description>
     <license>MIT</license>
     <author>Michael Jedich</author>
+
+    <description>TODO</description>
+    <keywords>TODO</keywords>
 
     <engines>
         <engine name="cordova" version=">=3.0.0"/>
@@ -47,43 +50,43 @@
         </config-file>
 
         <source-file src="res/apkupdater_paths.xml" target-dir="res/xml"/>
-        <source-file src="src/de/kolbasa/apkupdater/ApkUpdater.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/de/kolbasa/apkupdater/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/de/kolbasa/apkupdater/Event.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/de/kolbasa/apkupdater/UpdateManager.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/de/kolbasa/apkupdater/CordovaError.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/de/kolbasa/apkupdater/MainActivity.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/progress/AbstractProgress.java"
+        <source-file src="src/android/ApkUpdater.java" target-dir="src/de/kolbasa/apkupdater"/>
+        <source-file src="src/android/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater"/>
+        <source-file src="src/android/Event.java" target-dir="src/de/kolbasa/apkupdater"/>
+        <source-file src="src/android/UpdateManager.java" target-dir="src/de/kolbasa/apkupdater"/>
+        <source-file src="src/android/CordovaError.java" target-dir="src/de/kolbasa/apkupdater"/>
+        <source-file src="src/android/MainActivity.java" target-dir="src/de/kolbasa/apkupdater"/>
+        <source-file src="src/android/downloader/progress/AbstractProgress.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/progress/DownloadProgress.java"
+        <source-file src="src/android/downloader/progress/DownloadProgress.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/progress/UnzipProgress.java"
+        <source-file src="src/android/downloader/progress/UnzipProgress.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/update/tools/ChecksumGenerator.java"
+        <source-file src="src/android/downloader/update/tools/ChecksumGenerator.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/update/tools"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/update/tools/UpdateValidator.java"
+        <source-file src="src/android/downloader/update/tools/UpdateValidator.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/update/tools"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/update/tools/Unzipper.java"
+        <source-file src="src/android/downloader/update/tools/Unzipper.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/update/tools"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/update/UpdateDownloader.java"
+        <source-file src="src/android/downloader/update/UpdateDownloader.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/update"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/update/UpdateDownloadEvent.java"
+        <source-file src="src/android/downloader/update/UpdateDownloadEvent.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/update"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/update/UpdateChunk.java"
+        <source-file src="src/android/downloader/update/UpdateChunk.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/update"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/manifest/ManifestDownloader.java"
+        <source-file src="src/android/downloader/manifest/ManifestDownloader.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/manifest"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/manifest/Manifest.java"
+        <source-file src="src/android/downloader/manifest/Manifest.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/manifest"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/exceptions/AlreadyRunningException.java"
+        <source-file src="src/android/downloader/exceptions/AlreadyRunningException.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/exceptions"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/exceptions/WrongChecksumException.java"
+        <source-file src="src/android/downloader/exceptions/WrongChecksumException.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/exceptions"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/exceptions/ManifestMissingException.java"
+        <source-file src="src/android/downloader/exceptions/ManifestMissingException.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/exceptions"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/FileTools.java"
+        <source-file src="src/android/downloader/FileTools.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader"/>
-        <source-file src="src/de/kolbasa/apkupdater/downloader/FileDownloader.java"
+        <source-file src="src/android/downloader/FileDownloader.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader"/>
 
     </platform>
