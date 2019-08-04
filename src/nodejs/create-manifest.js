@@ -5,7 +5,14 @@ const exec = require('child_process').exec;
 
 const aArguments = process.argv.slice(2);
 if (aArguments.length < 4) {
-    console.error('TODO: help screen');
+    console.error(
+        '\nUSAGE: \n' +
+        '\tcreate-manifest.js <version> <chunk-size> <apk-path> <output-path>\n\n' +
+        '\tsize:        the size of one compressed chunk: {size}[b|k|m], e.g. 500b, 150k, 1m\n' +
+        '\tversion:     a string of your choosing, will not be used by the plugin\n' +
+        '\tapk-path:    the path to the apk-file\n' +
+        '\toutput-path: the path to copy the zip-files to'
+    );
     process.exit(1);
 }
 
