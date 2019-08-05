@@ -45,4 +45,13 @@ These are apk installation files that you can download freely on the Internet.
 
 Honestly, one should mention that the left file sizes are not found in the App Store. Since these installation files are also compressed and rather to compare with the right side.
 
-## TODO: im tired, come back tomorrow
+The script requires [7Zip](https://www.7-zip.org/) and [NodeJS](https://nodejs.org) to work.
+
+Usage: 
+```
+node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
+```
+sample:
+```bash
+node create.manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
+```
