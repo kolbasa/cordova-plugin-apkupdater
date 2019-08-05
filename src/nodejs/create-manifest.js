@@ -8,10 +8,10 @@ if (aArguments.length < 4) {
     console.error(
         '\nUSAGE: \n' +
         '\tcreate-manifest.js <version> <chunk-size> <apk-path> <output-path>\n\n' +
-        '\tsize:        the size of one compressed chunk: {size}[b|k|m], e.g. 500b, 150k, 1m\n' +
-        '\tversion:     a string of your choosing, will not be used by the plugin\n' +
+        '\tversion:     a string of your choosing, it will not be used by the plugin\n' +
+        '\tsize:        the size of one compressed chunk: specified with the units b|k|m, e.g. 500b, 150k, 1m\n' +
         '\tapk-path:    the path to the apk-file\n' +
-        '\toutput-path: the path to copy the zip-files to'
+        '\toutput-path: the path to which the update files are copied\n'
     );
     process.exit(1);
 }

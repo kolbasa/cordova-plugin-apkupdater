@@ -14,20 +14,6 @@ The plugin also speeds up the download when a wifi connection is detected. The g
 A nodejs script is used to prepare the update: `src/nodejs/create-manifest.js`. It compresses and splits the file into selected file sizes.
 In addition, a manifest file is also created. It contains the version of the update and the checksum of all parts.
 
-```json
-{
-  "version": "1.0.0",
-  "sum": "35d9fd2d688156e45b89707f650a61ac",
-  "size": 600,
-  "compressedSize": 351,
-  "chunks": [
-    "bf0b504ea0f6cdd7d3ba20d2fff48870",
-    "830d523f8f2038fea5ae0fccb3dfa4c0",
-    "c6a744ca828fa6dff4de888c6ec79a38"
-  ]
-}
-```
-
 You may be wondering if compression really makes sense. I have done some tests with popular apps.
 These are apk installation files that you can download freely on the Internet.
 
@@ -51,7 +37,56 @@ Usage:
 ```
 node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
 ```
-sample:
-```bash
+
+* `version` - a string of your choosing, it will not be used by the plugin
+* `size` - the size of one compressed chunk, defined with the units `b|k|m`, e.g. `500b`, `150k`, `1m`
+* `apk-path` - the path to the apk file
+* `size` - the path to which the update files are copied
+
+Example:
+```
 node create.manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
 ```
+
+For example, the following update files are created during execution.
+```
+manifest.json
+1.0.0.zip.001
+1.0.0.zip.002
+1.0.0.zip.003
+```
+
+The contents of the manifest file will look like this:
+```json
+{
+  "version": "1.0.0",
+  "sum": "35d9fd2d688156e45b89707f650a61ac",
+  "size": 600,
+  "compressedSize": 351,
+  "chunks": [
+    "bf0b504ea0f6cdd7d3ba20d2fff48870",
+    "830d523f8f2038fea5ae0fccb3dfa4c0",
+    "c6a744ca828fa6dff4de888c6ec79a38"
+  ]
+}
+```
+
+## Updating the client app
+
+The first step is to upload the generated update directory to your server.
+
+The app now only needs the URL of the directory.
+
+```js
+cordova.plugins.apkupdater.check(
+    'https://your-domain.com/update',
+    function (manifest) {
+        //
+    },
+    function (err) {
+        console.error(err);
+    }
+);
+```
+
+TODO: Come back tomorrow
