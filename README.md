@@ -29,7 +29,9 @@ These are apk installation files that you can download freely on the Internet.
 | Chrome      | 45.8 MB       | 39.8 MB    | 13.1%   |
 | Google Maps | 54.4 MB       | 50.4 MB    | 7.3%    |
 
-Honestly, one should mention that the left file sizes are not found in the App Store. Since these installation files are also compressed and rather to compare with the right side.
+Honestly, one should mention that the left file sizes are not found in the App Store. 
+The installation files stored there are also compressed and therefore more comparable to the right side of the table.
+So we have to take care of the compression ourselves.
 
 The script requires [7Zip](https://www.7-zip.org/) and [NodeJS](https://nodejs.org) to work.
 
@@ -39,7 +41,7 @@ node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
 ```
 
 * `version` - a string of your choosing, it will not be used by the plugin
-* `size` - the size of one compressed chunk, defined with the units `b|k|m`, e.g. `500b`, `150k`, `1m`
+* `chunk-size` - the size of one compressed chunk, defined with the units `b|k|m`, e.g. `500b`, `150k`, `1m`
 * `apk-path` - the path to the apk file
 * `size` - the path to which the update files are copied
 
@@ -61,8 +63,8 @@ The contents of the manifest file will look like this:
 {
   "version": "1.0.0",
   "sum": "35d9fd2d688156e45b89707f650a61ac",
-  "size": 600,
-  "compressedSize": 351,
+  "size": 5425986,
+  "compressedSize": 4304842,
   "chunks": [
     "bf0b504ea0f6cdd7d3ba20d2fff48870",
     "830d523f8f2038fea5ae0fccb3dfa4c0",
@@ -73,20 +75,33 @@ The contents of the manifest file will look like this:
 
 ## Updating the client app
 
-The first step is to upload the generated update directory to your server.
-
-The app now only needs the URL of the directory.
+First you have to call `check`. This will download the manifest file.
 
 ```js
 cordova.plugins.apkupdater.check(
     'https://your-domain.com/update',
     function (manifest) {
-        //
+        // 
     },
     function (err) {
         console.error(err);
     }
 );
 ```
+
+The method returns the following object as a result
+```json
+{
+    "version": "1.0.0",
+    "ready": false,
+    "size": 4304842,
+    "chunks": 3
+}
+```
+
+Your application logic now has to decide what happens with this update. So your app needs to know its own version.
+It can be hard coded or you can use [cordova-plugin-app-version](https://github.com/whiteoctober/cordova-plugin-app-version).
+This is what the `version` field is for. It will not be parsed by the plugin, you can choose your own versioning scheme.
+The `ready` field will tell you, if this update was already downloaded and is ready to install.
 
 TODO: Come back tomorrow

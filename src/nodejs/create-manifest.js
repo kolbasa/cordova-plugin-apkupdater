@@ -9,7 +9,7 @@ if (aArguments.length < 4) {
         '\nUSAGE: \n' +
         '\tcreate-manifest.js <version> <chunk-size> <apk-path> <output-path>\n\n' +
         '\tversion:     a string of your choosing, it will not be used by the plugin\n' +
-        '\tsize:        the size of one compressed chunk: specified with the units b|k|m, e.g. 500b, 150k, 1m\n' +
+        '\tchunk-size:  the size of one compressed chunk: specified with the units b|k|m, e.g. 500b, 150k, 1m\n' +
         '\tapk-path:    the path to the apk-file\n' +
         '\toutput-path: the path to which the update files are copied\n'
     );
