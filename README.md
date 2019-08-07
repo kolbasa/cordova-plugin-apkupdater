@@ -75,21 +75,23 @@ The contents of the manifest file will look like this:
 
 ## Updating the client app
 
+### `check` - check for new update
+
 First you have to call `check`. This will download the manifest file.
 
 ```js
 cordova.plugins.apkupdater.check(
     'https://your-domain.com/update',
     function (manifest) {
-        // 
+        // success callback
     },
     function (err) {
-        console.error(err);
+        // error callback
     }
 );
 ```
 
-The method returns the following object as a result
+The **success** function will be called with the following result:
 ```json
 {
     "version": "1.0.0",
@@ -103,5 +105,38 @@ Your application logic now has to decide what happens with this update. So your 
 It can be hard coded or you can use [cordova-plugin-app-version](https://github.com/whiteoctober/cordova-plugin-app-version).
 This is what the `version` field is for. It will not be parsed by the plugin, you can choose your own versioning scheme.
 The `ready` field will tell you, if this update was already downloaded and is ready to install.
+
+You can now tell the plugin to download the update. There are two functions for this: `download` and `backgroundDownload`.
+
+### `download` - download the complete update in one go
+
+The method `download` will download the complete update without any delays.
+
+```js
+cordova.plugins.apkupdater.download(
+    function () {
+        // success callback
+    },
+    function (err) {
+        // error callback
+    }
+);
+```
+
+### `backgroundDownload` - slowly downloads the update bit by bit at a pre-set time interval.
+
+```js
+cordova.plugins.apkupdater.backgroundDownload(
+    function () {
+        // success callback
+    },
+    function (err) {
+        // error callback
+    },
+    60000 // the desired time interval between the download of the individual update pieces in ms
+);
+```
+    
+### `install` - starts the install process
 
 TODO: Come back tomorrow
