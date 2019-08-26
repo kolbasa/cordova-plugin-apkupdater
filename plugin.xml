@@ -55,7 +55,6 @@
         <source-file src="src/android/Event.java" target-dir="src/de/kolbasa/apkupdater"/>
         <source-file src="src/android/UpdateManager.java" target-dir="src/de/kolbasa/apkupdater"/>
         <source-file src="src/android/CordovaError.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/MainActivity.java" target-dir="src/de/kolbasa/apkupdater"/>
         <source-file src="src/android/downloader/progress/AbstractProgress.java"
                      target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
         <source-file src="src/android/downloader/progress/DownloadProgress.java"
