@@ -13,7 +13,7 @@ public abstract class AbstractProgress {
     }
 
     AbstractProgress(final AbstractProgress copy) {
-        this.bytes = copy.getBytesWritten();
+        this.bytes = copy.getBytes();
         this.bytesWritten = copy.getBytesWritten();
         this.percent = copy.getPercent();
     }

@@ -39,7 +39,7 @@
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <provider
-                    android:authorities="${applicationId}.provider"
+                    android:authorities="${applicationId}.apkupdater.provider"
                     android:exported="false"
                     android:grantUriPermissions="true"
                     android:name="android.support.v4.content.FileProvider">
