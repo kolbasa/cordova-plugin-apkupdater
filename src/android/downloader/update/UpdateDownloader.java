@@ -37,6 +37,7 @@ public class UpdateDownloader extends FileDownloader {
 
     private Integer interval;
     private boolean downloading;
+    private int checksumFails;
 
     public UpdateDownloader(Manifest manifest, String serverUrl, String downloadPath, int timeout) {
         this.manifest = manifest;
@@ -239,7 +240,7 @@ public class UpdateDownloader extends FileDownloader {
                 }
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 0, interval);
+        timer.scheduleAtFixedRate(timerTask, interval, interval);
     }
 
     private void startTimer(int interval) {
@@ -319,6 +320,7 @@ public class UpdateDownloader extends FileDownloader {
                 } else {
                     downloadChunk(chunk);
                     files.add(chunk.getFile());
+                    checksumFails = 0;
                     break;
                 }
             }
@@ -334,7 +336,9 @@ public class UpdateDownloader extends FileDownloader {
             broadcast(e);
         } catch (WrongChecksumException e) {
             broadcast(e);
-            stop();
+            if (++checksumFails > 2) {
+                stop();
+            }
         } catch (Exception e) {
             broadcast(e);
             stop();
