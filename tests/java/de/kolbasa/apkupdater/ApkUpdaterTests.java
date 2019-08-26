@@ -29,6 +29,7 @@ class ApkUpdaterTests {
     private static final String VERSION = "1.0.0";
     private static final String APK_NAME = "example.apk";
     private static final String MANIFEST = "manifest.json";
+    private static final String MD5_HASH = "35d9fd2d688156e45b89707f650a61ac";
 
     private static final String UPDATE = RESOURCES + "update-compressed/1.0.0";
     private static final String UPDATE_CORRUPTED = RESOURCES + "update-compressed/1.0.0-corrupted";
@@ -37,9 +38,9 @@ class ApkUpdaterTests {
     private static final String APK = RESOURCES + "update/1.0.0/example.apk";
     private static final String APK_CORRUPTED = RESOURCES + "update/1.0.0-corrupted/example.apk";
 
-    private static final String PART_01 = VERSION + ".zip.001";
-    private static final String PART_02 = VERSION + ".zip.002";
-    private static final String PART_03 = VERSION + ".zip.003";
+    private static final String PART_01 = "update.zip.001";
+    private static final String PART_02 = "update.zip.002";
+    private static final String PART_03 = "update.zip.003";
 
     private static final String NON_ROUTABLE_IP = "http://10.255.255.1/";
 
@@ -111,12 +112,12 @@ class ApkUpdaterTests {
 
     private void copyUpdateToDevice(String apkPath) throws IOException {
         // noinspection ResultOfMethodCallIgnored
-        new File(downloadDirectory, VERSION).mkdir();
+        new File(downloadDirectory, MD5_HASH).mkdir();
         copyFile(new File(apkPath), new File(updateDirectory, APK_NAME));
     }
 
-    private File copyUpdateChunksToDevice(String version) throws IOException {
-        File dir = new File(downloadDirectory, version);
+    private File copyUpdateChunksToDevice(String hash) throws IOException {
+        File dir = new File(downloadDirectory, hash);
         // noinspection ResultOfMethodCallIgnored
         dir.mkdir();
         copyFile(new File(UPDATE), dir);
@@ -155,7 +156,7 @@ class ApkUpdaterTests {
     void setUp() throws IOException {
         copyFile(new File(UPDATE), new File(SERVER_PATH));
         this.downloadDirectory = createDownloadDirectory();
-        this.updateDirectory = this.downloadDirectory + File.separator + VERSION;
+        this.updateDirectory = this.downloadDirectory + File.separator + MD5_HASH;
     }
 
     @AfterEach
@@ -208,7 +209,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Do not mark as ready if only chunks are downloaded")
         void doNotMarkAsReadyIfOnlyChunksAreDownloaded() throws Exception {
-            copyUpdateChunksToDevice(VERSION);
+            copyUpdateChunksToDevice(MD5_HASH);
             Manifest manifest = new UpdateManager(SERVER_URL, downloadDirectory).check();
             assertNull(manifest.getUpdateFile());
         }
@@ -259,7 +260,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Extract only if download complete")
         void extractButNotDownload() throws Exception {
-            copyUpdateChunksToDevice(VERSION);
+            copyUpdateChunksToDevice(MD5_HASH);
             UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
 
             Events events = observe(updater);
@@ -279,16 +280,16 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Manually removing")
             void clearingUpdates() throws Exception {
-                copyUpdateChunksToDevice(VERSION);
+                copyUpdateChunksToDevice(MD5_HASH);
 
                 assertTrue(new File(downloadDirectory, MANIFEST).exists());
-                assertTrue(new File(downloadDirectory, VERSION).exists());
+                assertTrue(new File(downloadDirectory, MD5_HASH).exists());
 
                 UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
                 updater.removeUpdates();
 
                 assertFalse(new File(downloadDirectory, MANIFEST).exists());
-                assertFalse(new File(downloadDirectory, VERSION).exists());
+                assertFalse(new File(downloadDirectory, MD5_HASH).exists());
             }
 
             @Test
@@ -346,7 +347,7 @@ class ApkUpdaterTests {
                 ArrayList<UnzipProgress> events = observe(updater).getUnzipProgress();
 
                 // noinspection ResultOfMethodCallIgnored
-                new File(downloadDirectory, VERSION).mkdir();
+                new File(downloadDirectory, MD5_HASH).mkdir();
                 copyFile(new File(APK), new File(updateDirectory, APK_NAME));
 
                 updater.download();
@@ -389,7 +390,7 @@ class ApkUpdaterTests {
                 ArrayList<UnzipProgress> events = observe(updater).getUnzipProgress();
 
                 // noinspection ResultOfMethodCallIgnored
-                new File(downloadDirectory, VERSION).mkdir();
+                new File(downloadDirectory, MD5_HASH).mkdir();
                 copyFile(new File(APK_CORRUPTED), new File(updateDirectory, APK_NAME));
 
                 updater.download();

@@ -89,8 +89,8 @@ public class UpdateDownloader extends FileDownloader {
         setChanged();
         notifyObservers(UpdateDownloadEvent.STARTING);
 
-        String version = manifest.getVersion();
-        File downloadDir = new File(downloadPath, version);
+        String checkSum = manifest.getChecksum();
+        File downloadDir = new File(downloadPath, checkSum);
 
         if (!downloadDir.exists()) {
             // noinspection ResultOfMethodCallIgnored
@@ -98,7 +98,7 @@ public class UpdateDownloader extends FileDownloader {
         }
 
         for (File dir : new File(downloadPath).listFiles()) {
-            if (dir.isDirectory() && !dir.getName().equals(version)) {
+            if (dir.isDirectory() && !dir.getName().equals(checkSum)) {
                 FileTools.deleteDirectory(dir);
             }
         }
@@ -107,7 +107,7 @@ public class UpdateDownloader extends FileDownloader {
         for (int i = 0; i < chunks.size(); i++) {
             UpdateChunk chunk = chunks.get(i);
             String suffix = String.format(Locale.ENGLISH, "%03d", i + 1);
-            File file = new File(downloadDir, version + ".zip." + suffix);
+            File file = new File(downloadDir, "update.zip." + suffix);
             chunk.setFile(file);
         }
     }
@@ -244,9 +244,12 @@ public class UpdateDownloader extends FileDownloader {
 
     private void startTimer(int interval) {
         this.interval = interval;
-        if (Build.FINGERPRINT != null) {
+        try {
+            // noinspection unused
+            String build = Build.FINGERPRINT;
             startNativeTimer(interval);
-        } else {
+        } catch(NoClassDefFoundError err) {
+            // Mocking timer for tests
             startMockedTimer(interval);
         }
     }

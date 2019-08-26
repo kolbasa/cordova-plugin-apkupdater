@@ -9,8 +9,8 @@ import de.kolbasa.apkupdater.downloader.manifest.Manifest;
 public class UpdateValidator {
 
     public static File findValidUpdate(Manifest manifest) throws IOException {
-        String version = manifest.getVersion();
-        File downloadDir = new File(manifest.getFile().getParentFile(), version);
+        String checkSum = manifest.getChecksum();
+        File downloadDir = new File(manifest.getFile().getParentFile(), checkSum);
 
         if (downloadDir.exists()) {
             File apk = FileTools.findByFileType(downloadDir, "apk");
