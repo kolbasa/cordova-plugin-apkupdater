@@ -35,7 +35,7 @@ class ApkInstaller extends Observable {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            String fileProvider = context.getPackageName() + ".provider";
+            String fileProvider = context.getPackageName() + ".apkupdater.provider";
             setChanged();
             notifyObservers(InstallEvent.INSTALLING);
             intent.setData(FileProvider.getUriForFile(context, fileProvider, update));
