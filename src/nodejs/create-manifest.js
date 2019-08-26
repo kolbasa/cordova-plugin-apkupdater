@@ -16,51 +16,67 @@ if (aArguments.length < 4) {
     process.exit(1);
 }
 
-let sVersion = aArguments[ 0 ];
-let sChunkSize = aArguments[ 1 ];
-let sApkPath = aArguments[ 2 ];
-let sUpdatePath = aArguments[ 3 ];
+const sVersion = aArguments[ 0 ];
+const sChunkSize = aArguments[ 1 ];
+const sApkPath = path.resolve(aArguments[ 2 ]);
+const sUpdatePath = path.resolve(aArguments[ 3 ]);
 
-function compressUpdate() {
-    let sCommand = (
-        '7z a -v' + sChunkSize + ' -mm=Deflate -mfb=258 -mpass=15 -r '
-        + sUpdatePath + '/' + sVersion + '.zip ' + sApkPath
-    );
+const MANIFEST = 'manifest.json';
+const ARCHIVE_NAME = 'update.zip';
+const ZIP_OPTIONS = '-mm=Deflate -mfb=258 -mpass=15 -r';
 
+/**
+ * @returns {Promise<void>}
+ */
+const compressUpdate = async () => {
     console.log('Compressing Update');
-    return new Promise(function (resolve, reject) {
+    await new Promise((resolve, reject) => {
+        let sCommand = (
+            '7z a -v' + sChunkSize + ' ' + ZIP_OPTIONS + ' ' +
+            sUpdatePath + '/' + ARCHIVE_NAME + ' ' + sApkPath
+        );
+
         let dir = exec(
             sCommand,
-            function (err) {
+            (err) => {
                 if (err != null) {
                     reject(err);
                 }
             }
         );
-        dir.on('exit', function (code) {
+
+        dir.on('exit', (code) => {
             if (code === 0) {
                 resolve();
             }
         });
     });
-}
+};
 
-function getChecksum(sFilePath) {
-    return new Promise(function (resolve) {
+/**
+ * @param {string} sFilePath
+ * @returns {Promise<string>}
+ */
+const getChecksum = async (sFilePath) => {
+    return await new Promise((resolve) => {
         let rs = fs.createReadStream(sFilePath);
         let hash = crypto.createHash('md5');
         hash.setEncoding('hex');
-        rs.on('end', function () {
+        rs.on('end', () => {
             hash.end();
             resolve(hash.read());
         });
         rs.pipe(hash);
     });
-}
+};
 
-function getSize(sFilePath) {
-    return new Promise(function (resolve, reject) {
-        fs.stat(sFilePath, function (err, oStats) {
+/**
+ * @param {string} sFilePath
+ * @returns {Promise<number>}
+ */
+const getSize = async (sFilePath) => {
+    return await new Promise((resolve, reject) => {
+        fs.stat(sFilePath, (err, oStats) => {
             if (err == null) {
                 resolve(oStats.size);
             } else {
@@ -68,51 +84,50 @@ function getSize(sFilePath) {
             }
         });
     });
-}
+};
 
-function listChunks() {
-    return new Promise(function (resolve, reject) {
-        fs.readdir(sUpdatePath, function (err, items) {
+/**
+ * @returns {Promise<string[]>}
+ */
+const listChunks = async () => {
+    return await new Promise((resolve, reject) => {
+        fs.readdir(sUpdatePath, (err, aItems) => {
             if (err == null) {
-                resolve(items);
+                resolve(aItems);
             } else {
                 reject(err);
             }
         });
     });
-}
+};
 
-function getChunkStats(aChunks) {
-    let promise = Promise.resolve();
+/**
+ * @param {string[]} aChunks
+ * @returns {Promise<{size: number, sums: string[]}>}
+ */
+const getChunkStats = async (aChunks) => {
     let nSize = 0;
     let aCheckSums = [];
 
-    aChunks.forEach(function (sFileName) {
+    for (const sFileName of aChunks) {
         let sChunk = path.join(sUpdatePath, sFileName);
-        promise = promise
-            .then(function () {
-                return getChecksum(sChunk);
-            })
-            .then(function (sHash) {
-                aCheckSums.push(sHash);
-                return getSize(sChunk);
-            })
-            .then(function (_nSize) {
-                nSize += _nSize;
-            });
-    });
+        aCheckSums.push(await getChecksum(sChunk));
+        nSize += await getSize(sChunk);
+    }
 
-    return promise.then(function () {
-        return [ aCheckSums, nSize ];
-    });
-}
+    return {sums: aCheckSums, size: nSize};
+};
 
-function writeManifestToFile() {
-    return new Promise(function (resolve, reject) {
+/**
+ * @param {object} oManifest
+ * @returns {Promise<void>}
+ */
+const writeManifestToFile = async (oManifest) => {
+    return await new Promise((resolve, reject) => {
         fs.writeFile(
-            path.join(sUpdatePath, 'manifest.json'),
+            path.join(sUpdatePath, MANIFEST),
             JSON.stringify(oManifest),
-            function (err) {
+            (err) => {
                 if (err != null) {
                     reject(err);
                 } else {
@@ -121,11 +136,15 @@ function writeManifestToFile() {
             }
         );
     });
-}
+};
 
-function listFiles(sPath) {
-    return new Promise(function (resolve, reject) {
-        fs.readdir(sPath, function (err, aItems) {
+/**
+ * @param {string} sPath
+ * @returns {Promise<string[]>}
+ */
+const listFiles = async (sPath) => {
+    return await new Promise((resolve, reject) => {
+        fs.readdir(sPath, (err, aItems) => {
             if (err == null) {
                 resolve(aItems);
             } else {
@@ -133,35 +152,38 @@ function listFiles(sPath) {
             }
         });
     });
-}
+};
 
-function removeUpdateFiles(aFiles) {
-    let promise = Promise.resolve();
-    aFiles.forEach(function (sFile) {
-        promise = promise
-            .then(function () {
-                return new Promise(function (resolve, reject) {
-                    fs.unlink(path.join(sUpdatePath, sFile),
-                        function (err) {
-                            if (err == null) {
-                                resolve();
-                            } else {
-                                reject(err);
-                            }
-                        }
-                    );
-                });
-            });
-    });
-}
+/**
+ * @param {string[]} aFiles
+ * @returns {Promise<void>}
+ */
+const removeUpdateFiles = async (aFiles) => {
+    for (const sFile of aFiles) {
+        await new Promise((resolve, reject) => {
+            fs.unlink(path.join(sUpdatePath, sFile),
+                (err) => {
+                    if (err == null) {
+                        resolve();
+                    } else {
+                        reject(err);
+                    }
+                }
+            );
+        });
+    }
+};
 
-function prepareUpdateDirectory() {
+/**
+ * @returns {Promise<void>}
+ */
+const prepareUpdateDirectory = async () => {
     if (fs.existsSync(sUpdatePath)) {
         // remove old update-files if they exist
-        return listFiles(sUpdatePath).then(removeUpdateFiles);
+        await removeUpdateFiles(await listFiles(sUpdatePath));
     } else {
-        return new Promise(function (resolve, reject) {
-            fs.mkdir(sUpdatePath, function (err) {
+        await new Promise((resolve, reject) => {
+            fs.mkdir(sUpdatePath, (err) => {
                 if (err == null) {
                     resolve();
                 } else {
@@ -170,34 +192,29 @@ function prepareUpdateDirectory() {
             });
         });
     }
-}
-
-let oManifest = {
-    version: sVersion,
-    sum: null,
-    size: null,
-    compressedSize: null,
-    chunks: []
 };
 
-prepareUpdateDirectory()
-    .then(compressUpdate)
-    .then(listChunks)
-    .then(getChunkStats)
-    .then(function (aStats) {
-        oManifest.chunks = aStats[ 0 ];
-        oManifest.compressedSize = aStats[ 1 ];
-        return getSize(sApkPath);
-    })
-    .then(function (nSize) {
-        oManifest.size = nSize;
-        return getChecksum(sApkPath);
-    })
-    .then(function (sChecksum) {
-        oManifest.sum = sChecksum;
-        return writeManifestToFile();
-    })
-    .catch(function (err) {
+/**
+ * @returns {Promise<void>}
+ */
+const createManifest = async () => {
+    const oStats = await getChunkStats(await listChunks());
+    await writeManifestToFile({
+        version: sVersion,
+        chunks: oStats.sums,
+        compressedSize: oStats.size,
+        size: await getSize(sApkPath),
+        sum: await getChecksum(sApkPath)
+    });
+};
+
+(createUpdate = async () => {
+    try {
+        await prepareUpdateDirectory();
+        await compressUpdate();
+        await createManifest();
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
+})();
