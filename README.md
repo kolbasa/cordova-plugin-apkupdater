@@ -1,4 +1,4 @@
-# Please do not use yet, the documentation is still incomplete. I'm still working on it.
+# WARNING: Please do not use yet, the documentation is still incomplete. I'm still working on it.
 
 # cordova-plugin-apkupdater
 
