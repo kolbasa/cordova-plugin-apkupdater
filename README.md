@@ -145,7 +145,7 @@ cordova.plugins.apkupdater.backgroundDownload(
     function (err) {
         // error callback
     },
-    15 * 60 * 1000 // the desired time interval between the download of the individual update pieces in ms
+    15 * 60 * 1000 // the time interval in milliseconds.
 );
 ```
 
