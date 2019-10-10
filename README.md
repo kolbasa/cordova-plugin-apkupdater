@@ -134,8 +134,6 @@ Nevertheless it helps to keep the platform up to date.
 
 The download will also speed up automatically if a Wifi connection is detected.
 
-For important updates you can also actively get the user to download the installation file.
-
 An example with a 15 minute time interval:
 ```js
 cordova.plugins.apkupdater.backgroundDownload(
