@@ -124,13 +124,19 @@ cordova.plugins.apkupdater.download(
 ### `backgroundDownload` - slowly downloads the update bit by bit at a pre-set time interval.
 
 You can set a time interval here in which the individual parts are to be downloaded.
+
 In my use case, I generate 90 parts, each with 50 kilobytes. Altogether approx. 4.5 MegaByte.
 On a user's device, a single chunk is downloaded every 15 minutes. 
+
 If the user uses the app all day, the update will be completely downloaded in about 22 hours.
 Realistically it will take several days, because the app will be closed again and again after use.
 Nevertheless it helps to keep the platform up to date.
+
+The download will also speed up automatically if a Wifi connection is detected.
+
 For important updates you can also actively get the user to download the installation file.
 
+An example with a 15 minute time interval:
 ```js
 cordova.plugins.apkupdater.backgroundDownload(
     function () {
