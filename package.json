@@ -1,5 +1,5 @@
 {
-  "name": "ApkUpdater",
+  "name": "cordova-plugin-apkupdater",
   "version": "1.0.0",
   "description": "TODO",
   "cordova": {

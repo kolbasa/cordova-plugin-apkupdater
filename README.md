@@ -36,9 +36,8 @@ So we have to take care of the compression ourselves.
 The script requires [7Zip](https://www.7-zip.org/) and [NodeJS](https://nodejs.org) to work.
 
 Usage: 
-```
-node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
-```
+
+    node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
 
 * `version` - a string of your choosing, it will not be used by the plugin
 * `chunk-size` - the size of one compressed chunk, defined with the units `b|k|m`, e.g. `500b`, `150k`, `1m`
@@ -46,19 +45,18 @@ node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
 * `size` - the path to which the update files are copied
 
 Example:
-```
-node create.manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
-```
+
+    node create.manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
 
 For example, the following update files are created during execution.
-```
-manifest.json
-1.0.0.zip.001
-1.0.0.zip.002
-1.0.0.zip.003
-```
+
+    manifest.json
+    1.0.0.zip.001
+    1.0.0.zip.002
+    1.0.0.zip.003
 
 The contents of the manifest file will look like this:
+
 ```json
 {
   "version": "1.0.0",
@@ -114,8 +112,8 @@ The method `download` will download the complete update without any delays.
 
 ```js
 cordova.plugins.apkupdater.download(
-    function () {
-        // success callback
+    function () { 
+        // the update is ready to be installed
     },
     function (err) {
         // error callback
@@ -128,7 +126,7 @@ cordova.plugins.apkupdater.download(
 ```js
 cordova.plugins.apkupdater.backgroundDownload(
     function () {
-        // success callback
+        // the update is ready to be installed
     },
     function (err) {
         // error callback
@@ -136,7 +134,50 @@ cordova.plugins.apkupdater.backgroundDownload(
     60000 // the desired time interval between the download of the individual update pieces in ms
 );
 ```
+
+### `stop` - stops the execution of `download` and `backgroundDownload`
+
+This will stop the download. It will not delete the already downloaded parts. The download can be continued later. For this reason, you can also view this as a pause function.
+
+```js
+cordova.plugins.apkupdater.stop(successCallback, errorCallback);
+```
     
 ### `install` - starts the install process
 
-TODO: Come back tomorrow
+As soon as the download has been completed, you can use this method to ask the user to install the apk.
+
+```js
+cordova.plugins.apkupdater.install(successCallback, errorCallback);
+```
+
+### `setObserver` - sends progress information to a function you provide
+
+Example:
+```js
+cordova.plugins.apkupdater.setObserver(
+    {
+        downloadProgress: function (nPercentage, nBytes, nBytesWritten, nChunks, nChunksWritten) {
+            console.log('Download: ' + nPercentage + ' (' + nChunksWritten + '/' + nChunks + ')');
+        },
+        unzipProgress: function (nPercentage) {
+            console.log('Unzipping: ' + nPercentage);
+        },
+        event: function (sEvent) {
+            console.log(sEvent);
+        },
+        exception: function (sMessage) {
+            console.error(sMessage);
+        }
+    }
+);
+```
+
+### `reset` - Removes all downloaded update files
+
+This method will reset the state of the plugin. It is mostly useful only for debugging purposes.
+The user himself has no access to the files and the plugin deletes old updates automatically.
+
+```js
+cordova.plugins.apkupdater.reset(successCallback, errorCallback);
+```
