@@ -32,18 +32,17 @@ const WINDOWS_7ZIP_DEFAULT_PATH = '\\7-Zip\\7z.exe';
 const get7ZipPath = () => {
     if (process.platform === 'win32') { // Windows
         const WINDOWS_7ZIP_PATHS = [
-            '"' + process.env[ 'HOMEDRIVE' ] + '"' + WINDOWS_7ZIP_DEFAULT_PATH,
-            '"' + process.env[ 'ProgramFiles' ] + '"' + WINDOWS_7ZIP_DEFAULT_PATH,
-            '"' + process.env[ 'ProgramFiles(x86)' ] + '"' + WINDOWS_7ZIP_DEFAULT_PATH
+            process.env[ 'HOMEDRIVE' ] + WINDOWS_7ZIP_DEFAULT_PATH,
+            process.env[ 'ProgramFiles' ] + WINDOWS_7ZIP_DEFAULT_PATH,
+            process.env[ 'ProgramFiles(x86)' ] + WINDOWS_7ZIP_DEFAULT_PATH
         ];
         for (const sWindowsPath of WINDOWS_7ZIP_PATHS) {
             if (fs.existsSync(sWindowsPath)) {
-                return sWindowsPath;
+                return '"' + sWindowsPath + '"';
             }
         }
-    } else {
-        return '7z'; // Linux, MacOS
     }
+    return '7z'; // Linux, MacOS
 };
 
 /**
