@@ -35,7 +35,8 @@ Honestly, one should mention that the left file sizes are not found in the App S
 The installation files stored there are also compressed and therefore more comparable to the right side of the table.
 So we have to take care of the compression ourselves.
 
-The script requires [7Zip](https://www.7-zip.org/) and [NodeJS](https://nodejs.org) to work.
+The script requires [7Zip](https://www.7-zip.org/) and [NodeJS](https://nodejs.org) to work (works with Linux, MacOS and Windows).
+On Windows, the script looks for 7-Zip in the following folders: `%HOMEDRIVE%\7-Zip\`, `%ProgramFiles%\7-Zip\` and `%ProgramFiles(x86)%\7-Zip\`.
 
 Usage: 
 
