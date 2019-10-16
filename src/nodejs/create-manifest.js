@@ -24,10 +24,27 @@ const sUpdatePath = path.resolve(aArguments[ 3 ]);
 const MANIFEST = 'manifest.json';
 const ARCHIVE_NAME = 'update.zip';
 const ZIP_OPTIONS = '-mm=Deflate -mfb=258 -mpass=15 -r';
-const WINDOWS_7ZIP_PATHS = [
-    '"%ProgramFiles%"\\7-Zip\\7z.exe',
-    '"%ProgramFiles(x86)%"\\7-Zip\\7z.exe'
-];
+const WINDOWS_7ZIP_DEFAULT_PATH = '\\7-Zip\\7z.exe';
+
+/**
+ * @returns {string}
+ */
+const get7ZipPath = () => {
+    if (process.platform === 'win32') { // Windows
+        const WINDOWS_7ZIP_PATHS = [
+            '"' + process.env[ 'HOMEDRIVE' ] + '"' + WINDOWS_7ZIP_DEFAULT_PATH,
+            '"' + process.env[ 'ProgramFiles' ] + '"' + WINDOWS_7ZIP_DEFAULT_PATH,
+            '"' + process.env[ 'ProgramFiles(x86)' ] + '"' + WINDOWS_7ZIP_DEFAULT_PATH
+        ];
+        for (const sWindowsPath of WINDOWS_7ZIP_PATHS) {
+            if (fs.existsSync(sWindowsPath)) {
+                return sWindowsPath;
+            }
+        }
+    } else {
+        return '7z'; // Linux, MacOS
+    }
+};
 
 /**
  * @returns {Promise<void>}
@@ -35,19 +52,9 @@ const WINDOWS_7ZIP_PATHS = [
 const compressUpdate = async () => {
     console.log('Compressing Update');
     await new Promise((resolve, reject) => {
-        let s7ZipPath = '7z';
-
-        // Look for 7-Zip in the default Windows program directories:
-        if (process.platform === 'win32') {
-            for (const sWindowsPath of WINDOWS_7ZIP_PATHS) {
-                if (fs.existsSync(sWindowsPath)) {
-                    s7ZipPath = sWindowsPath;
-                }
-            }
-        }
 
         let sCommand = (
-            s7ZipPath + ' a -v' + sChunkSize + ' ' + ZIP_OPTIONS + ' ' +
+            get7ZipPath() + ' a -v' + sChunkSize + ' ' + ZIP_OPTIONS + ' ' +
             sUpdatePath + '/' + ARCHIVE_NAME + ' ' + sApkPath
         );
 
