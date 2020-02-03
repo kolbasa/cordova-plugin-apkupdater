@@ -24,8 +24,8 @@ public abstract class FileDownloader extends Observable {
         String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         URL url = new URL(fileUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true);
+        connection.setUseCaches(false);
+        connection.setAllowUserInteraction(false);
         connection.setConnectTimeout(timeout);
         connection.setReadTimeout(timeout);
         connection.connect();
