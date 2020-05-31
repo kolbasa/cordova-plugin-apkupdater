@@ -12,9 +12,6 @@
     "ecosystem:cordova",
     "cordova-android"
   ],
-  "dependencies": {
-    "cordova-plugin-test-framework": "^1.1.6"
-  },
   "engines": {
     "cordovaDependencies": {
       "3.0.0": {
