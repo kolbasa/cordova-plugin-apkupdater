@@ -1,14 +1,14 @@
 {
-  "name": "cordova-plugin-apkupdater-tests",
+  "name": "cordova-plugin-apkupdater-demo",
   "version": "1.0.0",
   "description": "",
   "cordova": {
-    "id": "cordova-plugin-apkupdater-tests",
+    "id": "cordova-plugin-apkupdater-demo",
     "platforms": []
   },
   "keywords": [
     "ecosystem:cordova"
   ],
-  "author": "",
-  "license": "Apache 2.0"
+  "author": "Michael Jedich",
+  "license": "MIT"
 }

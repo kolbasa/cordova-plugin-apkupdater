@@ -41,7 +41,7 @@ public class ApkUpdater extends CordovaPlugin {
     private BroadcastReceiver receiver;
 
     private static final int DEFAULT_SLOW_UPDATE_INTERVAL = 30 * 60 * 1000; // 1h
-    private static final int DEFAULT_FAST_UPDATE_INTERVAL = 1000; // 1s
+    private static final int DEFAULT_FAST_UPDATE_INTERVAL = 100; // 0.1s
 
     private static final String CORDOVA_CHECK = "" +
             "javascript:" +

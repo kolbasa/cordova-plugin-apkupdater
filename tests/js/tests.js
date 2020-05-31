@@ -1,21 +1,24 @@
 exports.defineManualTests = function (contentEl, createActionButton) {
 
-    var UPDATE_URL = 'https://github.com/kolbasa/cordova-plugin-apkupdater/tree/demo/update';
+    var UPDATE_URL = 'https://raw.githubusercontent.com/kolbasa/cordova-plugin-apkupdater-demo/master/update';
 
-    createActionButton('Check', function () {
+    createActionButton('apkupdater.check()', function () {
         cordova.plugins.apkupdater.setObserver(
             {
                 downloadProgress: function (nPercentage, nBytes, nBytesWritten, nChunks, nChunksWritten) {
-                    console.log('Download: ' + nPercentage + ' (' + nChunksWritten + '/' + nChunks + ')');
+                    console.log('Downloading ' + nChunksWritten + ' of ' + nChunks + ' (' + nPercentage + "%)");
                 },
                 unzipProgress: function (nPercentage) {
-                    console.log('Unzipping: ' + nPercentage);
+                    console.log('Unzipping: ' + nPercentage + '%');
                 },
                 event: function (sEvent) {
                     console.log(sEvent);
                 },
-                exception: function (sMessage) {
+                exception: function (sMessage, stack) {
                     console.error(sMessage);
+                    if (stack != null) {
+                        console.error(stack);
+                    }
                 }
             }
         );
@@ -23,29 +26,15 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         cordova.plugins.apkupdater.check(
             UPDATE_URL,
             function (oResp) {
-                console.log(oResp);
-            },
-            function (oResp) {
-                console.error(oResp);
+                console.log(JSON.stringify(oResp, ' ', 2));
             }
         );
     });
 
-    createActionButton('Reset ApkUpdater', function () {
-        cordova.plugins.apkupdater.reset(
-            function (oResp) {
-                console.log(oResp);
-            },
-            function (oResp) {
-                console.error(oResp);
-            }
-        );
-    });
-
-    createActionButton('Download', function () {
+    createActionButton('apkupdater.download()', function () {
         cordova.plugins.apkupdater.download(
-            function (oResp) {
-                console.log('Update can be installed.');
+            function () {
+                console.log('Update can be installed now.');
             },
             function (oResp) {
                 console.error(oResp);
@@ -53,20 +42,20 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         );
     });
 
-    createActionButton('Background download', function () {
+    createActionButton('apkupdater.backgroundDownload()', function () {
         cordova.plugins.apkupdater.backgroundDownload(
-            function (oResp) {
-                console.log('Update can be installed.');
+            function () {
+                console.log('Update can be installed now.');
             },
             function (oResp) {
                 console.error(oResp);
             },
-            60000,
-            100
+            5000, // Mobile speed
+            50  // Wifi speed
         );
     });
 
-    createActionButton('Install', function () {
+    createActionButton('apkupdater.install()', function () {
         cordova.plugins.apkupdater.install(
             function (oResp) {
                 //
@@ -77,10 +66,21 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         );
     });
 
-    createActionButton('Stop download', function () {
+    createActionButton('apkupdater.stop()', function () {
         cordova.plugins.apkupdater.stop(
             function (oResp) {
                 //
+            },
+            function (oResp) {
+                console.error(oResp);
+            }
+        );
+    });
+
+    createActionButton('apkupdater.reset()', function () {
+        cordova.plugins.apkupdater.reset(
+            function () {
+                console.log('Reset successfully.');
             },
             function (oResp) {
                 console.error(oResp);
