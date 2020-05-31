@@ -12,12 +12,24 @@
     "ecosystem:cordova",
     "cordova-android"
   ],
-  "engines": [
-    {
-      "name": "cordova",
-      "version": ">=3.0.0"
+  "dependencies": {
+    "cordova-plugin-test-framework": "^1.1.6"
+  },
+  "engines": {
+    "cordovaDependencies": {
+      "3.0.0": {
+        "cordova": ">100"
+      }
     }
-  ],
+  },
   "author": "Michael Jedich",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kolbasa/cordova-apkupdater.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kolbasa/cordova-apkupdater/issues"
+  },
+  "homepage": "https://github.com/kolbasa/cordova-apkupdater#readme"
 }
