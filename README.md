@@ -40,7 +40,7 @@ On Windows, the script looks for 7-Zip in the following folders: `%HOMEDRIVE%\7-
 
 Usage: 
 
-    node create.manifest.js <version> <chunk-size> <apk-path> <output-path>
+    node create-manifest.js <version> <chunk-size> <apk-path> <output-path>
 
 * `version` - a string of your choosing, it will not be used by the plugin
 * `chunk-size` - the size of one compressed chunk, defined with the units `b|k|m`, e.g. `500b`, `150k`, `1m`
@@ -49,7 +49,7 @@ Usage:
 
 Example:
 
-    node create.manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
+    node create-manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
 
 For example, the following update files are created during execution.
 
