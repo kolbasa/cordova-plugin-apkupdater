@@ -21,7 +21,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         );
 
         cordova.plugins.apkupdater.check(
-            UPDATE_URL + '/real/1.0.0',
+            UPDATE_URL,
             function (oResp) {
                 console.log(oResp);
             },
