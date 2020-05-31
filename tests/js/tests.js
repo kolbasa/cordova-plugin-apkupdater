@@ -1,6 +1,6 @@
 exports.defineManualTests = function (contentEl, createActionButton) {
 
-    var UPDATE_URL = 'http://10.0.2.2:8080/apk-update/';
+    var UPDATE_URL = 'https://github.com/kolbasa/cordova-plugin-apkupdater/tree/demo/update';
 
     createActionButton('Check', function () {
         cordova.plugins.apkupdater.setObserver(
