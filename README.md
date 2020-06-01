@@ -1,6 +1,4 @@
-# WARNING: Please do not use yet, the documentation is still incomplete. I'm still working on it.
-
-# cordova-plugin-apkupdater
+# Cordova Apk Updater Plugin
 
 This plugin gives you the tools to download an update for your android app automatically or manually without using the Play Store.
 The installation file is compressed for this purpose and downloaded on the devices in small parts at a pre-set interval.
