@@ -5,7 +5,7 @@ The installation file is compressed for this purpose and downloaded on the devic
 
 The plugin also speeds up the download when a wifi connection is detected. The goal of this plugin is to consume as little as possible of the user's mobile data quota.
 
-An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apkupdater-demo#example-cordova-apk-updater-app).
+An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apkupdater-demo).
 
 ## Installation
 
