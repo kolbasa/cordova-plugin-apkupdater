@@ -105,9 +105,10 @@ The **success** function will be called with the following result:
 ```
 
 Your application logic now has to decide what happens with this update. So your app needs to know its own version.
-It can be hard coded or you can use [cordova-plugin-app-version](https://github.com/whiteoctober/cordova-plugin-app-version).
-This is what the `version` field is for. It will not be parsed by the plugin, you can choose your own versioning scheme.
-The `ready` field will tell you, if this update was already downloaded and is ready to install.
+It can be hard coded, or you can use [cordova-plugin-app-version](https://github.com/whiteoctober/cordova-plugin-app-version).
+This is what the `version` field is for. It will not be parsed by the plugin, you can choose your own versioning scheme. For example, you can mark updates as optional or mandatory.
+
+The `ready` field will tell you, if this update is already complete and ready to install.
 
 You can now tell the plugin to download the update. There are two functions for this: `download` and `backgroundDownload`.
 
@@ -135,11 +136,11 @@ On a user's device, a single chunk is downloaded every 15 minutes.
 
 If the user uses the app all day, the update will be completely downloaded in about 22 hours.
 Realistically it will take several days, because the app will be closed again and again after use.
-Nevertheless it helps to keep the platform up to date.
+Nevertheless, it helps to keep the platform up to date.
 
 The download will also speed up automatically if a Wifi connection is detected.
 
-An example with a 15 minute time interval:
+An example with a 15-minute time interval:
 ```js
 cordova.plugins.apkupdater.backgroundDownload(
     function () {
@@ -161,7 +162,7 @@ This will stop the download. It will not delete the already downloaded parts.
 cordova.plugins.apkupdater.stop(successCallback, errorCallback);
 ```
     
-### `install` - starts the install process
+### `install` - starts install process
 
 As soon as the download has been completed, you can use this method to ask the user to install the apk.
 
@@ -194,7 +195,7 @@ cordova.plugins.apkupdater.setObserver(
 ### `reset` - Removes all downloaded update files
 
 This method will reset the state of the plugin. It is mostly useful only for debugging purposes.
-The user himself has no access to the files and the plugin deletes old updates automatically.
+The user himself has no access to the files. The plugin deletes old updates automatically.
 
 ```js
 cordova.plugins.apkupdater.reset(successCallback, errorCallback);
