@@ -1,13 +1,17 @@
 # Cordova Apk Updater Plugin
 
-This plugin gives you the tools to download an update for your android app automatically or manually without using the Play Store.
+This plugin gives you the tools to download an update for your Android app automatically or manually without using the Play Store.
 The installation file is compressed for this purpose and downloaded on the devices in small parts at a pre-set interval.
 
 The plugin also speeds up the download when a wifi connection is detected. The goal of this plugin is to consume as little as possible of the user's mobile data quota.
 
+An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apkupdater-demo#example-cordova-apk-updater-app).
+
 ## Installation
 
     cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
+    
+Let me know if you need a Capacitor port for this.
 
 ## Preparing your update
 
