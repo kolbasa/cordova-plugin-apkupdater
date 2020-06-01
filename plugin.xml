@@ -7,8 +7,8 @@
     <license>MIT</license>
     <author>Michael Jedich</author>
 
-    <description>TODO</description>
-    <keywords>TODO</keywords>
+    <description>This plugin allows your Android app to download and install compressed updates without the Google Play Store.</description>
+    <keywords>apk,updater,downloader,installer,play-store</keywords>
 
     <engines>
         <engine name="cordova" version=">=3.0.0"/>

@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-apkupdater",
   "version": "1.0.0",
-  "description": "TODO",
+  "description": "This plugin allows your Android app to download and install compressed updates without the Google Play Store.",
   "cordova": {
     "id": "cordova-plugin-apkupdater",
     "platforms": [
@@ -9,6 +9,11 @@
     ]
   },
   "keywords": [
+    "apk",
+    "updater",
+    "downloader",
+    "installer",
+    "play-store",
     "ecosystem:cordova",
     "cordova-android"
   ],
@@ -23,10 +28,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kolbasa/cordova-apkupdater.git"
+    "url": "git+https://github.com/kolbasa/cordova-plugin-apkupdater.git"
   },
   "bugs": {
-    "url": "https://github.com/kolbasa/cordova-apkupdater/issues"
+    "url": "https://github.com/kolbasa/cordova-plugin-apkupdater/issues"
   },
-  "homepage": "https://github.com/kolbasa/cordova-apkupdater#readme"
+  "homepage": "https://github.com/kolbasa/cordova-plugin-apkupdater"
 }
