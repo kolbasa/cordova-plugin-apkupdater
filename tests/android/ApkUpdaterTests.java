@@ -20,9 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ApkUpdaterTests {
 
-    private static final String SERVER_PATH = "/Users/michael/Sites/apk-updater";
-    private static final String SERVER_URL = "http://localhost:8080/apk-updater";
-    private static final String RESOURCES = "/Users/michael/Projekte/apk-updater/resources/";
+    private static final String SERVER_URL = "https://github.com/kolbasa/cordova-plugin-apkupdater/raw/master/tests/android-test-resources";
+    private static final String VERSION_100 = SERVER_URL + "/update-compressed/1.0.0";
+    private static final String VERSION_101 = SERVER_URL + "/update-compressed/1.0.1";
+    private static final String RESOURCES = "../../../plugins/cordova-plugin-apkupdater/tests/android-test-resources";
+
+    private static final String SERVER_PATH = "/home/michael/Projekte/cordova-plugin-apkupdater/cordova-plugin-apkupdater-resources/tests/build/plugins/cordova-plugin-apkupdater/tests/android-test-resources";
+
 
     private static final String TEMP_DIR = "cordova.apk.updater";
 
@@ -31,18 +35,18 @@ class ApkUpdaterTests {
     private static final String MANIFEST = "manifest.json";
     private static final String MD5_HASH = "35d9fd2d688156e45b89707f650a61ac";
 
-    private static final String UPDATE = RESOURCES + "update-compressed/1.0.0";
-    private static final String UPDATE_CORRUPTED = RESOURCES + "update-compressed/1.0.0-corrupted";
-    private static final String UPDATE_2 = RESOURCES + "update-compressed/1.0.1";
+    private static final String UPDATE = RESOURCES + "/update-compressed/1.0.0";
+    private static final String UPDATE_CORRUPTED = RESOURCES + "/update-compressed/1.0.0-corrupted";
+    private static final String UPDATE_2 = RESOURCES + "/update-compressed/1.0.1";
 
-    private static final String APK = RESOURCES + "update/1.0.0/example.apk";
-    private static final String APK_CORRUPTED = RESOURCES + "update/1.0.0-corrupted/example.apk";
+    private static final String APK = RESOURCES + "/update/1.0.0/example.apk";
+    private static final String APK_CORRUPTED = RESOURCES + "/update/1.0.0-corrupted/example.apk";
 
     private static final String PART_01 = "update.zip.001";
     private static final String PART_02 = "update.zip.002";
     private static final String PART_03 = "update.zip.003";
 
-    private static final String NON_ROUTABLE_IP = "http://10.255.255.1/";
+    private static final String TIMEOUT_IP = "http://example.com:81/";
 
     private static final int DOWNLOAD_INTERVAL_IN_MS = 100;
 
@@ -153,15 +157,13 @@ class ApkUpdaterTests {
     private String updateDirectory;
 
     @BeforeEach
-    void setUp() throws IOException {
-        copyFile(new File(UPDATE), new File(SERVER_PATH));
+    void setUp() {
         this.downloadDirectory = createDownloadDirectory();
         this.updateDirectory = this.downloadDirectory + File.separator + MD5_HASH;
     }
 
     @AfterEach
     void tearDown() {
-        deleteDirectory(new File(SERVER_PATH));
         deleteDirectory(new File(this.downloadDirectory));
     }
 
@@ -172,29 +174,30 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Writing manifest file to file system")
         void writing() throws Exception {
-            new UpdateManager(SERVER_URL, downloadDirectory).check();
+            new UpdateManager(VERSION_100, downloadDirectory).check();
             assertTrue(new File(downloadDirectory, "manifest.json").exists());
         }
 
         @Test
         @DisplayName("Reading manifest file")
         void reading() throws Exception {
-            Manifest manifest = new UpdateManager(SERVER_URL, downloadDirectory).check();
+            Manifest manifest = new UpdateManager(VERSION_100, downloadDirectory).check();
             assertNotNull(manifest);
         }
 
         @Test
         @DisplayName("Reading version in manifest")
         void readingVersion() throws Exception {
-            Manifest manifest = new UpdateManager(SERVER_URL, downloadDirectory).check();
+            Manifest manifest = new UpdateManager(VERSION_100, downloadDirectory).check();
             assertEquals(VERSION, manifest.getVersion());
         }
 
         @Test
         @DisplayName("Mark update as ready if already downloaded")
         void markIfAlreadyDownloaded() throws Exception {
+            System.out.println(System.getProperty("user.dir"));
             copyUpdateToDevice(APK);
-            Manifest manifest = new UpdateManager(SERVER_URL, downloadDirectory).check();
+            Manifest manifest = new UpdateManager(VERSION_100, downloadDirectory).check();
             assertNotNull(manifest.getUpdateFile());
         }
 
@@ -202,7 +205,7 @@ class ApkUpdaterTests {
         @DisplayName("Do not mark as ready if update corrupted")
         void doNotMarkAsReadyIfApkCorrupted() throws Exception {
             copyUpdateToDevice(APK_CORRUPTED);
-            Manifest manifest = new UpdateManager(SERVER_URL, downloadDirectory).check();
+            Manifest manifest = new UpdateManager(VERSION_100, downloadDirectory).check();
             assertNull(manifest.getUpdateFile());
         }
 
@@ -210,7 +213,7 @@ class ApkUpdaterTests {
         @DisplayName("Do not mark as ready if only chunks are downloaded")
         void doNotMarkAsReadyIfOnlyChunksAreDownloaded() throws Exception {
             copyUpdateChunksToDevice(MD5_HASH);
-            Manifest manifest = new UpdateManager(SERVER_URL, downloadDirectory).check();
+            Manifest manifest = new UpdateManager(VERSION_100, downloadDirectory).check();
             assertNull(manifest.getUpdateFile());
         }
 
@@ -227,7 +230,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Socket timeout")
             void socketTimeout() {
-                UpdateManager updater = new UpdateManager(NON_ROUTABLE_IP, downloadDirectory, 100);
+                UpdateManager updater = new UpdateManager(TIMEOUT_IP, downloadDirectory, 100);
                 assertThrows(java.net.SocketTimeoutException.class, updater::check);
             }
         }
@@ -240,7 +243,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Download all chunks")
         void downloadAllChunks() throws Exception {
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
             updater.check();
             updater.download();
             assertTrue(new File(updateDirectory, PART_01).exists());
@@ -251,7 +254,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Extract update")
         void extractUpdate() throws Exception {
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
             updater.check();
             updater.download();
             assertTrue(new File(updateDirectory, APK_NAME).exists());
@@ -261,7 +264,7 @@ class ApkUpdaterTests {
         @DisplayName("Extract only if download complete")
         void extractButNotDownload() throws Exception {
             copyUpdateChunksToDevice(MD5_HASH);
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
 
             Events events = observe(updater);
             ArrayList<UnzipProgress> unzipProgress = events.getUnzipProgress();
@@ -285,7 +288,7 @@ class ApkUpdaterTests {
                 assertTrue(new File(downloadDirectory, MANIFEST).exists());
                 assertTrue(new File(downloadDirectory, MD5_HASH).exists());
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.removeUpdates();
 
                 assertFalse(new File(downloadDirectory, MANIFEST).exists());
@@ -299,7 +302,7 @@ class ApkUpdaterTests {
                 File dir = copyUpdateChunksToDevice("0.9.0");
                 assertTrue(dir.exists());
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
 
                 assertFalse(new File(updateDirectory).exists());
 
@@ -317,7 +320,7 @@ class ApkUpdaterTests {
             @DisplayName("Create new update directory")
             void createNewUpdateDirectory() throws Exception {
                 assertFalse(new File(updateDirectory).exists());
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
                 updater.download();
                 assertTrue(new File(updateDirectory).exists());
@@ -326,7 +329,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Manifest should return correct update path")
             void updateFile() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
 
                 Manifest manifest = updater.check();
                 assertNull(manifest.getUpdateFile());
@@ -340,7 +343,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Extraction if already extracted")
             void apkAlreadyExtracted() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
 
                 assertNull(updater.check().getUpdateFile());
 
@@ -362,7 +365,7 @@ class ApkUpdaterTests {
                 new File(updateDirectory).mkdir();
                 copyFile(new File(SERVER_PATH, PART_01), new File(updateDirectory, PART_01));
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<DownloadProgress> events = observe(updater).getDownloadProgress();
@@ -384,7 +387,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Replace apk")
             void replaceApk() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<UnzipProgress> events = observe(updater).getUnzipProgress();
@@ -405,7 +408,7 @@ class ApkUpdaterTests {
                 new File(updateDirectory).mkdir();
                 copyFile(new File(UPDATE_CORRUPTED, PART_01), new File(updateDirectory, PART_01));
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<DownloadProgress> events = observe(updater).getDownloadProgress();
@@ -429,7 +432,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Extraction")
             void extraction() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<UnzipProgress> events = observe(updater).getUnzipProgress();
@@ -442,7 +445,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Downloading")
             void downloading() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<DownloadProgress> events = observe(updater).getDownloadProgress();
@@ -457,7 +460,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Update ready")
             void updateReady() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<UpdateDownloadEvent> events = observe(updater).getEvents();
@@ -468,7 +471,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Finished download")
             void finishedDownload() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<UpdateDownloadEvent> events = observe(updater).getEvents();
@@ -479,7 +482,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Individual downloaded chunks")
             void individualDownloadedChunks() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 ArrayList<DownloadProgress> events = observe(updater).getDownloadProgress();
@@ -504,7 +507,7 @@ class ApkUpdaterTests {
             void wrongChecksum() throws Exception {
                 copyFile(new File(UPDATE_CORRUPTED, PART_02), new File(SERVER_PATH, PART_02));
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
                 assertThrows(WrongChecksumException.class, updater::download);
 
@@ -519,7 +522,7 @@ class ApkUpdaterTests {
                 // noinspection ResultOfMethodCallIgnored
                 new File(SERVER_PATH, PART_02).delete();
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 assertThrows(FileNotFoundException.class, updater::download);
@@ -539,7 +542,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Download all chunks")
         void delayedDownload() throws Exception {
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
             updater.check();
 
             updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
@@ -570,7 +573,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Extract update")
         void extractUpdate() throws Exception {
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
             updater.check();
 
             updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
@@ -588,7 +591,7 @@ class ApkUpdaterTests {
         @Test
         @DisplayName("Stop download if new version is available")
         void shouldStopOnNewVersion() throws Exception {
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
             updater.check();
 
             updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
@@ -611,7 +614,7 @@ class ApkUpdaterTests {
         @DisplayName("Remove corrupted chunk")
         void removeCorruptedChunk() throws Exception {
 
-            UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+            UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
 
             updater.check();
             updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
@@ -642,7 +645,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Update ready")
             void broadcastFinishedDownload() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 ArrayList<UpdateDownloadEvent> events = observe(updater).getEvents();
 
                 Manifest manifest = updater.check();
@@ -671,7 +674,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("AbstractProgress")
             void progress() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
 
                 DownloadProgress event;
 
@@ -718,7 +721,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("UpdateChunk missing")
             void chunkMissing() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 ArrayList<Exception> exceptions = observe(updater).getExceptions();
 
                 updater.check();
@@ -742,7 +745,7 @@ class ApkUpdaterTests {
             void wrongChecksum() throws Exception {
                 copyFile(new File(UPDATE_CORRUPTED, PART_02), new File(SERVER_PATH, PART_02));
 
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 ArrayList<Exception> exceptions = observe(updater).getExceptions();
 
                 updater.check();
@@ -763,7 +766,7 @@ class ApkUpdaterTests {
             @Test
             @DisplayName("Stop second download request")
             void stopSecondDownloadRequest() throws Exception {
-                UpdateManager updater = new UpdateManager(SERVER_URL, downloadDirectory);
+                UpdateManager updater = new UpdateManager(VERSION_100, downloadDirectory);
                 updater.check();
 
                 updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
