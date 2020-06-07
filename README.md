@@ -10,7 +10,7 @@ An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apk
 ## Installation
 
     cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
-    
+
 Let me know if you need a Capacitor port for this.
 
 ## Preparing your update
