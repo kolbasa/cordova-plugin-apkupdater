@@ -200,3 +200,4 @@ The user himself has no access to the files. The plugin deletes old updates auto
 ```js
 cordova.plugins.apkupdater.reset(successCallback, errorCallback);
 ```
+
