@@ -41,7 +41,6 @@ public class ApkUpdater extends CordovaPlugin {
     private BroadcastReceiver receiver;
 
     private static final int DEFAULT_SLOW_UPDATE_INTERVAL = 30 * 60 * 1000; // 1h
-    private static final int DEFAULT_FAST_UPDATE_INTERVAL = 100; // 0.1s
 
     private static final String CORDOVA_CHECK = "" +
             "javascript:" +
@@ -235,7 +234,7 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private void registerConnectivityActionReceiver(int slowInterval, int fastInterval) {
+    private void registerConnectivityActionReceiver(int slowInterval) {
         unregisterConnectivityActionReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -249,7 +248,7 @@ public class ApkUpdater extends CordovaPlugin {
                     if (network != null) {
                         // connected to the internet
                         if (network.getType() == ConnectivityManager.TYPE_WIFI) {
-                            interval = fastInterval;
+                            interval = 0;
                         }
                     }
 
@@ -276,7 +275,6 @@ public class ApkUpdater extends CordovaPlugin {
             addObserver(manager, callbackContext);
 
             int slowInterval = DEFAULT_SLOW_UPDATE_INTERVAL;
-            int fastInterval = DEFAULT_FAST_UPDATE_INTERVAL;
 
             try {
                 slowInterval = data.getInt(0);
@@ -284,14 +282,8 @@ public class ApkUpdater extends CordovaPlugin {
                 //
             }
 
-            try {
-                fastInterval = data.getInt(1);
-            } catch (org.json.JSONException e) {
-                //
-            }
-
             manager.downloadInBackground(slowInterval);
-            registerConnectivityActionReceiver(slowInterval, fastInterval);
+            registerConnectivityActionReceiver(slowInterval);
         } catch (Exception e) {
             handleException(e, callbackContext);
         }
