@@ -85,6 +85,7 @@ First you have to call `check`. This will download the manifest file.
 The JavaScript API supports Promises and callbacks for all methods:
 ```js
 let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update');
+
 // Alternatively:
 cordova.plugins.apkupdater.check('https://your-domain.com/update', success, failure);
 ```
@@ -113,6 +114,7 @@ The method `download` will download the complete update without any delays.
 
 ```js
 await cordova.plugins.apkupdater.download();
+
 // Alternatively:
 cordova.plugins.apkupdater.download(success, failure);
 ```
@@ -133,6 +135,7 @@ The download will also speed up automatically if a Wi-Fi connection is detected.
 An example with a 15-minute time interval:
 ```js
 await cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000);
+
 // Alternatively:
 cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000, success, failure);
 ```
@@ -145,6 +148,7 @@ The download can be continued later. For this reason, you can also view this as 
 
 ```js
 await cordova.plugins.apkupdater.stop();
+
 // Alternatively:
 cordova.plugins.apkupdater.stop(success, failure);
 ```
@@ -155,6 +159,7 @@ As soon as the download has been completed, you can use this method to ask the u
 
 ```js
 await cordova.plugins.apkupdater.install();
+
 // Alternatively:
 cordova.plugins.apkupdater.install(success, failure);
 ```
@@ -181,7 +186,7 @@ cordova.plugins.apkupdater.setObserver(
 );
 ```
 
-The list of all events can be found under: `cordova.plugins.apkupdater.EVENTS`:
+The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`](www/ApkUpdater.js):
 ```js
 {
     STARTING: 'Download started',
@@ -199,6 +204,7 @@ The user himself has no access to the files. The plugin deletes old updates auto
 
 ```js
 await cordova.plugins.apkupdater.reset();
+
 // Alternatively:
 cordova.plugins.apkupdater.reset(success, failure);
 ```
