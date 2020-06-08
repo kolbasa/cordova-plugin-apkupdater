@@ -15,7 +15,9 @@ Let me know if you need a Capacitor port for this.
 
 ## Preparing your update
 
-A nodejs script is used to prepare the update: `src/nodejs/create-manifest.js`. It compresses and splits the file into selected file sizes.
+A nodejs script is used to prepare the update: `src/nodejs/create-manifest.js`. 
+
+It compresses and splits the file into selected file sizes.
 In addition, a manifest file is also created. It contains the version of the update and the checksum of all parts.
 
 You may be wondering if compression really makes sense. I have done some tests with popular apps.
@@ -82,19 +84,18 @@ The contents of the manifest file will look like this:
 
 First you have to call `check`. This will download the manifest file.
 
+The JavaScript API supports Promises for all methods.
+
 ```js
-cordova.plugins.apkupdater.check(
-    'https://your-domain.com/update',
-    function (manifest) {
-        // success callback
-    },
-    function (err) {
-        // error callback
-    }
-);
+let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update');
 ```
 
-The **success** function will be called with the following result:
+Alternatively with callbacks. This can also be applied to the other methods.
+```js
+cordova.plugins.apkupdater.check('https://your-domain.com/update', success, failure);
+```
+
+This will return the following result:
 ```json
 {
     "version": "1.0.0",
@@ -117,14 +118,7 @@ You can now tell the plugin to download the update. There are two functions for 
 The method `download` will download the complete update without any delays.
 
 ```js
-cordova.plugins.apkupdater.download(
-    function () { 
-        // the update is ready to be installed
-    },
-    function (err) {
-        // error callback
-    }
-);
+await cordova.plugins.apkupdater.download();
 ```
 
 ### `backgroundDownload` - slowly downloads the update bit by bit at a pre-set time interval.
@@ -138,28 +132,22 @@ If the user uses the app all day, the update will be completely downloaded in ab
 Realistically it will take several days, because the app will be closed again and again after use.
 Nevertheless, it helps to keep the platform up to date.
 
-The download will also speed up automatically if a Wifi connection is detected.
+The download will also speed up automatically if a Wi-Fi connection is detected.
 
 An example with a 15-minute time interval:
 ```js
-cordova.plugins.apkupdater.backgroundDownload(
-    function () {
-        // the update is ready to be installed
-    },
-    function (err) {
-        // error callback
-    },
-    15 * 60 * 1000 // the time interval in milliseconds.
-);
+await cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000);
 ```
 
 ### `stop` - stops the execution of `download` and `backgroundDownload`
 
 This will stop the download. It will not delete the already downloaded parts. 
-    The download can be continued later. For this reason, you can also view this as a pause function.
+The download can be continued later. 
+
+For this reason, you can also view this as a pause function.
 
 ```js
-cordova.plugins.apkupdater.stop(successCallback, errorCallback);
+await cordova.plugins.apkupdater.stop();
 ```
     
 ### `install` - starts install process
@@ -167,7 +155,7 @@ cordova.plugins.apkupdater.stop(successCallback, errorCallback);
 As soon as the download has been completed, you can use this method to ask the user to install the apk.
 
 ```js
-cordova.plugins.apkupdater.install(successCallback, errorCallback);
+await cordova.plugins.apkupdater.install();
 ```
 
 ### `setObserver` - sends progress information to a function you provide
@@ -192,11 +180,22 @@ cordova.plugins.apkupdater.setObserver(
 );
 ```
 
+The list of all events can be found under: `cordova.plugins.apkupdater.EVENTS`:
+```js
+{
+    STARTING: 'Download started',
+    STOPPED: 'Download stopped',
+    UPDATE_READY: 'Update ready',
+    SPEEDING_UP_DOWNLOAD: 'Speeding up download',
+    SLOWING_DOWN_DOWNLOAD: 'Slowing down download'
+}
+```
+
 ### `reset` - Removes all downloaded update files
 
 This method will reset the state of the plugin. It is mostly useful only for debugging purposes.
 The user himself has no access to the files. The plugin deletes old updates automatically.
 
 ```js
-cordova.plugins.apkupdater.reset(successCallback, errorCallback);
+await cordova.plugins.apkupdater.reset();
 ```

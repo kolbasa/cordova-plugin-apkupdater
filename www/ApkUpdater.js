@@ -2,6 +2,14 @@ var API = require('./API');
 
 module.exports = {
 
+    EVENTS: {
+        STARTING: 'Download started',
+        STOPPED: 'Download stopped',
+        UPDATE_READY: 'Update ready',
+        SPEEDING_UP_DOWNLOAD: 'Speeding up download',
+        SLOWING_DOWN_DOWNLOAD: 'Slowing down download'
+    },
+
     /**
      * @param {string} manifestUrl - The url to your hosted manifest file
      * @param {function=} success - Returns the parsed manifest object
