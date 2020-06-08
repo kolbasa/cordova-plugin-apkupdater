@@ -177,16 +177,18 @@ cordova.plugins.apkupdater.setObserver(
             console.log('Unzipping: ' + nPercentage);
         },
         event: function (sEvent) {
+            // See explanation below.
             console.log(sEvent);
         },
         exception: function (sMessage) {
+            // Here the complete native error message is thrown.
             console.error(sMessage);
         }
     }
 );
 ```
 
-The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`](www/ApkUpdater.js#L5):
+The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`](www/ApkUpdater.js#L5-L11):
 ```js
 {
     STARTING: 'Download started',
