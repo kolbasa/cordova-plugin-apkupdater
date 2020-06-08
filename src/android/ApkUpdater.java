@@ -248,7 +248,7 @@ public class ApkUpdater extends CordovaPlugin {
                     if (network != null) {
                         // connected to the internet
                         if (network.getType() == ConnectivityManager.TYPE_WIFI) {
-                            interval = 0;
+                            interval = 1;
                         }
                     }
 
