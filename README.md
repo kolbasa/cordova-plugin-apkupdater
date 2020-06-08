@@ -11,7 +11,7 @@ An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apk
 
     cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
     
-Let me know if you need a Capacitor port for this.
+ A [capacitor port](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/1) is in the works.
 
 ## Preparing your update
 
@@ -32,8 +32,6 @@ These are apk installation files that you can download freely on the Internet.
 | YouTube     | 37.6 MB       | 28.6 MB    | 23.9%   |
 | Netflix     | 27.2 MB       | 21.9 MB    | 19.4%   |
 | Whatsapp    | 24.6 MB       | 20.7 MB    | 15.8%   |
-| Chrome      | 45.8 MB       | 39.8 MB    | 13.1%   |
-| Google Maps | 54.4 MB       | 50.4 MB    | 7.3%    |
 
 Honestly, one should mention that the left file sizes are not found in the App Store. 
 The installation files stored there are also compressed and therefore more comparable to the right side of the table.
@@ -84,14 +82,10 @@ The contents of the manifest file will look like this:
 
 First you have to call `check`. This will download the manifest file.
 
-The JavaScript API supports Promises for all methods.
-
+The JavaScript API supports Promises and callbacks for all methods:
 ```js
 let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update');
-```
-
-Alternatively with callbacks. This can also be applied to the other methods.
-```js
+// Alternatively:
 cordova.plugins.apkupdater.check('https://your-domain.com/update', success, failure);
 ```
 
@@ -119,6 +113,8 @@ The method `download` will download the complete update without any delays.
 
 ```js
 await cordova.plugins.apkupdater.download();
+// Alternatively:
+cordova.plugins.apkupdater.download(success, failure);
 ```
 
 ### `backgroundDownload` - slowly downloads the update bit by bit at a pre-set time interval.
@@ -137,17 +133,20 @@ The download will also speed up automatically if a Wi-Fi connection is detected.
 An example with a 15-minute time interval:
 ```js
 await cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000);
+// Alternatively:
+cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000, success, failure);
 ```
 
 ### `stop` - stops the execution of `download` and `backgroundDownload`
 
 This will stop the download. It will not delete the already downloaded parts. 
-The download can be continued later. 
 
-For this reason, you can also view this as a pause function.
+The download can be continued later. For this reason, you can also view this as a pause function.
 
 ```js
 await cordova.plugins.apkupdater.stop();
+// Alternatively:
+cordova.plugins.apkupdater.stop(success, failure);
 ```
     
 ### `install` - starts install process
@@ -156,6 +155,8 @@ As soon as the download has been completed, you can use this method to ask the u
 
 ```js
 await cordova.plugins.apkupdater.install();
+// Alternatively:
+cordova.plugins.apkupdater.install(success, failure);
 ```
 
 ### `setObserver` - sends progress information to a function you provide
@@ -198,4 +199,6 @@ The user himself has no access to the files. The plugin deletes old updates auto
 
 ```js
 await cordova.plugins.apkupdater.reset();
+// Alternatively:
+cordova.plugins.apkupdater.reset(success, failure);
 ```
