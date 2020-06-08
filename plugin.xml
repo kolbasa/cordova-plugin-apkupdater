@@ -14,9 +14,10 @@
         <engine name="cordova" version=">=3.0.0"/>
     </engines>
 
-    <js-module src="www/plugins.ApkUpdater.js" name="ApkUpdater">
+    <js-module src="www/ApkUpdater.js" name="ApkUpdater">
         <clobbers target="cordova.plugins.apkupdater"/>
     </js-module>
+    <js-module src="www/API.js" name="API"/>
 
     <!-- Android -->
     <platform name="android">
