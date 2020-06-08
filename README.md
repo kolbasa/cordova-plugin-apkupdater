@@ -186,7 +186,7 @@ cordova.plugins.apkupdater.setObserver(
 );
 ```
 
-The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`](www/ApkUpdater.js):
+The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`](www/ApkUpdater.js#L5):
 ```js
 {
     STARTING: 'Download started',
