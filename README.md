@@ -201,7 +201,9 @@ The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`]
 
 ### `reset` - Removes all downloaded update files
 
-This method will reset the state of the plugin. It is mostly useful only for debugging purposes.
+This method will reset the state of the plugin.
+
+It is mostly useful only for debugging purposes.
 The user himself has no access to the files. The plugin deletes old updates automatically.
 
 ```js
