@@ -1,7 +1,5 @@
 package de.kolbasa.apkupdater.downloader.update;
 
-import android.os.Build;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,7 +27,6 @@ public class UpdateDownloader extends FileDownloader {
     private int timeout;
     private UpdateChunk currentChunk;
     private Unzipper unzipper;
-    private Thread mockedTimer;
 
     private Timer timer;
     private DownloadProgress progress;
@@ -245,14 +242,7 @@ public class UpdateDownloader extends FileDownloader {
 
     private void startTimer(int interval) {
         this.interval = interval;
-        try {
-            // noinspection unused
-            String build = Build.FINGERPRINT;
-            startNativeTimer(interval);
-        } catch(NoClassDefFoundError err) {
-            // Mocking timer for tests
-            startMockedTimer(interval);
-        }
+        startNativeTimer(interval);
     }
 
     private void stopTimer() {
@@ -260,11 +250,6 @@ public class UpdateDownloader extends FileDownloader {
             timer.cancel();
             timer.purge();
             timer = null;
-        }
-
-        if (mockedTimer != null) {
-            mockedTimer.interrupt(); // interrupt timer
-            mockedTimer = null;
         }
     }
 
@@ -282,30 +267,6 @@ public class UpdateDownloader extends FileDownloader {
             stopTimer();
             startTimer(interval);
         }
-    }
-
-    private void startMockedTimer(int interval) {
-        final UpdateDownloader _this = this;
-
-        mockedTimer = new Thread(() -> {
-            try {
-                while (!Thread.interrupted()) {
-                    try {
-                        Thread.sleep(interval);
-                    } catch (InterruptedException e) {
-                        //
-                    }
-
-                    if (downloadNextChunk()) {
-                        break; // we are done here
-                    }
-                }
-            } finally {
-                _this.stop();
-            }
-        });
-
-        mockedTimer.start();
     }
 
     private boolean downloadNextChunk() {
