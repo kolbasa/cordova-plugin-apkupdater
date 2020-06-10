@@ -103,21 +103,25 @@ module.exports = {
     setObserver: API.setObserver,
 
     /**
+     * Gets called by the cordova plugin itself.
      * @private
      */
     _downloadProgress: API.onDownloadProgress,
 
     /**
+     * Gets called by the cordova plugin itself.
      * @private
      */
     _unzipProgress: API.onUnzipProgress,
 
     /**
+     * Gets called by the cordova plugin itself.
      * @private
      */
     _exception: API.onException,
 
     /**
+     * Gets called by the cordova plugin itself.
      * @private
      */
     _event: API.onEvent

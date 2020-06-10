@@ -17,8 +17,6 @@ cordova.plugins.apkupdater.backgroundDownload(success?: function, failure?: func
 cordova.plugins.apkupdater.backgroundDownload(interval: number, success?: function, failure?: function)
 ```
 
-
-
 ## 1.0.0 - 2020-06-01
 
 - The first stable version.
