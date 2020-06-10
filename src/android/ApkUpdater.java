@@ -1,19 +1,15 @@
 package de.kolbasa.apkupdater;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.File;
@@ -37,8 +33,9 @@ public class ApkUpdater extends CordovaPlugin {
     private String downloadUrl;
     private Manifest manifest;
     private UpdateManager manager;
+
     private ConnectivityManager cm;
-    private BroadcastReceiver receiver;
+    private ConnectivityManager.NetworkCallback networkListener;
 
     private static final int DEFAULT_SLOW_UPDATE_INTERVAL = 30 * 60 * 1000; // 1h
 
@@ -48,12 +45,6 @@ public class ApkUpdater extends CordovaPlugin {
             "typeof cordova.plugins !== 'undefined' && " +
             "typeof cordova.plugins.apkupdater !== 'undefined' && " +
             "cordova.plugins.apkupdater._";
-
-    @Override
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        this.cm = (ConnectivityManager) cordova.getActivity()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-    }
 
     private boolean notInitialized(CallbackContext callbackContext) {
         if (manager == null) {
@@ -227,38 +218,45 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private void unregisterConnectivityActionReceiver() {
-        if (receiver != null) {
-            webView.getContext().unregisterReceiver(receiver);
-            receiver = null;
+    private void adjustSpeed(int slowInterval) {
+        if (manager == null) {
+            return;
+        }
+        if (this.cm.isActiveNetworkMetered()) {
+            manager.setDownloadInterval(slowInterval);
+        } else {
+            manager.setDownloadInterval(1);
         }
     }
 
     private void registerConnectivityActionReceiver(int slowInterval) {
-        unregisterConnectivityActionReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        this.receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                try {
-                    NetworkInfo network = cm.getActiveNetworkInfo();
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                this.cm = (ConnectivityManager) cordova.getContext()
+                        .getSystemService(Context.CONNECTIVITY_SERVICE);
 
-                    int interval = slowInterval;
-                    if (network != null) {
-                        // connected to the internet
-                        if (network.getType() == ConnectivityManager.TYPE_WIFI) {
-                            interval = 1;
-                        }
+                this.networkListener = new ConnectivityManager.NetworkCallback() {
+                    @Override
+                    public void onAvailable(Network network) {
+                        adjustSpeed(slowInterval);
                     }
 
-                    manager.setDownloadInterval(interval);
-                } catch (Exception e) {
-                    handleException(e);
-                }
+                    @Override
+                    public void onLost(Network network) {
+                        adjustSpeed(slowInterval);
+                    }
+                };
+                this.cm.registerDefaultNetworkCallback(this.networkListener);
+            } catch (Exception e) {
+                //
             }
-        };
-        webView.getContext().registerReceiver(receiver, intentFilter);
+        }
+    }
+
+    private void unregisterConnectivityActionReceiver() {
+        if (networkListener != null && cm != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            cm.unregisterNetworkCallback(networkListener);
+        }
     }
 
     private void downloadInBackground(JSONArray data, CallbackContext callbackContext) {
