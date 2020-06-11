@@ -10,7 +10,7 @@ An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apk
 ## Installation
 
     cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
-    
+
  A [capacitor port](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/1) is in the works.
 
 ## Preparing your update
@@ -212,3 +212,4 @@ await cordova.plugins.apkupdater.reset();
 // Alternatively:
 cordova.plugins.apkupdater.reset(success, failure);
 ```
+
