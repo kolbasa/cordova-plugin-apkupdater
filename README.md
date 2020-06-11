@@ -1,6 +1,6 @@
 # Cordova Apk Updater Plugin
 
-<p align="center">
+<p>
     <a href="https://www.npmjs.com/package/cordova-plugin-apkupdater">
         <img src="https://badge.fury.io/js/cordova-plugin-apkupdater.svg" alt="npm version" />
     </a>
