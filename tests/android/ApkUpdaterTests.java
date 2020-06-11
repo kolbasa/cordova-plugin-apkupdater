@@ -541,7 +541,6 @@ class ApkUpdaterTests {
             for (int i = 0; i < waitTime / 5; i++) {
                 Thread.sleep(5);
                 if (new File(updateDirectory, part).exists()) {
-                    System.out.println("foo: " + (i * 5));
                     return i * 5;
                 }
             }
