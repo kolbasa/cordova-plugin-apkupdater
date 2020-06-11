@@ -11,7 +11,7 @@ An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apk
 
     cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
 
- A [capacitor port](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/1) is in the works.
+ A [capacitor port](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/6) is in the works.
 
 ## Preparing your update
 
