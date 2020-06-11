@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.0.0 - 2020-06-10
+## 1.1.0 - 2020-06-11
 
 - [Added] Refactored Javascript API to use Promises ([#1](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/1)).
 - [Fixed] Replaced deprecated network methods in `ApkUpdater.java` ([#3](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/3)).
