@@ -55,7 +55,7 @@ class ApkUpdaterTests {
 
     private static final String TIMEOUT_IP = "http://example.com:81/";
 
-    private static final int DOWNLOAD_INTERVAL_IN_MS = 500;
+    private static final int DOWNLOAD_INTERVAL_IN_MS = 1000;
     private static final int MAX_DOWNLOAD_TIME = DOWNLOAD_INTERVAL_IN_MS - 100;
 
     private static class Events {
@@ -539,7 +539,7 @@ class ApkUpdaterTests {
     }
 
     @Nested
-    @DisplayName("Gradually downloading update")
+    @DisplayName("backgroundDownload")
     class GradualDownload {
 
         int waitForFile(String part) throws InterruptedException {
@@ -612,10 +612,12 @@ class ApkUpdaterTests {
 
             Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
             waitForFile(PART_03);
+            assertTrue(new File(updateDirectory, PART_03).exists());
             assertFalse(new File(updateDirectory, APK_NAME).exists());
 
-            waitForFile(APK_NAME, 500);
+            waitForFile(APK_NAME, 1000);
             assertTrue(new File(updateDirectory, APK_NAME).exists());
+
         }
 
 //        @Test
@@ -703,7 +705,7 @@ class ApkUpdaterTests {
 
                 Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
                 waitForFile(PART_03);
-                waitForFile(APK_NAME);
+                waitForFile(APK_NAME, 1000);
                 Thread.sleep(100);
                 assertEquals(2, events.size());
 
@@ -729,7 +731,7 @@ class ApkUpdaterTests {
 
                 Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
                 shift = waitForFile(PART_01);
-                Thread.sleep(100); // TODO: should not be necessary
+                Thread.sleep(200); // TODO: should not be necessary
                 assertEquals(2, events.size());
 
                 // there is one event at the start of the download
@@ -744,7 +746,7 @@ class ApkUpdaterTests {
 
                 Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
                 shift = waitForFile(PART_02);
-                Thread.sleep(100);
+                Thread.sleep(200);
 
                 assertEquals(3, events.size());
                 event = events.get(2);
@@ -754,7 +756,7 @@ class ApkUpdaterTests {
 
                 Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
                 waitForFile(PART_03);
-                Thread.sleep(100);
+                Thread.sleep(200);
 
                 assertEquals(4, events.size());
                 event = events.get(3);
