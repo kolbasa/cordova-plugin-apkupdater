@@ -161,6 +161,35 @@ class ApkUpdaterTests {
         return events;
     }
 
+    private int waitForFile(String part) throws InterruptedException {
+        return waitForFile(part, MAX_DOWNLOAD_TIME);
+    }
+
+    private int waitForFile(String part, Integer waitTime) throws InterruptedException {
+        for (int i = 0; i < waitTime / 5; i++) {
+            Thread.sleep(5);
+            File chunk = new File(updateDirectory, part);
+            File lock = new File(updateDirectory, part + ".lock");
+
+            if (chunk.exists() && chunk.length() > 0 && !lock.exists()) {
+                return i * 5;
+            }
+        }
+        return waitTime;
+    }
+
+    private void waitForException(ArrayList<Exception> list) throws InterruptedException {
+        int initialCount = list.size();
+        int waitTime = 1000;
+
+        for (int i = 0; i < waitTime / 5; i++) {
+            Thread.sleep(5);
+            if (list.size() > initialCount) {
+                return;
+            }
+        }
+    }
+
     private String downloadDirectory;
     private String updateDirectory;
 
@@ -172,80 +201,340 @@ class ApkUpdaterTests {
 
     @AfterEach
     void tearDown() {
-        System.out.println(this.downloadDirectory);
+//        System.out.println(this.downloadDirectory);
         deleteDirectory(new File(this.downloadDirectory));
     }
 
     @Nested
-    @DisplayName("Looking for new update")
-    class ManifestLogic {
+    @DisplayName("Slow download")
+    class SlowDownload {
 
         @Test
-        @DisplayName("Writing manifest file to file system")
-        void writing() throws Exception {
-            new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertTrue(new File(downloadDirectory, "manifest.json").exists());
+        @DisplayName("Download all chunks")
+        void delayedDownload() throws Exception {
+            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+            updater.check();
+
+            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+            assertFalse(new File(updateDirectory, PART_01).exists());
+            assertFalse(new File(updateDirectory, PART_02).exists());
+            assertFalse(new File(updateDirectory, PART_03).exists());
+
+            int shift = 0;
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            shift = waitForFile(PART_01);
+
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertFalse(new File(updateDirectory, PART_02).exists());
+            assertFalse(new File(updateDirectory, PART_03).exists());
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            shift = waitForFile(PART_02);
+
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertTrue(new File(updateDirectory, PART_02).exists());
+            assertFalse(new File(updateDirectory, PART_03).exists());
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            waitForFile(PART_03);
+
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertTrue(new File(updateDirectory, PART_02).exists());
+            assertTrue(new File(updateDirectory, PART_03).exists());
         }
 
         @Test
-        @DisplayName("Reading manifest file")
-        void reading() throws Exception {
-            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertNotNull(manifest);
+        @DisplayName("Extract update")
+        void extractUpdate() throws Exception {
+            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+            updater.check();
+
+            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+            int shift = 0;
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            shift = waitForFile(PART_01);
+            assertFalse(new File(updateDirectory, APK_NAME).exists());
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            shift = waitForFile(PART_02);
+            assertFalse(new File(updateDirectory, APK_NAME).exists());
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            waitForFile(PART_03);
+
+            waitForFile(APK_NAME);
+            assertTrue(new File(updateDirectory, APK_NAME).exists());
+
         }
 
-        @Test
-        @DisplayName("Reading version in manifest")
-        void readingVersion() throws Exception {
-            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertEquals(VERSION, manifest.getVersion());
-        }
+//        @Test
+//        @DisplayName("Stop download if new version is available")
+//        void shouldStopOnNewVersion() throws Exception {
+//            UpdateManager updater = new UpdateManager(REMOTE_UPDATE_1_0_0, downloadDirectory);
+//            updater.check();
+//
+//            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+//
+//            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS + 50);
+//            assertTrue(updater.isDownloading());
+//            assertTrue(new File(updateDirectory, PART_01).exists());
+//            assertFalse(new File(updateDirectory, PART_02).exists());
+//            assertFalse(new File(updateDirectory, PART_03).exists());
+//            assertFalse(new File(updateDirectory, APK_NAME).exists());
+//
+//            deleteDirectory(new File(SERVER_PATH));
+//            copyFile(new File(UPDATE_2), new File(SERVER_PATH));
+//
+//            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS);
+//            assertFalse(updater.isDownloading());
+//        }
 
         @Test
-        @DisplayName("Mark update as ready if already downloaded")
-        void markIfAlreadyDownloaded() throws Exception {
-            System.out.println(System.getProperty("user.dir"));
-            copyUpdateToDevice(APK);
-            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertNotNull(manifest.getUpdateFile());
+        @DisplayName("Remove corrupted chunk")
+        void removeCorruptedChunk() throws Exception {
+
+            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+
+            updater.check();
+            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+            int shift = 0;
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            assertTrue(updater.isDownloading());
+            shift = waitForFile(PART_01);
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertFalse(new File(updateDirectory, PART_02).exists());
+
+            // Corrupting first chunk
+            copyFile(new File(LOCAL_UPDATE_WITH_CORRUPTION, PART_01), new File(updateDirectory, PART_01));
+
+            // Replacing corrupted chunk
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            // TODO: better solve with checksum
+            shift = 100;
+            Thread.sleep(shift);
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertFalse(new File(updateDirectory, PART_02).exists());
+
+            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+            waitForFile(PART_02);
+            assertTrue(updater.isDownloading());
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertTrue(new File(updateDirectory, PART_02).exists());
+            assertFalse(new File(updateDirectory, PART_03).exists());
+
+            updater.stop();
         }
 
-        @Test
-        @DisplayName("Do not mark as ready if update corrupted")
-        void doNotMarkAsReadyIfApkCorrupted() throws Exception {
-            copyUpdateToDevice(APK_WITH_CORRUPTION);
-            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertNull(manifest.getUpdateFile());
-        }
+        @Nested
+        class Broadcasting {
+            @Test
+            @DisplayName("Update ready")
+            void broadcastFinishedDownload() throws Exception {
+                UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+                ArrayList<UpdateDownloadEvent> events = observe(updater).getEvents();
 
-        @Test
-        @DisplayName("Do not mark as ready if only chunks are downloaded")
-        void doNotMarkAsReadyIfOnlyChunksAreDownloaded() throws Exception {
-            copyUpdateChunksToDevice(APK_MD5_HASH);
-            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertNull(manifest.getUpdateFile());
+                Manifest manifest = updater.check();
+                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+                events.clear(); // we don't need the start event
+
+                int shift = 0;
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_01);
+                assertEquals(0, events.size());
+                assertNull(manifest.getUpdateFile());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_02);
+                assertEquals(0, events.size());
+                assertNull(manifest.getUpdateFile());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                waitForFile(PART_03);
+                waitForFile(APK_NAME);
+                assertEquals(2, events.size());
+
+                assertEquals(UpdateDownloadEvent.UPDATE_READY, events.get(0));
+                assertEquals(UpdateDownloadEvent.STOPPED, events.get(1));
+
+                assertNotNull(manifest.getUpdateFile());
+            }
+
+            @Test
+            @DisplayName("AbstractProgress")
+            void progress() throws Exception {
+                UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+
+                ArrayList<DownloadProgress> events = observe(updater).getDownloadProgress();
+
+                updater.check();
+                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+                int shift = 0;
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_01);
+                assertEquals(2, events.size());
+
+                DownloadProgress event;
+
+                // there is one event at the start of the download
+                event = events.get(0);
+                assertEquals(0, event.getBytesWritten());
+                assertEquals(0, event.getChunksDownloaded());
+
+                event = events.get(1);
+                assertEquals(1, event.getChunksDownloaded());
+                assertEquals(150, event.getBytesWritten());
+                assertEquals(42.74f, event.getPercent());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_02);
+
+                assertEquals(3, events.size());
+                event = events.get(2);
+                assertEquals(2, event.getChunksDownloaded());
+                assertEquals(300, event.getBytesWritten());
+                assertEquals(85.47f, event.getPercent());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                waitForFile(PART_03);
+
+                assertEquals(4, events.size());
+                event = events.get(3);
+                assertEquals(3, event.getChunksDownloaded());
+                assertEquals(event.getBytes(), event.getBytesWritten());
+                assertEquals(100f, event.getPercent());
+            }
+
         }
 
         @Nested
         class Exceptions {
             @Test
-            @DisplayName("Manifest file is missing on server")
-            void missing() {
-                UpdateManager updater = new UpdateManager(REMOTE, downloadDirectory);
-                assertThrows(java.io.FileNotFoundException.class, updater::check);
+            @DisplayName("UpdateChunk missing")
+            void chunkMissing() throws Exception {
+                UpdateManager updater = new UpdateManager(REMOTE_UPDATE_WITH_MISSING_CHUNK, downloadDirectory);
+                ArrayList<Exception> exceptions = observe(updater).getExceptions();
+
+                updater.check();
+                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+                int shift = 0;
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_01);
+                assertTrue(updater.isDownloading());
+                assertTrue(new File(updateDirectory, PART_01).exists());
+                assertEquals(0, exceptions.size());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                waitForFile(PART_02);
+                assertEquals(1, exceptions.size());
+                assertTrue(exceptions.get(0) instanceof FileNotFoundException);
+                assertTrue(exceptions.get(0).getMessage().endsWith(PART_02));
             }
 
             @Test
-            @DisplayName("Socket timeout")
-            void socketTimeout() {
-                UpdateManager updater = new UpdateManager(TIMEOUT_IP, downloadDirectory, 100);
-                assertThrows(java.net.SocketTimeoutException.class, updater::check);
+            @DisplayName("Wrong checksum")
+            void wrongChecksum() throws Exception {
+                UpdateManager updater = new UpdateManager(REMOTE_UPDATE_WITH_CORRUPTION, downloadDirectory);
+                ArrayList<Exception> exceptions = observe(updater).getExceptions();
+
+                updater.check();
+                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+                int shift = 0;
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_01);
+                assertEquals(0, exceptions.size());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                waitForFile(PART_02);
+                assertEquals(1, exceptions.size());
+                assertTrue(exceptions.get(0) instanceof WrongChecksumException);
+
+                updater.stop();
+            }
+
+            @Test
+            @DisplayName("Stop when the checksum is wrong three times in a row.")
+            void stopOnThirdChecksumFail() throws Exception {
+                UpdateManager updater = new UpdateManager(REMOTE_UPDATE_WITH_CORRUPTION, downloadDirectory);
+                ArrayList<Exception> exceptions = observe(updater).getExceptions();
+
+                updater.check();
+                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+                int shift = 0;
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_01);
+                assertTrue(updater.isDownloading());
+                assertEquals(0, exceptions.size());
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                waitForFile(PART_02);
+                assertEquals(1, exceptions.size());
+                assertTrue(exceptions.get(0) instanceof WrongChecksumException);
+                assertTrue(updater.isDownloading());
+
+                exceptions.clear();
+                waitForException(exceptions);
+                assertEquals(1, exceptions.size());
+                assertTrue(exceptions.get(0) instanceof WrongChecksumException);
+                assertTrue(updater.isDownloading());
+
+                exceptions.clear();
+                waitForException(exceptions);
+                assertEquals(1, exceptions.size());
+                assertTrue(exceptions.get(0) instanceof WrongChecksumException);
+                assertFalse(updater.isDownloading()); // should stop
+
+                updater.stop();
+            }
+
+            @Test
+            @DisplayName("Ignore second 'backgroundDownload'-call")
+            void ignoreSecondDownloadRequest() throws Exception {
+                UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+                updater.check();
+
+                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
+
+                int shift = 0;
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                shift = waitForFile(PART_01);
+
+                assertTrue(new File(updateDirectory, PART_01).exists());
+                assertFalse(new File(updateDirectory, PART_02).exists());
+
+                assertThrows(AlreadyRunningException.class, () ->
+                        updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS));
+
+                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
+                waitForFile(PART_02);
+
+                assertTrue(new File(updateDirectory, PART_01).exists());
+                assertTrue(new File(updateDirectory, PART_02).exists());
+                assertFalse(new File(updateDirectory, PART_03).exists());
+
+                updater.stop();
             }
         }
+
     }
 
     @Nested
-    @DisplayName("Downloading update")
+    @DisplayName("Download")
     class Download {
 
         @Test
@@ -539,314 +828,69 @@ class ApkUpdaterTests {
     }
 
     @Nested
-    @DisplayName("backgroundDownload")
-    class GradualDownload {
+    @DisplayName("Looking for new update")
+    class ManifestLogic {
 
-        int waitForFile(String part) throws InterruptedException {
-            return waitForFile(part, MAX_DOWNLOAD_TIME);
-        }
-
-        int waitForFile(String part, Integer waitTime) throws InterruptedException {
-            for (int i = 0; i < waitTime / 5; i++) {
-                Thread.sleep(5);
-                if (new File(updateDirectory, part).exists()) {
-                    return i * 5;
-                }
-            }
-            return waitTime;
+        @Test
+        @DisplayName("Writing manifest file to file system")
+        void writing() throws Exception {
+            new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
+            assertTrue(new File(downloadDirectory, "manifest.json").exists());
         }
 
         @Test
-        @DisplayName("Download all chunks")
-        void delayedDownload() throws Exception {
-            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
-            updater.check();
-
-            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-            assertFalse(new File(updateDirectory, PART_01).exists());
-            assertFalse(new File(updateDirectory, PART_02).exists());
-            assertFalse(new File(updateDirectory, PART_03).exists());
-
-            int shift = 0;
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            shift = waitForFile(PART_01);
-
-            assertTrue(new File(updateDirectory, PART_01).exists());
-            assertFalse(new File(updateDirectory, PART_02).exists());
-            assertFalse(new File(updateDirectory, PART_03).exists());
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            shift = waitForFile(PART_02);
-
-            assertTrue(new File(updateDirectory, PART_01).exists());
-            assertTrue(new File(updateDirectory, PART_02).exists());
-            assertFalse(new File(updateDirectory, PART_03).exists());
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            waitForFile(PART_03);
-
-            assertTrue(new File(updateDirectory, PART_01).exists());
-            assertTrue(new File(updateDirectory, PART_02).exists());
-            assertTrue(new File(updateDirectory, PART_03).exists());
+        @DisplayName("Reading manifest file")
+        void reading() throws Exception {
+            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
+            assertNotNull(manifest);
         }
 
         @Test
-        @DisplayName("Extract update")
-        void extractUpdate() throws Exception {
-            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
-            updater.check();
-
-            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-            int shift = 0;
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            shift = waitForFile(PART_01);
-            assertFalse(new File(updateDirectory, APK_NAME).exists());
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            shift = waitForFile(PART_02);
-            assertFalse(new File(updateDirectory, APK_NAME).exists());
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            waitForFile(PART_03);
-            assertTrue(new File(updateDirectory, PART_03).exists());
-            assertFalse(new File(updateDirectory, APK_NAME).exists());
-
-            waitForFile(APK_NAME, 1000);
-            assertTrue(new File(updateDirectory, APK_NAME).exists());
-
+        @DisplayName("Reading version in manifest")
+        void readingVersion() throws Exception {
+            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
+            assertEquals(VERSION, manifest.getVersion());
         }
-
-//        @Test
-//        @DisplayName("Stop download if new version is available")
-//        void shouldStopOnNewVersion() throws Exception {
-//            UpdateManager updater = new UpdateManager(REMOTE_UPDATE_1_0_0, downloadDirectory);
-//            updater.check();
-//
-//            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-//
-//            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS + 50);
-//            assertTrue(updater.isDownloading());
-//            assertTrue(new File(updateDirectory, PART_01).exists());
-//            assertFalse(new File(updateDirectory, PART_02).exists());
-//            assertFalse(new File(updateDirectory, PART_03).exists());
-//            assertFalse(new File(updateDirectory, APK_NAME).exists());
-//
-//            deleteDirectory(new File(SERVER_PATH));
-//            copyFile(new File(UPDATE_2), new File(SERVER_PATH));
-//
-//            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS);
-//            assertFalse(updater.isDownloading());
-//        }
 
         @Test
-        @DisplayName("Remove corrupted chunk")
-        void removeCorruptedChunk() throws Exception {
-
-            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
-
-            updater.check();
-            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-            int shift = 0;
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            assertTrue(updater.isDownloading());
-            shift = waitForFile(PART_01);
-            assertTrue(new File(updateDirectory, PART_01).exists());
-            assertFalse(new File(updateDirectory, PART_02).exists());
-
-            // Corrupting first chunk
-            copyFile(new File(LOCAL_UPDATE_WITH_CORRUPTION, PART_01), new File(updateDirectory, PART_01));
-
-            // Replacing corrupted chunk
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            shift = 100;
-            Thread.sleep(shift);
-            assertTrue(new File(updateDirectory, PART_01).exists());
-            assertFalse(new File(updateDirectory, PART_02).exists());
-
-            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-            waitForFile(PART_02);
-            assertTrue(updater.isDownloading());
-            assertTrue(new File(updateDirectory, PART_01).exists());
-            assertTrue(new File(updateDirectory, PART_02).exists());
-            assertFalse(new File(updateDirectory, PART_03).exists());
-
-            updater.stop();
+        @DisplayName("Mark update as ready if already downloaded")
+        void markIfAlreadyDownloaded() throws Exception {
+            copyUpdateToDevice(APK);
+            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
+            assertNotNull(manifest.getUpdateFile());
         }
 
-        @Nested
-        class Broadcasting {
-            @Test
-            @DisplayName("Update ready")
-            void broadcastFinishedDownload() throws Exception {
-                UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
-                ArrayList<UpdateDownloadEvent> events = observe(updater).getEvents();
+        @Test
+        @DisplayName("Do not mark as ready if update corrupted")
+        void doNotMarkAsReadyIfApkCorrupted() throws Exception {
+            copyUpdateToDevice(APK_WITH_CORRUPTION);
+            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
+            assertNull(manifest.getUpdateFile());
+        }
 
-                Manifest manifest = updater.check();
-                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-                events.clear(); // we don't need the start event
-
-                int shift = 0;
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_01);
-                assertEquals(0, events.size());
-                assertNull(manifest.getUpdateFile());
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_02);
-                assertEquals(0, events.size());
-                assertNull(manifest.getUpdateFile());
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                waitForFile(PART_03);
-                waitForFile(APK_NAME, 1000);
-                Thread.sleep(100);
-                assertEquals(2, events.size());
-
-                assertEquals(UpdateDownloadEvent.UPDATE_READY, events.get(0));
-                assertEquals(UpdateDownloadEvent.STOPPED, events.get(1));
-
-                assertNotNull(manifest.getUpdateFile());
-            }
-
-            @Test
-            @DisplayName("AbstractProgress")
-            void progress() throws Exception {
-                UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
-
-                DownloadProgress event;
-
-                ArrayList<DownloadProgress> events = observe(updater).getDownloadProgress();
-
-                updater.check();
-                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-                int shift = 0;
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_01);
-                Thread.sleep(200); // TODO: should not be necessary
-                assertEquals(2, events.size());
-
-                // there is one event at the start of the download
-                event = events.get(0);
-                assertEquals(0, event.getBytesWritten());
-                assertEquals(0, event.getChunksDownloaded());
-
-                event = events.get(1);
-                assertEquals(1, event.getChunksDownloaded());
-                assertEquals(150, event.getBytesWritten());
-                assertEquals(42.74f, event.getPercent());
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_02);
-                Thread.sleep(200);
-
-                assertEquals(3, events.size());
-                event = events.get(2);
-                assertEquals(2, event.getChunksDownloaded());
-                assertEquals(300, event.getBytesWritten());
-                assertEquals(85.47f, event.getPercent());
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                waitForFile(PART_03);
-                Thread.sleep(200);
-
-                assertEquals(4, events.size());
-                event = events.get(3);
-                assertEquals(3, event.getChunksDownloaded());
-                assertEquals(event.getBytes(), event.getBytesWritten());
-                assertEquals(100f, event.getPercent());
-            }
-
+        @Test
+        @DisplayName("Do not mark as ready if only chunks are downloaded")
+        void doNotMarkAsReadyIfOnlyChunksAreDownloaded() throws Exception {
+            copyUpdateChunksToDevice(APK_MD5_HASH);
+            Manifest manifest = new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
+            assertNull(manifest.getUpdateFile());
         }
 
         @Nested
         class Exceptions {
             @Test
-            @DisplayName("UpdateChunk missing")
-            void chunkMissing() throws Exception {
-                UpdateManager updater = new UpdateManager(REMOTE_UPDATE_WITH_MISSING_CHUNK, downloadDirectory);
-                ArrayList<Exception> exceptions = observe(updater).getExceptions();
-                System.out.println(REMOTE_UPDATE_WITH_MISSING_CHUNK);
-
-                updater.check();
-                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-                int shift = 0;
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_01);
-                assertTrue(updater.isDownloading());
-                assertTrue(new File(updateDirectory, PART_01).exists());
-                assertEquals(0, exceptions.size());
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                Thread.sleep(500);
-                assertEquals(1, exceptions.size());
-                assertTrue(exceptions.get(0) instanceof FileNotFoundException);
-                assertTrue(exceptions.get(0).getMessage().endsWith(PART_02));
+            @DisplayName("Manifest file is missing on server")
+            void missing() {
+                UpdateManager updater = new UpdateManager(REMOTE, downloadDirectory);
+                assertThrows(java.io.FileNotFoundException.class, updater::check);
             }
 
             @Test
-            @DisplayName("Wrong checksum")
-            void wrongChecksum() throws Exception {
-                UpdateManager updater = new UpdateManager(REMOTE_UPDATE_WITH_CORRUPTION, downloadDirectory);
-                ArrayList<Exception> exceptions = observe(updater).getExceptions();
-
-                updater.check();
-                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-                int shift = 0;
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_01);
-                assertTrue(updater.isDownloading());
-                assertEquals(0, exceptions.size());
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                Thread.sleep(500);
-                assertEquals(1, exceptions.size());
-                assertTrue(exceptions.get(0) instanceof WrongChecksumException);
-
-                updater.stop();
-            }
-
-            @Test
-            @DisplayName("Stop second download request")
-            void stopSecondDownloadRequest() throws Exception {
-                UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
-                updater.check();
-
-                updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-
-                int shift = 0;
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                shift = waitForFile(PART_01);
-
-                assertTrue(new File(updateDirectory, PART_01).exists());
-                assertFalse(new File(updateDirectory, PART_02).exists());
-
-                assertThrows(AlreadyRunningException.class, () ->
-                        updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS));
-
-                Thread.sleep(DOWNLOAD_INTERVAL_IN_MS - shift);
-                waitForFile(PART_02);
-
-                assertTrue(new File(updateDirectory, PART_01).exists());
-                assertTrue(new File(updateDirectory, PART_02).exists());
-                assertFalse(new File(updateDirectory, PART_03).exists());
-
-                updater.stop();
+            @DisplayName("Socket timeout")
+            void socketTimeout() {
+                UpdateManager updater = new UpdateManager(TIMEOUT_IP, downloadDirectory, 100);
+                assertThrows(java.net.SocketTimeoutException.class, updater::check);
             }
         }
-
     }
 }

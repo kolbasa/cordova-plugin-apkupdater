@@ -17,6 +17,8 @@ import java.util.zip.ZipInputStream;
 
 public class Unzipper extends Observable {
 
+    private static final String LOCK_MARKER = ".lock";
+
     private boolean interrupted;
 
     public void interrupt() {
@@ -43,9 +45,19 @@ public class Unzipper extends Observable {
         SequenceInputStream sis = new SequenceInputStream(Collections.enumeration(chunkToExtract));
 
         try (ZipInputStream zis = new ZipInputStream(sis)) {
+
+            File lockFile = null;
             ZipEntry chunk;
+
             while ((chunk = zis.getNextEntry()) != null && !interrupted) {
                 File extract = new File(directoryPath, chunk.getName());
+
+                if (lockFile == null) {
+                    lockFile = new File(directoryPath, chunk.getName() + LOCK_MARKER);
+                    //noinspection ResultOfMethodCallIgnored
+                    lockFile.createNewFile();
+                }
+
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(extract))) {
                     byte[] buffer = new byte[1024];
                     int bytes;
@@ -68,6 +80,11 @@ public class Unzipper extends Observable {
 
                     os.flush();
                 }
+            }
+
+            if (lockFile != null && lockFile.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                lockFile.delete();
             }
         }
     }

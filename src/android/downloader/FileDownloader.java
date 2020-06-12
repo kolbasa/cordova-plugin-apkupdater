@@ -10,6 +10,8 @@ import java.util.Observable;
 
 public abstract class FileDownloader extends Observable {
 
+    private static final String LOCK_MARKER = ".lock";
+
     public abstract void onProgress(int total, int current);
 
     private boolean interrupted;
@@ -33,6 +35,8 @@ public abstract class FileDownloader extends Observable {
         File file = new File(destination);
 
         File outputFile = new File(file, fileName);
+        File lockFile = new File(file, fileName + LOCK_MARKER);
+
         // noinspection ResultOfMethodCallIgnored
         outputFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(outputFile);
@@ -47,28 +51,27 @@ public abstract class FileDownloader extends Observable {
         byte[] buffer = new byte[1024];
 
         int bytes;
-        int count = 0;
         int bytesDownloaded = 0;
         int fileLength = connection.getContentLength();
 
         this.onProgress(fileLength, bytesDownloaded);
 
+        //noinspection ResultOfMethodCallIgnored
+        lockFile.createNewFile();
+
         while ((bytes = is.read(buffer)) != -1 && !interrupted) {
             bytesDownloaded += bytes;
             fos.write(buffer, 0, bytes);
-
-            // broadcast progress every 20kb
-            if (++count % 20 == 0) {
-                this.onProgress(fileLength, bytesDownloaded);
-            }
+            this.onProgress(fileLength, bytesDownloaded);
         }
-
-        this.onProgress(fileLength, bytesDownloaded);
 
         fos.flush();
         fos.close();
         is.close();
         connection.disconnect();
+
+        //noinspection ResultOfMethodCallIgnored
+        lockFile.delete();
     }
 
 }
