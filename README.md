@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/cordova-plugin-apkupdater.svg)](https://badge.fury.io/js/cordova-plugin-apkupdater)
 [![GitHub version](https://badge.fury.io/gh/kolbasa%2Fcordova-plugin-apkupdater.svg)](https://badge.fury.io/gh/kolbasa%2Fcordova-plugin-apkupdater)
 [![License](https://img.shields.io/badge/license-MIT%202.0-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE)
+[![Test Coverage](https://img.shields.io/badge/coverage-70%25-yellow.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE)
 
 This plugin gives you the tools to download an update for your Android app automatically or manually without using the Play Store.
 The installation file is compressed for this purpose and downloaded on the devices in small parts at a pre-set interval.
