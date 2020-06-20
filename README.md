@@ -20,9 +20,11 @@ An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apk
 
 ## Installation
 
+npm:
+
     cordova plugin add cordova-plugin-apkupdater
     
-Alternatively   
+GitHub:
 
     cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
 
