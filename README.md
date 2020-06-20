@@ -255,7 +255,7 @@ cordova.plugins.apkupdater.reset(success, failure);
 
 ## Edge cases
 
-* We have released a new update while a user is downloading the old update in the background.
+* "We have released a new update while a user is downloading the old update in the background."
 
     &#8595; &#8595; &#8595;
 
