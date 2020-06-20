@@ -39,8 +39,8 @@ You may be wondering if compression really makes sense. I have done some tests w
 These are apk installation files that you can download freely on the Internet.
 
 
-| App         | Uncompressed  | Compressed | Saving  |
-|------------ |-------------: | ---------: | ------: |
+|             | Uncompressed  | Compressed | Saving  |
+| ----------- |-------------: | ---------: | ------: |
 | GMail       | 26.0 MB       | 14.4 MB    | 44.6%   |
 | Twitter     | 31.0 MB       | 20.2 MB    | 34.8%   |
 | Wikipedia   | 10.1 MB       | 6.67 MB    | 33.9%   |
