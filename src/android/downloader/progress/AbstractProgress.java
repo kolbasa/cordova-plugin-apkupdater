@@ -4,11 +4,11 @@ import java.util.Locale;
 
 public abstract class AbstractProgress {
 
-    private int bytes;
-    private int bytesWritten;
+    private long bytes;
+    private long bytesWritten;
     private float percent;
 
-    AbstractProgress(int bytes) {
+    AbstractProgress(long bytes) {
         this.bytes = bytes;
     }
 
@@ -18,11 +18,11 @@ public abstract class AbstractProgress {
         this.percent = copy.getPercent();
     }
 
-    public int getBytes() {
+    public long getBytes() {
         return bytes;
     }
 
-    public int getBytesWritten() {
+    public long getBytesWritten() {
         return bytesWritten;
     }
 
@@ -30,11 +30,11 @@ public abstract class AbstractProgress {
         return percent;
     }
 
-    public void setBytesWritten(int downloadedSize) {
+    public void setBytesWritten(long downloadedSize) {
         this.bytesWritten = downloadedSize;
         if (bytes > 0) {
             float percent = ((((float) downloadedSize) / bytes) * 100);
-            this.percent = Float.valueOf(String.format(Locale.ENGLISH, "%.2f", percent));
+            this.percent = Float.parseFloat(String.format(Locale.ENGLISH, "%.2f", percent));
         }
     }
 

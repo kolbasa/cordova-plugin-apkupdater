@@ -21,6 +21,8 @@ import de.kolbasa.apkupdater.downloader.update.tools.UpdateValidator;
 
 public class UpdateDownloader extends FileDownloader {
 
+    private static final int BROADCAST_LOCK_MILLIS = 50;
+
     private Manifest manifest;
     private String serverURL;
     private String downloadPath;
@@ -30,11 +32,13 @@ public class UpdateDownloader extends FileDownloader {
 
     private Timer timer;
     private DownloadProgress progress;
-    private Float lastDownloadPercentage;
+    private DownloadProgress lastProgress;
 
     private Integer interval;
     private boolean downloading;
     private int checksumFails;
+
+    private long startTimeMillis;
 
     public UpdateDownloader(Manifest manifest, String serverUrl, String downloadPath, int timeout) {
         this.manifest = manifest;
@@ -51,33 +55,37 @@ public class UpdateDownloader extends FileDownloader {
         return downloading;
     }
 
+    private void updateProgress() {
+        int totalSize = 0;
+        int downloadedChunks = 0;
+
+        List<UpdateChunk> chunks = manifest.getChunks();
+        for (int i = 0; i < chunks.size(); i++) {
+            UpdateChunk chunk = chunks.get(i);
+            totalSize += chunk.getBytesDownloaded();
+            if (chunk.isReady()) {
+                downloadedChunks++;
+            }
+        }
+
+        progress.setBytesWritten(totalSize);
+        progress.setChunksDownloaded(downloadedChunks);
+
+        flowControlledProgressBroadcast();
+    }
+
     @Override
     public void onProgress(int total, int current) {
         if (currentChunk == null) {
             return;
         }
 
-        currentChunk.setProgress(current);
+        currentChunk.setBytesDownloaded(current);
 
-        int totalSize = 0;
-
-        List<UpdateChunk> chunks = manifest.getChunks();
-        for (int i = 0; i < chunks.size(); i++) {
-            UpdateChunk chunk = chunks.get(i);
-            totalSize += chunk.getProgress();
-            if (chunk.equals(currentChunk)) {
-                if (total == current) {
-                    progress.setChunksDownloaded(i + 1);
-                }
-                break;
-            }
-        }
-
-        progress.setBytesWritten(totalSize);
-
-        if (lastDownloadPercentage == null || lastDownloadPercentage != progress.getPercent()) {
-            lastDownloadPercentage = progress.getPercent();
-            broadcast(new DownloadProgress(progress));
+        // Only interim updates will be broadcasted
+        // If the download is ready it must be validated first
+        if (total != current) {
+            updateProgress();
         }
     }
 
@@ -162,13 +170,45 @@ public class UpdateDownloader extends FileDownloader {
         notifyObservers(event);
     }
 
+    private boolean shouldBroadcast() {
+        if (lastProgress == null) {
+            return true;
+        }
+
+        if (lastProgress.getChunksDownloaded() != progress.getChunksDownloaded()) {
+            return true;
+        }
+
+        if (lastProgress.getPercent() == progress.getPercent()) {
+            return false;
+        }
+
+        if (progress.getPercent() == 0 || progress.getPercent() == 100) {
+            return true;
+        }
+
+        return (System.currentTimeMillis() - startTimeMillis) > BROADCAST_LOCK_MILLIS;
+    }
+
+    private void flowControlledProgressBroadcast() {
+        if (shouldBroadcast()) {
+            startTimeMillis = System.currentTimeMillis();
+            lastProgress = new DownloadProgress(progress);
+            broadcast(lastProgress);
+        }
+    }
+
     private boolean hasValidClone(UpdateChunk chunk) throws IOException {
         File file = chunk.getFile();
 
         if (file.exists()) {
             if (chunk.getChecksum().equals(ChecksumGenerator.getFileChecksum(file))) {
+                chunk.setReady(true);
+                chunk.setBytesDownloaded(file.length());
                 return true;
             } else {
+                chunk.setReady(false); // mark as not ready
+                chunk.setBytesDownloaded(0);
                 // noinspection ResultOfMethodCallIgnored
                 file.delete(); // delete corrupted file
             }
@@ -196,6 +236,8 @@ public class UpdateDownloader extends FileDownloader {
             if (!hasValidClone(chunk) && downloading) {
                 throw new WrongChecksumException(file.getName());
             }
+
+            updateProgress();
         } finally {
             currentChunk = null;
         }
@@ -276,7 +318,6 @@ public class UpdateDownloader extends FileDownloader {
             List<UpdateChunk> chunks = manifest.getChunks();
             for (UpdateChunk chunk : chunks) {
                 if (hasValidClone(chunk)) {
-                    chunk.setProgress((int) chunk.getFile().length());
                     files.add(chunk.getFile());
                 } else {
                     downloadChunk(chunk);

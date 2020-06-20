@@ -8,30 +8,39 @@ public class UpdateChunk {
 
     private String checksum;
 
-    private int progress;
+    private long bytesDownloaded;
+
+    private boolean ready;
 
     public UpdateChunk(String checksum)  {
         this.checksum = checksum;
+    }
+
+    public String getChecksum() {
+        return checksum;
     }
 
     public File getFile() {
         return file;
     }
 
-    String getChecksum() {
-        return checksum;
-    }
-
-    public int getProgress() {
-        return progress;
-    }
-
     public void setFile(File file) {
         this.file = file;
     }
 
-    public void setProgress(int progress) {
-        this.progress = progress;
+    public long getBytesDownloaded() {
+        return bytesDownloaded;
     }
 
+    public void setBytesDownloaded(long bytesDownloaded) {
+        this.bytesDownloaded = bytesDownloaded;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
 }

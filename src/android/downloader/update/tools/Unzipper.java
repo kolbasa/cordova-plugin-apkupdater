@@ -19,6 +19,8 @@ public class Unzipper extends Observable {
 
     private static final String LOCK_MARKER = ".lock";
 
+    private static final int BROADCAST_LOCK_MILLIS = 50;
+
     private boolean interrupted;
 
     public void interrupt() {
@@ -47,13 +49,16 @@ public class Unzipper extends Observable {
         try (ZipInputStream zis = new ZipInputStream(sis)) {
 
             File lockFile = null;
-            ZipEntry chunk;
+            ZipEntry apk;
 
-            while ((chunk = zis.getNextEntry()) != null && !interrupted) {
-                File extract = new File(directoryPath, chunk.getName());
+            int bytesUnzipped = 0;
+            long startTimeMillis = 0;
+
+            while ((apk = zis.getNextEntry()) != null && !interrupted) {
+                File extract = new File(directoryPath, apk.getName());
 
                 if (lockFile == null) {
-                    lockFile = new File(directoryPath, chunk.getName() + LOCK_MARKER);
+                    lockFile = new File(directoryPath, apk.getName() + LOCK_MARKER);
                     //noinspection ResultOfMethodCallIgnored
                     lockFile.createNewFile();
                 }
@@ -61,8 +66,6 @@ public class Unzipper extends Observable {
                 try (OutputStream os = new BufferedOutputStream(new FileOutputStream(extract))) {
                     byte[] buffer = new byte[1024];
                     int bytes;
-                    int count = 0;
-                    int bytesUnzipped = 0;
 
                     broadcastProgress(bytesUnzipped);
 
@@ -70,9 +73,9 @@ public class Unzipper extends Observable {
                         bytesUnzipped += bytes;
                         os.write(buffer, 0, bytes);
 
-                        // broadcast progress every 1Mb
-                        if (++count % 1024 == 0) {
+                        if ((System.currentTimeMillis() - startTimeMillis) > BROADCAST_LOCK_MILLIS) {
                             broadcastProgress(bytesUnzipped);
+                            startTimeMillis = System.currentTimeMillis();
                         }
                     }
 

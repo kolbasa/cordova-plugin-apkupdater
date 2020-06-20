@@ -256,6 +256,8 @@ public class ApkUpdater extends CordovaPlugin {
     private void unregisterConnectivityActionReceiver() {
         if (networkListener != null && cm != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             cm.unregisterNetworkCallback(networkListener);
+            cm = null;
+            networkListener = null;
         }
     }
 
