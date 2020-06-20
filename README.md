@@ -16,7 +16,7 @@ An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apk
 * **Android**: 5+
 * **Cordova**: 7.1.0+
 * **Cordova CLI**: 7.1.0+
-* **7Zip** (for update compression.): [Windows](https://www.7-zip.org/), [Linux](https://de.wikipedia.org/wiki/P7zip)
+* **7Zip** (for update compression): [Windows](https://www.7-zip.org/), [Linux](https://de.wikipedia.org/wiki/P7zip)
 
 ## Installation
 
@@ -36,6 +36,7 @@ It compresses and splits the file into small chunks.
 It also creates a manifest file. From this file the plugin gets the version and file checksums of all parts.
 
 You may be wondering if compression really makes sense. I have done some tests with popular apps.
+
 These are apk installation files that you can download freely on the Internet.
 
 
@@ -66,7 +67,7 @@ Usage:
 | `apk-path`    | the path to the apk file                                                                    |
 | `output-path` | the path to which the update should be copied                                               |
 
-Example:
+Example with 100 Kilobyte files:
 
     node create-manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
 
@@ -145,7 +146,7 @@ cordova.plugins.apkupdater.download(success, failure);
 
 The method `backgroundDownload` downloads the update slowly in the background.
 
-You can set a time interval here in which the individual parts are to be downloaded.
+You can set a time interval in which the individual parts are to be downloaded.
 
 In my use case, I generate 90 parts, each with 50 kilobytes. Altogether approx. 4.5 MegaByte.
 The user's device downloads an update file every 15 minutes.
