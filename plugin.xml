@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-apkupdater" version="1.1.2">
+        id="cordova-plugin-apkupdater" version="1.1.3">
 
     <name>Apk Updater</name>
     <license>MIT</license>
@@ -11,7 +11,8 @@
     <keywords>apk,updater,downloader,installer,play-store</keywords>
 
     <engines>
-        <engine name="cordova" version=">=3.0.0"/>
+        <engine name="cordova" version=">=7.1.0"/>
+        <engine name="cordova-android" version=">=6.4.0"/>
     </engines>
 
     <js-module src="www/ApkUpdater.js" name="ApkUpdater">
@@ -19,7 +20,6 @@
     </js-module>
     <js-module src="www/API.js" name="API"/>
 
-    <!-- Android -->
     <platform name="android">
 
         <preference name="ANDROID_SUPPORT_V4_VERSION" default="27.+"/>
