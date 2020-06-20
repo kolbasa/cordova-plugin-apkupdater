@@ -1,10 +1,10 @@
 # CHANGELOG
 
-## 1.1.2 - 2020-06-11
+## 1.1.2 - 2020-06-20
 
-- [Added] `check` method now also accepts a direct URL to the `manifest.json` file
+- [Added] `check` method now also accepts a direct URL to the `manifest.json` file ([#4](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/4)).
 - [Changed] `setObserver` now provides significantly more reliable progress information. Especially if you pause the download and start it again.
-- [Fixed] Fixed `java.lang.IllegalArgumentException: NetworkCallback was already unregistered`. The error occurred during cleanup for the method `backgroundDownload`.
+- [Fixed] Fixed `java.lang.IllegalArgumentException: NetworkCallback was already unregistered`. The error occurred during a cleanup procedure for the method `backgroundDownload`.
 
 ## 1.1.1 - 2020-06-11
 
