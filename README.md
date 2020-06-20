@@ -60,9 +60,9 @@ Example:
 For example, the following update files are created during execution.
 
     manifest.json
-    1.0.0.zip.001
-    1.0.0.zip.002
-    1.0.0.zip.003
+    update.zip.001
+    update.zip.002
+    update.zip.003
 
 The contents of the manifest file will look like this:
 
