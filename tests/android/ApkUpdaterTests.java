@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.*;
 
 import de.kolbasa.apkupdater.downloader.exceptions.AlreadyRunningException;
@@ -889,10 +890,17 @@ class ApkUpdaterTests {
     class ManifestLogic {
 
         @Test
-        @DisplayName("Writing manifest file to file system")
+        @DisplayName("Writing manifest file to file system - url to parent directory")
         void writing() throws Exception {
             new UpdateManager(REMOTE_UPDATE, downloadDirectory).check();
-            assertTrue(new File(downloadDirectory, "manifest.json").exists());
+            assertTrue(new File(downloadDirectory, MANIFEST).exists());
+        }
+
+        @Test
+        @DisplayName("Writing manifest file to file system - url to manifest file")
+        void writingWithDirectLink() throws Exception {
+            new UpdateManager(REMOTE_UPDATE + "/" + MANIFEST, downloadDirectory).check();
+            assertTrue(new File(downloadDirectory, MANIFEST).exists());
         }
 
         @Test

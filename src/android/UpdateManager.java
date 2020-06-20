@@ -4,6 +4,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Observer;
 
 import de.kolbasa.apkupdater.downloader.FileTools;
@@ -19,6 +20,7 @@ import de.kolbasa.apkupdater.downloader.update.tools.UpdateValidator;
 class UpdateManager {
 
     private static final int DEFAULT_TIMEOUT = 30 * 1000; // 30sec
+    private static final String MANIFEST_FILE = "manifest.json";
 
     private int timeout;
     private String manifestUrl;
@@ -30,10 +32,10 @@ class UpdateManager {
     private UpdateDownloader updateDownloader;
 
     UpdateManager(String manifestUrl, String downloadPath, int timeout) {
-        this.manifestUrl = manifestUrl;
+        this.manifestUrl = validateUrl(manifestUrl);
         this.downloadPath = downloadPath;
         this.timeout = timeout;
-        this.manifestDownloader = new ManifestDownloader(manifestUrl, downloadPath, timeout);
+        this.manifestDownloader = new ManifestDownloader(this.manifestUrl, this.downloadPath, this.timeout);
     }
 
     UpdateManager(String manifestUrl, String downloadPath) {
@@ -42,6 +44,13 @@ class UpdateManager {
 
     void addObserver(Observer observer) {
         this.observer = observer;
+    }
+
+    private String validateUrl(String manifestUrl) {
+        if (manifestUrl.endsWith("/" + MANIFEST_FILE)) {
+            manifestUrl = manifestUrl.replaceFirst("/" + MANIFEST_FILE, "");
+        }
+        return manifestUrl;
     }
 
     private void syncWithStorageFiles(Manifest manifest) throws IOException {

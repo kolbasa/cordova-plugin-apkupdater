@@ -1,7 +1,6 @@
 # Cordova Apk Updater Plugin
 
 [![npm version](https://badge.fury.io/js/cordova-plugin-apkupdater.svg)](https://badge.fury.io/js/cordova-plugin-apkupdater)
-[![GitHub version](https://badge.fury.io/gh/kolbasa%2Fcordova-plugin-apkupdater.svg)](https://badge.fury.io/gh/kolbasa%2Fcordova-plugin-apkupdater)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE)
 [![Test Coverage](https://img.shields.io/badge/coverage-70%25-yellow.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/5)
 
@@ -89,10 +88,10 @@ First you have to call `check`. This will download the manifest file.
 
 The JavaScript API supports Promises and callbacks for all methods:
 ```js
-let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update');
+let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update/manifest.json');
 
 // Alternatively:
-cordova.plugins.apkupdater.check('https://your-domain.com/update', success, failure);
+cordova.plugins.apkupdater.check('https://your-domain.com/update/manifest.json', success, failure);
 ```
 
 This will return the following result:
