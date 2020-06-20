@@ -2,7 +2,7 @@
 
 ## 1.1.3 - 2020-06-20
 
-- [Changed] README.md improvements
+- [Changed] `README.md` improvements
 
 ## 1.1.2 - 2020-06-20
 
