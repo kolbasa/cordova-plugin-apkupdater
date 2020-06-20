@@ -49,6 +49,7 @@ These are apk installation files that you can download freely on the Internet.
 | Netflix     | 27.2 MB       | 21.9 MB    | 19.4%   |
 | Whatsapp    | 24.6 MB       | 20.7 MB    | 15.8%   |
 
+
 Honestly, you won't find the file sizes from the left side in the Google Play Store.
 The installation files stored there are also compressed and therefore more comparable to the right side of the table.
 However, we do not have this luxury and therefore have to do the compression ourselves.
@@ -66,6 +67,7 @@ Usage:
 | `chunk-size`  | the size of one compressed chunk, defined with the units `b,k,m`, e.g. `500b`, `150k`, `1m` |
 | `apk-path`    | the path to the apk file                                                                    |
 | `output-path` | the path to which the update should be copied                                               |
+
 
 Example with 100 Kilobyte files:
 
@@ -247,7 +249,7 @@ The user himself has no access to the files. The plugin deletes old updates auto
 // promise
 await cordova.plugins.apkupdater.reset();
 
-// Alternatively:
+// alternative with callbacks
 cordova.plugins.apkupdater.reset(success, failure);
 ```
 
