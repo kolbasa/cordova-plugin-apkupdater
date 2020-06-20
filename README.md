@@ -59,10 +59,12 @@ Usage:
 
     node create-manifest.js <version> <chunk-size> <apk-path> <output-path>
 
-* `version` - a string of your choosing, it will not be used by the plugin
-* `chunk-size` - the size of one compressed chunk, defined with the units `b|k|m`, e.g. `500b`, `150k`, `1m`
-* `apk-path` - the path to the apk file
-* `size` - the path to which the update should be copied
+| Parameter     |                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| `version`     | a string of your choosing, it will not be used by the plugin                                |
+| `chunk-size`  | the size of one compressed chunk, defined with the units `b,k,m`, e.g. `500b`, `150k`, `1m` |
+| `apk-path`    | the path to the apk file                                                                    |
+| `output-path` | the path to which the update should be copied                                               |
 
 Example:
 
@@ -77,7 +79,7 @@ This will create the following files:
 
 The contents of the manifest file will look like this:
 
-```json
+```js
 {
   "version": "1.0.0",                        // your custom version
   "sum": "35d9fd2d688156e45b89707f650a61ac", // checksum of the apk-file
