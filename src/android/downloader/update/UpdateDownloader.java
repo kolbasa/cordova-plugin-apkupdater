@@ -21,7 +21,7 @@ import de.kolbasa.apkupdater.downloader.update.tools.UpdateValidator;
 
 public class UpdateDownloader extends FileDownloader {
 
-    private static final int BROADCAST_LOCK_MILLIS = 50;
+    private static final int BROADCAST_LOCK_MILLIS = 100;
 
     private Manifest manifest;
     private String serverURL;
