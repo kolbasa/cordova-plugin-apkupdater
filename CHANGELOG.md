@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.3 - 2020-06-20
+
+- [Changed] README.md improvements
+
 ## 1.1.2 - 2020-06-20
 
 - [Added] `check` method now also accepts a direct URL to the `manifest.json` file ([#4](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/4)).
