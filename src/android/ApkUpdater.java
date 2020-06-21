@@ -9,6 +9,7 @@ import org.json.simple.parser.ParseException;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.Log;
 
@@ -222,13 +223,17 @@ public class ApkUpdater extends CordovaPlugin {
     }
 
     private void adjustSpeed(int slowInterval) {
-        if (manager == null) {
+        if (cm == null || manager == null) {
             return;
         }
-        if (this.cm.isActiveNetworkMetered()) {
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        if (!isConnected || this.cm.isActiveNetworkMetered()) {
             manager.setDownloadInterval(slowInterval);
         } else {
-            manager.setDownloadInterval(1);
+            manager.setDownloadInterval(100);
         }
     }
 
