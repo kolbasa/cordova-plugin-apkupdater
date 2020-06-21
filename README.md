@@ -8,10 +8,12 @@ This plugin enables you to update your Android app completely without the Google
 It offers two modes for downloading the installation file.
 
 * Download and install the complete update at once.
-* Download the update piece by piece in the background and then ask the user to install it at a later time.
+* Download the update slowly in the background and then ask the user to install it at a later time.
 
 
 &#128073; **[DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo)** &#128072;
+
+If you have any problems or suggestions, just [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues). I actively maintain the plugin and will take care of it.
 
 ## Plugin Requirements
 
@@ -231,7 +233,7 @@ cordova.plugins.apkupdater.setObserver(
 );
 ```
 
-The list of all events can be found under: [`cordova.plugins.apkupdater.EVENTS`](www/ApkUpdater.js#L5-L11):
+The list of all events can be found under: `cordova.plugins.apkupdater.EVENTS`:
 ```js
 {
     STARTING: 'Download started',
@@ -259,14 +261,16 @@ cordova.plugins.apkupdater.reset(success, failure);
 
 ## Edge cases
 
-* "We have released a new update while a user is downloading the old update in the background."
+* "We have released a new update while a user is downloading the old one."
 
-    &#8595; &#8595; &#8595;
+    &#128071; &#128071; &#128071;
 
     No problem. The plugin will check if the last downloaded file matches the checksum from the manifest. 
     
-    If this check fails more than two times, the download will be stopped. Then you can `check()` again if you want to continue with the new update. 
+    If this check fails more than two times, the download will be stopped. Then you can `check()` again if you want to continue with the new manifest. 
     
-    In my case I simply start the check on the login page of my app.
+    In my case I simply start the `check()` on the login page of my app. The plugin automatically deletes the old update files because they are not in the manifest.
+    
+    
     
     
