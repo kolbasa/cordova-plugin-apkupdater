@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.1.4 - 2020-06-20
+## 1.1.4 - 2020-06-21
 
 - [Fixed]  The `reset` method now works even if no manifest has been downloaded before. You can now also run it when a download is in progress.
 
