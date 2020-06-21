@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.*;
 
 import de.kolbasa.apkupdater.downloader.exceptions.AlreadyRunningException;
@@ -178,7 +177,7 @@ class ApkUpdaterTests {
 
     private void waitForException(ArrayList<Exception> list) throws InterruptedException {
         int initialCount = list.size();
-        int waitTime = 1000;
+        int waitTime = 1500;
 
         for (int i = 0; i < waitTime / 5; i++) {
             Thread.sleep(5);
@@ -208,13 +207,61 @@ class ApkUpdaterTests {
 
     @AfterEach
     void tearDown() {
-//        System.out.println(this.downloadDirectory);
         deleteDirectory(new File(this.downloadDirectory));
     }
 
     @Nested
-    @DisplayName("Slow download")
-    class SlowDownload {
+    @DisplayName("Reset")
+    class Reset {
+
+        @Test
+        @DisplayName("Delete manifest file")
+        void deleteManifest() throws Exception {
+            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+            copyUpdateChunksToDevice(APK_MD5_HASH);
+
+            assertTrue(new File(downloadDirectory, MANIFEST).exists());
+
+            updater.removeUpdates();
+
+            assertFalse(new File(downloadDirectory, MANIFEST).exists());
+        }
+
+        @Test
+        @DisplayName("Delete update files")
+        void deleteUpdateFiles() throws Exception {
+            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+            copyUpdateChunksToDevice(APK_MD5_HASH);
+
+            assertTrue(new File(updateDirectory, PART_01).exists());
+            assertTrue(new File(updateDirectory, PART_02).exists());
+            assertTrue(new File(updateDirectory, PART_03).exists());
+
+            updater.removeUpdates();
+
+            assertFalse(new File(updateDirectory, PART_01).exists());
+            assertFalse(new File(updateDirectory, PART_02).exists());
+            assertFalse(new File(updateDirectory, PART_03).exists());
+        }
+
+        @Test
+        @DisplayName("Delete extracted update")
+        void deleteExtractedUpdate() throws Exception {
+            UpdateManager updater = new UpdateManager(REMOTE_UPDATE, downloadDirectory);
+            copyUpdateToDevice(APK);
+
+            assertTrue(new File(updateDirectory, APK_NAME).exists());
+
+            updater.removeUpdates();
+
+            assertFalse(new File(updateDirectory, APK_NAME).exists());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Background download")
+    class BackgroundDownload {
 
         @Test
         @DisplayName("Download all chunks")
@@ -277,28 +324,6 @@ class ApkUpdaterTests {
             assertTrue(new File(updateDirectory, APK_NAME).exists());
 
         }
-
-//        @Test
-//        @DisplayName("Stop download if new version is available")
-//        void shouldStopOnNewVersion() throws Exception {
-//            UpdateManager updater = new UpdateManager(REMOTE_UPDATE_1_0_0, downloadDirectory);
-//            updater.check();
-//
-//            updater.downloadInBackground(DOWNLOAD_INTERVAL_IN_MS);
-//
-//            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS + 50);
-//            assertTrue(updater.isDownloading());
-//            assertTrue(new File(updateDirectory, PART_01).exists());
-//            assertFalse(new File(updateDirectory, PART_02).exists());
-//            assertFalse(new File(updateDirectory, PART_03).exists());
-//            assertFalse(new File(updateDirectory, APK_NAME).exists());
-//
-//            deleteDirectory(new File(SERVER_PATH));
-//            copyFile(new File(UPDATE_2), new File(SERVER_PATH));
-//
-//            Thread.sleep(DOWNLOAD_INTERVAL_IN_MS);
-//            assertFalse(updater.isDownloading());
-//        }
 
         @Test
         @DisplayName("Remove corrupted chunk")

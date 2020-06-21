@@ -17,8 +17,7 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 ## Plugin Requirements
 
-* **Android**: 5+
-* **Cordova**: 7.1.0+
+* **Android**: 5+ and `cordova-android` 6.4+
 * **Cordova CLI**: 7.1.0+
 * **7Zip** (for update compression): [Windows](https://www.7-zip.org/), [Linux](https://de.wikipedia.org/wiki/P7zip)
 

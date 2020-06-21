@@ -4,7 +4,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Observer;
 
 import de.kolbasa.apkupdater.downloader.FileTools;
@@ -128,7 +127,12 @@ class UpdateManager {
 
     void removeUpdates() {
         stop();
-        FileTools.clearDirectory(new File(downloadPath));
+        try {
+            Thread.sleep(500);
+            FileTools.clearDirectory(new File(downloadPath));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import de.kolbasa.apkupdater.downloader.FileTools;
 import de.kolbasa.apkupdater.downloader.exceptions.AlreadyRunningException;
 import de.kolbasa.apkupdater.downloader.manifest.Manifest;
 import de.kolbasa.apkupdater.downloader.exceptions.ManifestMissingException;
@@ -54,11 +55,13 @@ public class ApkUpdater extends CordovaPlugin {
         return false;
     }
 
+    private File getUpdateDirectory() {
+        return new File(cordova.getContext().getFilesDir(), UPDATE_DIR);
+    }
+
     private void checkForUpdate(JSONArray data, CallbackContext callbackContext) {
         try {
             String url = data.getString(0);
-
-            File storageDir = cordova.getContext().getFilesDir();
 
             // Download url changed
             if (manager != null && downloadUrl != null && !url.equals(downloadUrl)) {
@@ -66,7 +69,7 @@ public class ApkUpdater extends CordovaPlugin {
             }
 
             if (manager == null) {
-                File updateDir = new File(storageDir, UPDATE_DIR);
+                File updateDir = getUpdateDirectory();
                 if (!updateDir.exists()) {
                     // noinspection ResultOfMethodCallIgnored
                     updateDir.mkdir();
@@ -208,7 +211,7 @@ public class ApkUpdater extends CordovaPlugin {
             addObserver(manager, null);
             manager.download();
 
-            if (manifest.getUpdateFile() != null) {
+            if (manifest != null && manifest.getUpdateFile() != null) {
                 callbackContext.success();
             } else {
                 callbackContext.error(CordovaError.UPDATE_NOT_READY.getMessage());
@@ -291,11 +294,11 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void reset(CallbackContext callbackContext) {
         try {
-            manifest = null;
-
-            if (manager != null) {
-                manager.stop();
+            if (manager == null) {
+                FileTools.clearDirectory(getUpdateDirectory());
+            } else {
                 manager.removeUpdates();
+                manifest = null;
                 manager = null;
             }
 
