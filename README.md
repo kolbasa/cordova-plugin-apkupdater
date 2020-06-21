@@ -179,7 +179,7 @@ As soon as the plugin downloads a part, the app knows even after a restart that 
 The plugin also [accelerates](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/blob/master/SHOWCASE-2.md) the download as soon as the connection switches to Wi-Fi.
 The goal of this plugin is to consume as little as possible of the user's mobile data quota.
 
-## Installation
+## Installation prompt
 
 As soon as the download has been completed, you can use this method to ask the user to install the apk.
 
