@@ -11,7 +11,7 @@ It offers two modes for downloading the installation file.
 * Download the update piece by piece in the background and then ask the user to install it at a later time.
 
 
-&#128073; [DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo) &#128073;
+&#128073; [DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo) &#128072;
 
 ## Plugin Requirements
 
