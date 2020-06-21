@@ -156,18 +156,6 @@ The method `backgroundDownload` downloads the update slowly in the background.
 
 You can set a time interval in which the individual parts are to be downloaded.
 
-In my use case, I generate 90 parts, each with 50 kilobytes. Altogether approx. 4.5 MegaByte.
-The user's device downloads an update file every 15 minutes.
-
-If the user uses the app all day, the update will be completely downloaded in about 22 hours.
-Realistically it will take several days, because the app will be closed again and again after use.
-Nevertheless, it helps to keep the platform up to date.
-
-As soon as the plugin downloads a part, the app knows even after a restart that it does not need to be downloaded again.
-
-The plugin also accelerates the download as soon as the connection switches to Wi-Fi.
-The goal of this plugin is to consume as little as possible of the user's mobile data quota.
-
 An example with a 15-minute time interval:
 ```js
 // promise
@@ -177,9 +165,23 @@ await cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000);
 cordova.plugins.apkupdater.backgroundDownload(15 * 60 * 1000, success, failure);
 ```
 
-## Install your update
+In my use case, I generate 90 parts, each with 50 kilobytes. Altogether approx. 4.5 MegaByte.
+The user's device downloads an update file every 15 minutes.
 
-As soon as the download has been completed, you can use this method to ask the user to install the apk. That's all.
+If the user does not close the app, the update will be completely downloaded in about 22 hours.
+Realistically it will take several days, because the app will be closed again and again after use.
+Nevertheless, it helps to keep the platform up to date.
+
+I prioritize important updates accordingly and set the time interval lower.
+
+As soon as the plugin downloads a part, the app knows even after a restart that it does not need to be downloaded again.
+
+The plugin also [accelerates](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/blob/master/SHOWCASE-2.md) the download as soon as the connection switches to Wi-Fi.
+The goal of this plugin is to consume as little as possible of the user's mobile data quota.
+
+## Installation
+
+As soon as the download has been completed, you can use this method to ask the user to install the apk.
 
 ```js
 // promise
@@ -261,14 +263,12 @@ cordova.plugins.apkupdater.reset(success, failure);
 
 ## Edge cases
 
-* "We have released a new update while a user is downloading the old one."
-
-    &#128071; &#128071; &#128071;
+* **"We have released a new update while a user is downloading the old one."**
 
     No problem. The plugin will check if the last downloaded file matches the checksum from the manifest. 
-    
+
     If this check fails more than two times, the download will be stopped. Then you can `check()` again if you want to continue with the new manifest. 
-    
+
     In my case I simply start the `check()` on the login page of my app. The plugin automatically deletes the old update files because they are not in the manifest.
     
     
