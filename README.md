@@ -3,13 +3,15 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE)
 [![Test Coverage](https://img.shields.io/badge/coverage-70%25-yellow.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/5)
 
-This plugin gives you the tools to download an update for your Android app automatically or manually without using the Google Play Store.
-This plugin offers two modes for downloading the update.
+This plugin enables you to update your Android app completely without the Google Play Store.
+
+It offers two modes for downloading the installation file.
 
 * Download and install the complete update at once.
 * Download the update piece by piece in the background and then ask the user to install it at a later time.
 
-An example app can be found [here](https://github.com/kolbasa/cordova-plugin-apkupdater-demo).
+
+&#128073; [DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo) &#128073;
 
 ## Plugin Requirements
 
