@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-apkupdater" version="1.1.5">
+        id="cordova-plugin-apkupdater" version="1.2.0">
 
     <name>Apk Updater</name>
     <license>MIT</license>
     <author>Michael Jedich</author>
 
-    <description>This plugin allows your Android app to download and install compressed updates without the Google Play Store.</description>
+    <description>This plugin allows your Android app to download and install compressed updates without the Google Play
+        Store.
+    </description>
     <keywords>apk,updater,downloader,installer,play-store</keywords>
 
     <engines>
-        <engine name="cordova" version=">=7.1.0"/>
-        <engine name="cordova-android" version=">=6.4.0"/>
+        <engine name="cordova" version=">=8.1.0"/>
+        <engine name="cordova-android" version=">=8.1.0"/>
     </engines>
+
+    <dependency id="cordova-plugin-androidx" version="^2.0.0"/>
+    <dependency id="cordova-plugin-androidx-adapter" version="^1.1.1"/>
 
     <js-module src="www/ApkUpdater.js" name="ApkUpdater">
         <clobbers target="cordova.plugins.apkupdater"/>
@@ -39,14 +44,13 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <provider
-                    android:authorities="${applicationId}.apkupdater.provider"
-                    android:exported="false"
-                    android:grantUriPermissions="true"
-                    android:name="android.support.v4.content.FileProvider">
-                <meta-data
-                        android:name="android.support.FILE_PROVIDER_PATHS"
-                        android:resource="@xml/apkupdater_paths"/>
+            <provider android:name="androidx.core.content.FileProvider"
+                      android:authorities="${applicationId}.apkupdater.provider"
+                      android:exported="false"
+                      android:grantUriPermissions="true">
+                <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                           android:resource="@xml/apkupdater_paths">
+                </meta-data>
             </provider>
         </config-file>
 

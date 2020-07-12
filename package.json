@@ -1,12 +1,16 @@
 {
   "name": "cordova-plugin-apkupdater",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "description": "This plugin allows your Android app to download and install compressed updates without the Google Play Store.",
   "cordova": {
     "id": "cordova-plugin-apkupdater",
     "platforms": [
       "android"
     ]
+  },
+  "dependencies": {
+    "cordova-plugin-androidx": "^2.0.0",
+    "cordova-plugin-androidx-adapter": "^1.1.1"
   },
   "keywords": [
     "apk",

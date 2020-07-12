@@ -1,12 +1,20 @@
 # CHANGELOG
 
+## 1.2.0 - 2020-07-12
+
+- [Changed] Migrated to the new Android Support Library: AndroidX ([#2](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/2#issuecomment-656645632)).
+
+    **WARNING! Breaking Changes:**
+
+    The minimum Cordova CLI version is increased from `7.1.0` to `8.1.0`.
+
 ## 1.1.5 - 2020-06-21
 
-- [Fixed]  In random cases, the method `backgroundDownload` could cause an infinite loop if you lost the internet connection.
+- [Fixed] In random cases, the method `backgroundDownload` could cause an infinite loop if you lost the internet connection.
 
 ## 1.1.4 - 2020-06-21
 
-- [Fixed]  The `reset` method now works even if no manifest has been downloaded before. You can now also run it when a download is in progress.
+- [Fixed] The `reset` method now works even if no manifest has been downloaded before. You can now also run it when a download is in progress.
 
 ## 1.1.3 - 2020-06-20
 
