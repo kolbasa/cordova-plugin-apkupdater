@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.1 - 2020-08-05
+
+* [Fixed] The compression node script `create-manifest.js` incorrectly searched recursively for the update file ([#8](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/8#issuecomment-669294103)).
+
 ## 1.2.0 - 2020-07-12
 
 - [Changed] Migrated to the new Android Support Library: AndroidX ([#2](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/2#issuecomment-656645632)).

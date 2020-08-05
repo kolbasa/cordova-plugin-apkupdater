@@ -23,7 +23,7 @@ const sUpdatePath = path.resolve(aArguments[ 3 ]);
 
 const MANIFEST = 'manifest.json';
 const ARCHIVE_NAME = 'update.zip';
-const ZIP_OPTIONS = '-mm=Deflate -mfb=258 -mpass=15 -r';
+const ZIP_OPTIONS = '-mm=Deflate -mfb=258 -mpass=15';
 const WINDOWS_7ZIP_DEFAULT_PATH = '\\7-Zip\\7z.exe';
 
 /**
