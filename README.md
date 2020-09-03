@@ -226,9 +226,9 @@ cordova.plugins.apkupdater.setObserver(
             // See list below
             console.log(sEvent);
         },
-        exception: function (sMessage) {
+        exception: function (sMessage, sStack) {
             // Here the complete native error message is thrown.
-            console.error(sMessage);
+            console.error(sMessage, sStack);
         }
     }
 );
