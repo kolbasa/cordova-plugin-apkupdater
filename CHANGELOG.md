@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.2.2 - 2020-09-06
+
+* [Fixed] The `plugin.xml` file did not modify `AndroidManifest.xml` correctly. The changes could be overwritten by the `config.xml` ([#9](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/9)).
+* [Fixed] The permission `android.permission.INTERNET` is now requested for older devices.
+* [Fixed] Under certain circumstances not the correct error message was thrown. Instead there was only: `SyntaxError: missing ) after argument list`. The stack of the error message was not escaped correctly.
+
 ## 1.2.1 - 2020-08-05
 
 * [Fixed] The compression node script `create-manifest.js` incorrectly searched recursively for the update file ([#8](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/8#issuecomment-669294103)).

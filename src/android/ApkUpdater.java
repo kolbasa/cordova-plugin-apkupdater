@@ -1,5 +1,6 @@
 package de.kolbasa.apkupdater;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
@@ -123,7 +124,8 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void broadcastException(String message, String stack) {
         cordova.getActivity().runOnUiThread(() -> webView.loadUrl(
-                CORDOVA_CHECK + "exception('" + message + "', '" + stack + "')"
+                CORDOVA_CHECK + "exception('" + StringEscapeUtils.escapeEcmaScript(message) +
+                        "', '" + StringEscapeUtils.escapeEcmaScript(stack) + "')"
         ));
     }
 
