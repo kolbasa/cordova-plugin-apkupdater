@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.3 - 2020-11-17
+
+* [Fixed] The acceleration of the background download when switching to WiFi did not work on Android 5 & 6 ([#11](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/11)).
+
 ## 1.2.2 - 2020-09-06
 
 * [Fixed] The `plugin.xml` file did not modify `AndroidManifest.xml` correctly. The changes could be overwritten by the `config.xml` ([#9](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/9)).

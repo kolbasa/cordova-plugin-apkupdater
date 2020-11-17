@@ -7,12 +7,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +44,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private ConnectivityManager cm;
     private ConnectivityManager.NetworkCallback networkListener;
+    private BroadcastReceiver connectionReceiver;
 
     private static final int DEFAULT_SLOW_UPDATE_INTERVAL = 30 * 60 * 1000; // 1h
 
@@ -240,19 +246,21 @@ public class ApkUpdater extends CordovaPlugin {
     }
 
     private void registerConnectivityActionReceiver(int slowInterval) {
+        Context context = cordova.getContext();
+        if (this.cm == null) {
+            this.cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        }
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
-                this.cm = (ConnectivityManager) cordova.getContext()
-                        .getSystemService(Context.CONNECTIVITY_SERVICE);
-
                 this.networkListener = new ConnectivityManager.NetworkCallback() {
                     @Override
-                    public void onAvailable(Network network) {
+                    public void onAvailable(@NonNull Network network) {
                         adjustSpeed(slowInterval);
                     }
 
                     @Override
-                    public void onLost(Network network) {
+                    public void onLost(@NonNull Network network) {
                         adjustSpeed(slowInterval);
                     }
                 };
@@ -260,14 +268,28 @@ public class ApkUpdater extends CordovaPlugin {
             } catch (Exception e) {
                 //
             }
+        } else {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            connectionReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    adjustSpeed(slowInterval);
+                }
+            };
+            context.registerReceiver(connectionReceiver, intentFilter);
         }
     }
 
     private void unregisterConnectivityActionReceiver() {
-        if (networkListener != null && cm != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (cm != null && networkListener != null) {
             cm.unregisterNetworkCallback(networkListener);
-            cm = null;
             networkListener = null;
+        }
+
+        if (connectionReceiver != null) {
+            cordova.getContext().unregisterReceiver(connectionReceiver);
+            connectionReceiver = null;
         }
     }
 
