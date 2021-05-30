@@ -18,7 +18,7 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 * **Android**: 5+ and `cordova-android` 8.1.0+
 * **Cordova CLI**: 8.1.0+
-* **7Zip** (for update compression): [Windows](https://www.7-zip.org/), [Linux](doc/7zip-linux.md), [MacOS](doc/7zip-macos.md)
+* **7Zip** (for update compression): [Windows](doc/7zip-windows.md), [Linux](doc/7zip-linux.md), [MacOS](doc/7zip-macos.md)
 
 ## Installation
 
@@ -28,7 +28,7 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 To do this, use the following nodejs script: `src/nodejs/create-manifest.js`. 
 
-It [compresses](doc/compression.md) and splits the file into small chunks. 
+It [compresses](doc/compression.md) and splits your update apk-file into small chunks. 
 It also creates a manifest file. From this file the plugin gets the version and file checksums of all parts.
 
 Usage: 
@@ -45,7 +45,7 @@ Usage:
 
 Example with 100 Kilobyte files:
 
-    node create-manifest.js 1.0.0 100k /home/user/app.apk /home/user/update
+    node create-manifest.js 1.0.0 100k /home/user/update.apk /home/user/update
 
 This will create the following files:
 
