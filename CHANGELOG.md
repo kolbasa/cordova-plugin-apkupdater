@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.4 - 2021-05-30
+
++ [Fixed] The app restart after an update was unreliable, especially with newer Android versions ([#15](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/15)).
+
 ## 1.2.3 - 2020-11-17
 
 * [Fixed] The acceleration of the background download when switching to WiFi did not work on Android 5 & 6 ([#11](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/11)).
