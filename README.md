@@ -1,7 +1,6 @@
 # Cordova Apk Updater Plugin
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE)
-[![Test Coverage](https://img.shields.io/badge/coverage-70%25-yellow.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/5)
 
 This plugin enables you to update your Android app completely without the Google Play Store.
 
@@ -19,19 +18,11 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 * **Android**: 5+ and `cordova-android` 8.1.0+
 * **Cordova CLI**: 8.1.0+
-* **7Zip** (for update compression): [Windows](https://www.7-zip.org/), [Linux](https://de.wikipedia.org/wiki/P7zip)
+* **7Zip** (for update compression): [Windows](https://www.7-zip.org/), [Linux](doc/7zip-linux.md), [MacOS](doc/7zip-macos.md)
 
 ## Installation
 
-npm:
-
     cordova plugin add cordova-plugin-apkupdater
-    
-GitHub:
-
-    cordova plugin add https://github.com/kolbasa/cordova-plugin-apkupdater
-
- A [capacitor port](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/6) is in the works.
  
 ## Prepare and compress the update
 
