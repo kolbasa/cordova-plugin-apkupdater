@@ -28,30 +28,8 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 To do this, use the following nodejs script: `src/nodejs/create-manifest.js`. 
 
-It compresses and splits the file into small chunks.
+It [compresses](doc/compression.md) and splits the file into small chunks. 
 It also creates a manifest file. From this file the plugin gets the version and file checksums of all parts.
-
-You may be wondering if compression really makes sense. I have done some tests with popular apps.
-
-These are apk installation files that you can download freely on the Internet.
-
-
-|             | Uncompressed  | Compressed | Saving  |
-| ----------- |-------------: | ---------: | ------: |
-| GMail       | 26.0 MB       | 14.4 MB    | 44.6%   |
-| Twitter     | 31.0 MB       | 20.2 MB    | 34.8%   |
-| Wikipedia   | 10.1 MB       | 6.67 MB    | 33.9%   |
-| YouTube     | 37.6 MB       | 28.6 MB    | 23.9%   |
-| Netflix     | 27.2 MB       | 21.9 MB    | 19.4%   |
-| Whatsapp    | 24.6 MB       | 20.7 MB    | 15.8%   |
-
-
-Honestly, you won't find the file sizes from the left side in the Google Play Store.
-The installation files stored there are also compressed and therefore more comparable to the right side of the table.
-However, we do not have this luxury and therefore have to do the compression ourselves.
-
-The script requires [7Zip](https://www.7-zip.org/) and [NodeJS](https://nodejs.org) to work (works with Linux, MacOS and Windows).
-On Windows, the script looks for 7-Zip in the following folders: `%HOMEDRIVE%\7-Zip\`, `%ProgramFiles%\7-Zip\` and `%ProgramFiles(x86)%\7-Zip\`.
 
 Usage: 
 
@@ -166,8 +144,10 @@ I prioritize important updates accordingly and set the time interval lower.
 
 As soon as the plugin downloads a part, the app knows even after a restart that it does not need to be downloaded again.
 
-The plugin also [accelerates](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/blob/master/SHOWCASE-2.md) the download as soon as the connection switches to Wi-Fi.
+The plugin also [accelerates](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/blob/documentation/BackgroundDownload.gif) the download as soon as the connection switches to Wi-Fi.
 The goal of this plugin is to consume as little as possible of the user's mobile data quota.
+
+If you only want to use Wi-Fi for downloading, then you can simply set the interval to a very high value.
 
 ## Installation prompt
 
@@ -265,7 +245,7 @@ cordova.plugins.apkupdater.reset(success, failure);
 
 MIT License
 
-Copyright (c) 2020 Michael Jedich
+Copyright (c) 2021 Michael Jedich
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
