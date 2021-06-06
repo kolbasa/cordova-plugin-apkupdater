@@ -144,7 +144,7 @@ I prioritize important updates accordingly and set the time interval lower.
 
 As soon as the plugin downloads a part, the app knows even after a restart that it does not need to be downloaded again.
 
-The plugin also [accelerates](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/blob/documentation/BackgroundDownload.gif) the download as soon as the connection switches to Wi-Fi.
+The plugin also [accelerates](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/BackgroundDownload.gif) the download as soon as the connection switches to Wi-Fi.
 The goal of this plugin is to consume as little as possible of the user's mobile data quota.
 
 If you only want to use Wi-Fi for downloading, then you can simply set the interval to a very high value.
