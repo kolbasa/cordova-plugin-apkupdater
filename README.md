@@ -16,14 +16,19 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 ## Plugin Requirements
 
-* **Android**: 5+ and `cordova-android` 8.1.0+
+* **Android**: 5+ and `cordova-android` 9.0.0+
 * **Cordova CLI**: 8.1.0+
 * **7Zip** (for update compression): [Windows](doc/7zip-windows.md), [Linux](doc/7zip-linux.md), [MacOS](doc/7zip-macos.md)
 
 ## Installation
 
     cordova plugin add cordova-plugin-apkupdater
- 
+
+Legacy installation without AndroidX:
+
+    cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
+
+
 ## Prepare and compress the update
 
 To do this, use the following nodejs script: `src/nodejs/create-manifest.js`. 

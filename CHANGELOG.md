@@ -1,22 +1,30 @@
 # CHANGELOG
 
+## 1.3.0 - 2021-07-03
+
+- [Changed] Minimum version of `cordova-android` was raised to `9.0.0`. This allows the dependency `cordova-plugin-androidx` to be omitted  ([#22](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/1)).
+- [Added] There is now an alternative installation option without AndroidX. The legacy lib `android.support.v4` is used as a replacement.
+    ```
+    cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
+    ```
+
 ## 1.2.4 - 2021-05-30
 
-+ [Fixed] The app restart after an update was unreliable, especially with newer Android versions ([#15](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/15)).
+- [Fixed] The app restart after an update was unreliable, especially with newer Android versions ([#15](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/15)).
 
 ## 1.2.3 - 2020-11-17
 
-* [Fixed] The acceleration of the background download when switching to WiFi did not work on Android 5 & 6 ([#11](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/11)).
+- [Fixed] The acceleration of the background download when switching to WiFi did not work on Android 5 & 6 ([#11](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/11)).
 
 ## 1.2.2 - 2020-09-06
 
-* [Fixed] The `plugin.xml` file did not modify `AndroidManifest.xml` correctly. The changes could be overwritten by the `config.xml` ([#9](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/9)).
-* [Fixed] The permission `android.permission.INTERNET` is now requested for older devices.
-* [Fixed] Under certain circumstances not the correct error message was thrown. Instead there was only: `SyntaxError: missing ) after argument list`. The stack of the error message was not escaped correctly.
+- [Fixed] The `plugin.xml` file did not modify `AndroidManifest.xml` correctly. The changes could be overwritten by the `config.xml` ([#9](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/9)).
+- [Fixed] The permission `android.permission.INTERNET` is now requested for older devices.
+- [Fixed] Under certain circumstances not the correct error message was thrown. Instead there was only: `SyntaxError: missing ) after argument list`. The stack of the error message was not escaped correctly.
 
 ## 1.2.1 - 2020-08-05
 
-* [Fixed] The compression node script `create-manifest.js` incorrectly searched recursively for the update file ([#8](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/8#issuecomment-669294103)).
+- [Fixed] The compression node script `create-manifest.js` incorrectly searched recursively for the update file ([#8](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/8#issuecomment-669294103)).
 
 ## 1.2.0 - 2020-07-12
 
