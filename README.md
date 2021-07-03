@@ -14,13 +14,13 @@ It offers two modes for downloading the installation file.
 
 If you have any problems or suggestions, just [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues). I actively maintain the plugin and will take care of it.
 
-## Plugin Requirements
+## Plugin requirements
 
 * **Android**: 5+ and `cordova-android` 9.0.0+
 * **Cordova CLI**: 8.1.0+
 * **7Zip** (for update compression): [Windows](doc/7zip-windows.md), [Linux](doc/7zip-linux.md), [MacOS](doc/7zip-macos.md)
 
-## Installation
+## Cordova installation
 
     cordova plugin add cordova-plugin-apkupdater
 
@@ -28,6 +28,12 @@ Legacy installation without AndroidX:
 
     cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
 
+## Ionic installation
+
+For Ionic, you also need `cordova-plugin-androidx-adapter`. [Ionic Web View](https://github.com/ionic-team/cordova-plugin-ionic-webview) for Cordova requires this.
+
+    ionic cordova plugin add cordova-plugin-apkupdater
+    ionic cordova plugin add cordova-plugin-androidx-adapter
 
 ## Prepare and compress the update
 
