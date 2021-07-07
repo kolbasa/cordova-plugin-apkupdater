@@ -37,12 +37,12 @@ For Ionic, you also need `cordova-plugin-androidx-adapter`. [Ionic Web View](htt
 
 ## Prepare and compress the update
 
-To do this, use the following nodejs script: `src/nodejs/create-manifest.js`. 
+To do this, use the following nodejs script: `src/nodejs/create-manifest.js`.
 
-It [compresses](doc/compression.md) and splits your update apk-file into small chunks. 
+It [compresses](doc/compression.md) and splits your update apk-file into small chunks.
 It also creates a manifest file. From this file the plugin gets the version and file checksums of all parts.
 
-Usage: 
+Usage:
 
     node create-manifest.js <version> <chunk-size> <apk-path> <output-path>
 
@@ -87,13 +87,26 @@ The folder is now your update, you can put it on your update server.
 
 First you have to call `check()`. This will download the manifest file.
 
-The JavaScript API supports **promises** and **callbacks** for all methods:
+The JavaScript API supports **promises** and **callbacks** for all methods, plus an `options` parameter to pass some optional configurations:
 ```js
 // promise
 let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update/manifest.json');
 
+// promise with configurations
+let options = {
+  basicAuth = "yourBasicAuthToken"
+}
+let manifest = await cordova.plugins.apkupdater.check('https://your-domain.com/update/manifest.json', options);
+
 // alternative with callbacks
 cordova.plugins.apkupdater.check('https://your-domain.com/update/manifest.json', success, failure);
+```
+
+The `options` object supports the following configurations:
+```javascript
+let options = {
+  basicAuth = "yourBasicAuthToken"
+}
 ```
 
 This will return the following result:
@@ -110,7 +123,7 @@ Your application logic now has to decide what happens with this update. So your 
 
 It can be hard coded, or you can use [cordova-plugin-app-version](https://github.com/whiteoctober/cordova-plugin-app-version).
 This is what the `version` field is for. It will not be parsed by the plugin, you can choose your own versioning scheme.
- 
+
 For example, you can mark updates as optional or mandatory.
 
 **By design, the plugin does not provide its own update dialogs.**
@@ -174,7 +187,7 @@ cordova.plugins.apkupdater.install(success, failure);
 
 ## Interrupt download
 
-This will stop both download methods. It will not delete the already downloaded parts. 
+This will stop both download methods. It will not delete the already downloaded parts.
 
 The download can be continued later. For this reason, you can also view this as a pause function.
 The more update items you have generated, the less data needs to be downloaded again when you continue.
@@ -246,12 +259,12 @@ cordova.plugins.apkupdater.reset(success, failure);
 
 * **"We have released a new update while a user is downloading the old one."**
 
-    No problem. The plugin will check if the last downloaded file matches the checksum from the manifest. 
+    No problem. The plugin will check if the last downloaded file matches the checksum from the manifest.
 
-    If this check fails more than two times, the download will be stopped. Then you can `check()` again if you want to continue with the new manifest. 
+    If this check fails more than two times, the download will be stopped. Then you can `check()` again if you want to continue with the new manifest.
 
     In my case I simply start the `check()` on the login page of my app. The plugin automatically deletes the old update files because they are not in the manifest.
-    
+
 ## License
 
 MIT License
