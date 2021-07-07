@@ -25,12 +25,16 @@ public class ManifestDownloader extends FileDownloader {
 
     private String serverURL;
     private String downloadPath;
+    private String basicAuth;
     private int timeout;
 
-    public ManifestDownloader(String manifestUrl, String downloadPath, int timeout) {
+    public ManifestDownloader(
+        String manifestUrl, String downloadPath, String basicAuth, int timeout
+    ) {
         this.serverURL = manifestUrl;
         this.downloadPath = downloadPath;
         this.timeout = timeout;
+        this.basicAuth = basicAuth;
     }
 
     @Override
@@ -83,7 +87,12 @@ public class ManifestDownloader extends FileDownloader {
     }
 
     public Manifest download() throws IOException, ParseException {
-        super.download(this.serverURL + "/" + MANIFEST_FILE, this.downloadPath, this.timeout);
+        super.download(
+            this.serverURL + "/" + MANIFEST_FILE,
+            this.downloadPath,
+            this.basicAuth,
+            this.timeout
+        );
         File manifestFile = new File(this.downloadPath, MANIFEST_FILE);
         FileReader fileReader = new FileReader(manifestFile);
         JSONObject m = (JSONObject) new JSONParser().parse(fileReader);

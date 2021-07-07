@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Observable;
 
 public abstract class FileDownloader extends Observable {
@@ -20,12 +21,23 @@ public abstract class FileDownloader extends Observable {
         interrupted = true;
     }
 
-    protected void download(String fileUrl, String destination, int timeout) throws IOException {
+    protected void download(
+        String fileUrl, String destination, String basicAuth, int timeout
+    ) throws IOException, MalformedURLException {
         interrupted = false;
 
         String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         URL url = new URL(fileUrl);
+
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        // Sends basic authorization with request if provided
+        if ( basicAuth != null ) {
+            connection.setRequestProperty(
+                "Authorization",
+                "Basic " + basicAuth
+            );
+        }
+
         connection.setUseCaches(false);
         connection.setAllowUserInteraction(false);
         connection.setConnectTimeout(timeout);

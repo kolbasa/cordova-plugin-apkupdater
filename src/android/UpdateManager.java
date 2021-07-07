@@ -24,21 +24,31 @@ class UpdateManager {
     private int timeout;
     private String manifestUrl;
     private String downloadPath;
+    private String basicAuth;
     private Observer observer;
 
     private Manifest manifest;
     private ManifestDownloader manifestDownloader;
     private UpdateDownloader updateDownloader;
 
-    UpdateManager(String manifestUrl, String downloadPath, int timeout) {
+    UpdateManager(
+        String manifestUrl, String downloadPath, String basicAuth, int timeout
+    ) {
         this.manifestUrl = validateUrl(manifestUrl);
         this.downloadPath = downloadPath;
+        this.basicAuth = basicAuth;
         this.timeout = timeout;
-        this.manifestDownloader = new ManifestDownloader(this.manifestUrl, this.downloadPath, this.timeout);
+        this.manifestDownloader = new ManifestDownloader(
+            this.manifestUrl, this.downloadPath, this.basicAuth, this.timeout
+        );
+    }
+
+    UpdateManager(String manifestUrl, String downloadPath, String basicAuth) {
+        this(manifestUrl, downloadPath, basicAuth, DEFAULT_TIMEOUT);
     }
 
     UpdateManager(String manifestUrl, String downloadPath) {
-        this(manifestUrl, downloadPath, DEFAULT_TIMEOUT);
+        this(manifestUrl, downloadPath, null, DEFAULT_TIMEOUT);
     }
 
     void addObserver(Observer observer) {
@@ -75,7 +85,7 @@ class UpdateManager {
 
         syncWithStorageFiles(manifest);
 
-        updateDownloader = new UpdateDownloader(manifest, manifestUrl, downloadPath, timeout);
+        updateDownloader = new UpdateDownloader(manifest, manifestUrl, downloadPath, basicAuth, timeout);
 
         if (observer != null) {
             updateDownloader.addObserver(observer);

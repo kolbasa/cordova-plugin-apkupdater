@@ -6,9 +6,10 @@ var _observer;
 
 module.exports = {
 
-    check: function (manifestUrl) {
+    check: function (manifestUrl, options) {
+        const { basicAuth } = options || {}
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, MODULE_NAME, 'check', [manifestUrl]);
+            exec(resolve, reject, MODULE_NAME, 'check', [manifestUrl, basicAuth]);
         });
     },
 
@@ -71,4 +72,3 @@ module.exports = {
     }
 
 }
-

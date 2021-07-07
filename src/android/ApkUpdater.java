@@ -70,6 +70,10 @@ public class ApkUpdater extends CordovaPlugin {
     private void checkForUpdate(JSONArray data, CallbackContext callbackContext) {
         try {
             String url = data.getString(0);
+            String basicAuth = null;
+            if ( data.length() > 1 ) {
+              basicAuth = data.getString(1);
+            }
 
             // Download url changed
             if (manager != null && downloadUrl != null && !url.equals(downloadUrl)) {
@@ -83,7 +87,7 @@ public class ApkUpdater extends CordovaPlugin {
                     updateDir.mkdir();
                 }
                 downloadUrl = url;
-                manager = new UpdateManager(url, updateDir.getAbsolutePath());
+                manager = new UpdateManager(url, updateDir.getAbsolutePath(), basicAuth);
             }
 
             manifest = manager.check();

@@ -26,6 +26,7 @@ public class UpdateDownloader extends FileDownloader {
     private Manifest manifest;
     private String serverURL;
     private String downloadPath;
+    private String basicAuth;
     private int timeout;
     private UpdateChunk currentChunk;
     private Unzipper unzipper;
@@ -40,10 +41,11 @@ public class UpdateDownloader extends FileDownloader {
 
     private long startTimeMillis;
 
-    public UpdateDownloader(Manifest manifest, String serverUrl, String downloadPath, int timeout) {
+    public UpdateDownloader(Manifest manifest, String serverUrl, String downloadPath, String basicAuth, int timeout) {
         this.manifest = manifest;
         this.serverURL = serverUrl;
         this.downloadPath = downloadPath;
+        this.basicAuth = basicAuth;
         this.timeout = timeout;
         this.progress = new DownloadProgress(
                 manifest.getCompressedSize(),
@@ -231,7 +233,7 @@ public class UpdateDownloader extends FileDownloader {
 
             String url = serverURL + "/" + file.getName();
 
-            super.download(url, file.getParent(), timeout);
+            super.download(url, file.getParent(), basicAuth, timeout);
 
             if (!hasValidClone(chunk) && downloading) {
                 throw new WrongChecksumException(file.getName());

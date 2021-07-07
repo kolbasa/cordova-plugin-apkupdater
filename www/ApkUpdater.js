@@ -17,11 +17,11 @@ module.exports = {
      *
      * @returns {Promise<object>|void}
      */
-    check: function (manifestUrl, success, failure) {
+    check: function (manifestUrl, options, success, failure) {
         if (success == null && failure == null) {
-            return API.check(manifestUrl);
+            return API.check(manifestUrl, options);
         } else {
-            API.check(manifestUrl).then(success).catch(failure);
+            API.check(manifestUrl, options).then(success).catch(failure);
         }
     },
 
