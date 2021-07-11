@@ -13,8 +13,6 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 
 * **Android**: 5+ and `cordova-android` 9.0.0+
 * **Cordova CLI**: 8.1.0+
-* **7Zip** (for update compression): [Windows](doc/7zip-windows.md), [Linux](doc/7zip-linux.md)
-  , [MacOS](doc/7zip-macos.md)
 
 ## Cordova installation
 
@@ -45,7 +43,8 @@ let manifest = await ApkUpdater.download('https://your-domain.com/update/update.
 ApkUpdater.download('https://your-domain.com/update/update.apk', options, success, failure);
 ```
 
-You can also pass a zip file here. However, you should make sure that the archive contains only the APK file, nothing else.
+You can also pass a zip file here. 
+However, you should make sure that the archive contains only the APK file, nothing else.
 
 The download method accepts the following options:
 ```js
@@ -60,7 +59,7 @@ let options = {
 }
 ```
 
-After the successful download you will get detailed information about the downloaded file.
+If the download is successful, you will receive detailed information about the update file.
 ```js
 let response = {
   "zip": "update-encrypted.zip",
