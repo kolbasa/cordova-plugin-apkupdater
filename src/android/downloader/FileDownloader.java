@@ -8,70 +8,87 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Observable;
 
-public abstract class FileDownloader extends Observable {
+public class FileDownloader extends Observable {
 
-    private static final String LOCK_MARKER = ".lock";
+    private static final int BROADCAST_LOCK_MILLIS = 100;
 
-    public abstract void onProgress(int total, int current);
+    private HttpURLConnection connection;
 
-    private boolean interrupted;
-
-    protected void interrupt() {
-        interrupted = true;
+    public void interrupt() {
+        if (connection != null) {
+            connection.disconnect();
+            connection = null;
+        }
     }
 
-    protected void download(String fileUrl, String destination, int timeout) throws IOException {
-        interrupted = false;
+    private void broadcast(Progress progress) {
+        setChanged();
+        notifyObservers(progress);
+    }
+
+    public File download(String fileUrl, File dir) throws IOException {
 
         String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
-        URL url = new URL(fileUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setUseCaches(false);
-        connection.setAllowUserInteraction(false);
-        connection.setConnectTimeout(timeout);
-        connection.setReadTimeout(timeout);
-        connection.connect();
+        File outputFile = new File(dir, fileName);
 
-        File file = new File(destination);
-
-        File outputFile = new File(file, fileName);
-        File lockFile = new File(file, fileName + LOCK_MARKER);
-
-        // noinspection ResultOfMethodCallIgnored
-        outputFile.createNewFile();
-        FileOutputStream fos = new FileOutputStream(outputFile);
-        InputStream is;
         try {
-            is = connection.getInputStream();
-        } catch (Exception err) {
-            //noinspection ResultOfMethodCallIgnored
-            outputFile.delete();
-            throw err;
+            URL url = new URL(fileUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setUseCaches(false);
+            connection.setAllowUserInteraction(false);
+            connection.connect();
+
+            String headerFileName = connection.getHeaderField("Content-Disposition");
+            if (headerFileName != null && headerFileName.contains("filename=\"")) {
+                String name = headerFileName.split("\"")[1];
+                if (name != null) {
+                    outputFile = new File(dir, name);
+                }
+            }
+
+            // noinspection ResultOfMethodCallIgnored
+            outputFile.createNewFile();
+            FileOutputStream fos = new FileOutputStream(outputFile);
+            InputStream is;
+            try {
+                is = connection.getInputStream();
+            } catch (Exception err) {
+                //noinspection ResultOfMethodCallIgnored
+                outputFile.delete();
+                throw err;
+            }
+            byte[] buffer = new byte[1024];
+
+            int bytes;
+            int bytesDownloaded = 0;
+            long fileLength = connection.getContentLength();
+
+            Progress progress = new Progress(fileLength);
+            broadcast(progress);
+
+            long startTimeMillis = 0;
+            while ((bytes = is.read(buffer)) != -1) {
+                bytesDownloaded += bytes;
+                fos.write(buffer, 0, bytes);
+
+                if ((System.currentTimeMillis() - startTimeMillis) > BROADCAST_LOCK_MILLIS) {
+                    progress.setBytesWritten(bytesDownloaded);
+                    broadcast(progress);
+                    startTimeMillis = System.currentTimeMillis();
+                }
+            }
+
+            progress.setBytesWritten(bytesDownloaded);
+            broadcast(progress);
+
+            fos.flush();
+            fos.close();
+            is.close();
+        } finally {
+            interrupt();
         }
-        byte[] buffer = new byte[1024];
 
-        int bytes;
-        int bytesDownloaded = 0;
-        int fileLength = connection.getContentLength();
-
-        this.onProgress(fileLength, bytesDownloaded);
-
-        //noinspection ResultOfMethodCallIgnored
-        lockFile.createNewFile();
-
-        while ((bytes = is.read(buffer)) != -1 && !interrupted) {
-            bytesDownloaded += bytes;
-            fos.write(buffer, 0, bytes);
-            this.onProgress(fileLength, bytesDownloaded);
-        }
-
-        fos.flush();
-        fos.close();
-        is.close();
-        connection.disconnect();
-
-        //noinspection ResultOfMethodCallIgnored
-        lockFile.delete();
+        return outputFile;
     }
 
 }

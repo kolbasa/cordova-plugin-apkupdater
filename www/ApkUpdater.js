@@ -2,55 +2,36 @@ var API = require('./API');
 
 module.exports = {
 
-    EVENTS: {
-        STARTING: 'Download started',
-        STOPPED: 'Download stopped',
-        UPDATE_READY: 'Update ready',
-        SPEEDING_UP_DOWNLOAD: 'Speeding up download',
-        SLOWING_DOWN_DOWNLOAD: 'Slowing down download'
-    },
-
-    /**
-     * @param {string} manifestUrl - The url to your hosted manifest file
-     * @param {function=} success - Returns the parsed manifest object
-     * @param {function=} failure
-     *
-     * @returns {Promise<object>|void}
-     */
-    check: function (manifestUrl, success, failure) {
-        if (success == null && failure == null) {
-            return API.check(manifestUrl);
-        } else {
-            API.check(manifestUrl).then(success).catch(failure);
-        }
-    },
-
     /**
      * @param {function=} success
      * @param {function=} failure
      *
-     * @returns {Promise<void>|void}
+     * @returns {Promise<object>|object}
      */
-    download: function (success, failure) {
+    getInstalledVersion: function (success, failure) {
         if (success == null && failure == null) {
-            return API.download();
+            return API.getInstalledVersion();
         } else {
-            API.download().then(success).catch(failure);
+            API.getInstalledVersion().then(success).catch(failure);
         }
     },
 
     /**
-     * @param {number} interval - How fast individual parts should be downloaded in milliseconds.
+     * @param {string} url - Your apk or zip-archive
+     * @param {object | undefined} opt - Optional
+     * @param {string=} opt.password
+     * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onDownloadProgress
+     * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onUnzipProgress
      * @param {function=} success
      * @param {function=} failure
      *
-     * @returns {Promise<void>|void}
+     * @returns {Promise<object>|object}
      */
-    backgroundDownload: function (interval, success, failure) {
+    download: function (url, opt, success, failure) {
         if (success == null && failure == null) {
-            return API.backgroundDownload(interval);
+            return API.download(url, opt);
         } else {
-            API.backgroundDownload(interval).then(success).catch(failure);
+            API.download(url, opt).then(success).catch(failure);
         }
     },
 
@@ -65,6 +46,20 @@ module.exports = {
             return API.stop();
         } else {
             API.stop().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<object>|object}
+     */
+    getDownloadedUpdate: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.getDownloadedUpdate();
+        } else {
+            API.getDownloadedUpdate().then(success).catch(failure);
         }
     },
 
@@ -88,6 +83,20 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
+    rootInstall: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.rootInstall();
+        } else {
+            API.rootInstall().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<void>|void}
+     */
     reset: function (success, failure) {
         if (success == null && failure == null) {
             return API.reset();
@@ -97,33 +106,9 @@ module.exports = {
     },
 
     /**
-     * @param {object} observer
-     * @returns {void}
-     */
-    setObserver: API.setObserver,
-
-    /**
      * Gets called by the cordova plugin itself.
      * @private
      */
-    _downloadProgress: API.onDownloadProgress,
-
-    /**
-     * Gets called by the cordova plugin itself.
-     * @private
-     */
-    _unzipProgress: API.onUnzipProgress,
-
-    /**
-     * Gets called by the cordova plugin itself.
-     * @private
-     */
-    _exception: API.onException,
-
-    /**
-     * Gets called by the cordova plugin itself.
-     * @private
-     */
-    _event: API.onEvent
+    _event: API.event
 
 };

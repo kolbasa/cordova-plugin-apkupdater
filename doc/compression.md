@@ -1,5 +1,7 @@
 # Update compression
 
+### Do you need it?
+
 You may be wondering if compression really makes sense. I have done some tests with popular apps.
 
 These are apk installation files that you can download freely on the Internet.

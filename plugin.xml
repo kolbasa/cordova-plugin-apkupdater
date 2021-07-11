@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-apkupdater" version="1.3.0">
+        id="cordova-plugin-apkupdater" version="2.0.0">
 
     <name>Apk Updater</name>
     <license>MIT</license>
@@ -21,17 +21,16 @@
     <hook type="before_prepare" src="src/nodejs/hooks/before-prepare.js" />
 
     <js-module src="www/ApkUpdater.js" name="ApkUpdater">
-        <clobbers target="cordova.plugins.apkupdater"/>
+        <clobbers target="window.ApkUpdater"/>
     </js-module>
     <js-module src="www/API.js" name="API"/>
 
     <platform name="android">
 
-        <framework src="com.googlecode.json-simple:json-simple:1.1"/>
         <framework src="org.apache.commons:commons-text:1.9"/>
+        <framework src="net.lingala.zip4j:zip4j:2.9.0"/>
 
-        <framework src="androidx.core:core:1.5.0" />
-        <framework src="androidx.annotation:annotation:1.2.0" />
+        <framework src="androidx.core:core:1.6.0" />
         <config-file target="config.xml" parent="/*">
             <preference name="AndroidXEnabled" value="true" />
         </config-file>
@@ -61,42 +60,22 @@
 
         <source-file src="res/apkupdater_paths.xml" target-dir="res/xml"/>
         <source-file src="src/android/ApkUpdater.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/Event.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/UpdateManager.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/CordovaError.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/downloader/progress/AbstractProgress.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
-        <source-file src="src/android/downloader/progress/DownloadProgress.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
-        <source-file src="src/android/downloader/progress/UnzipProgress.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/progress"/>
-        <source-file src="src/android/downloader/update/tools/ChecksumGenerator.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/update/tools"/>
-        <source-file src="src/android/downloader/update/tools/UpdateValidator.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/update/tools"/>
-        <source-file src="src/android/downloader/update/tools/Unzipper.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/update/tools"/>
-        <source-file src="src/android/downloader/update/UpdateDownloader.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/update"/>
-        <source-file src="src/android/downloader/update/UpdateDownloadEvent.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/update"/>
-        <source-file src="src/android/downloader/update/UpdateChunk.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/update"/>
-        <source-file src="src/android/downloader/manifest/ManifestDownloader.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/manifest"/>
-        <source-file src="src/android/downloader/manifest/Manifest.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/manifest"/>
-        <source-file src="src/android/downloader/exceptions/AlreadyRunningException.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/exceptions"/>
-        <source-file src="src/android/downloader/exceptions/WrongChecksumException.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/exceptions"/>
-        <source-file src="src/android/downloader/exceptions/ManifestMissingException.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader/exceptions"/>
-        <source-file src="src/android/downloader/FileTools.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader"/>
-        <source-file src="src/android/downloader/FileDownloader.java"
-                     target-dir="src/de/kolbasa/apkupdater/downloader"/>
+        <source-file src="src/android/cordova/CordovaError.java" target-dir="src/de/kolbasa/apkupdater/cordova"/>
+        <source-file src="src/android/cordova/CordovaEvent.java" target-dir="src/de/kolbasa/apkupdater/cordova"/>
+        <source-file src="src/android/cordova/StackExtractor.java" target-dir="src/de/kolbasa/apkupdater/cordova"/>
+        <source-file src="src/android/downloader/FileDownloader.java" target-dir="src/de/kolbasa/apkupdater/downloader"/>
+        <source-file src="src/android/downloader/Progress.java" target-dir="src/de/kolbasa/apkupdater/downloader"/>
+        <source-file src="src/android/exceptions/DownloadInProgressException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/exceptions/DownloadNotRunningException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/exceptions/InstallationFailedException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/exceptions/UpdateNotFoundException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/tools/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
+        <source-file src="src/android/tools/AppData.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
+        <source-file src="src/android/tools/ChecksumGenerator.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
+        <source-file src="src/android/tools/FileTools.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
+        <source-file src="src/android/tools/Unzipper.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
+        <source-file src="src/android/update/Update.java" target-dir="src/de/kolbasa/apkupdater/update"/>
+        <source-file src="src/android/update/UpdateManager.java" target-dir="src/de/kolbasa/apkupdater/update"/>
 
     </platform>
 

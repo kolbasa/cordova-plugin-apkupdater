@@ -1,414 +1,220 @@
 package de.kolbasa.apkupdater;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.ParseException;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
-import android.os.Build;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
+import android.content.pm.PackageManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
-import de.kolbasa.apkupdater.downloader.FileTools;
-import de.kolbasa.apkupdater.downloader.exceptions.AlreadyRunningException;
-import de.kolbasa.apkupdater.downloader.manifest.Manifest;
-import de.kolbasa.apkupdater.downloader.exceptions.ManifestMissingException;
-import de.kolbasa.apkupdater.downloader.progress.DownloadProgress;
-import de.kolbasa.apkupdater.downloader.progress.UnzipProgress;
-import de.kolbasa.apkupdater.downloader.exceptions.WrongChecksumException;
-import de.kolbasa.apkupdater.downloader.update.UpdateDownloadEvent;
+import de.kolbasa.apkupdater.exceptions.DownloadInProgressException;
+import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
+import de.kolbasa.apkupdater.exceptions.UpdateNotFoundException;
+import de.kolbasa.apkupdater.tools.ApkInstaller;
+import de.kolbasa.apkupdater.tools.AppData;
+import de.kolbasa.apkupdater.downloader.Progress;
+import de.kolbasa.apkupdater.cordova.CordovaEvent;
+import de.kolbasa.apkupdater.cordova.StackExtractor;
+import de.kolbasa.apkupdater.update.Update;
+import de.kolbasa.apkupdater.update.UpdateManager;
 
 public class ApkUpdater extends CordovaPlugin {
 
-    private static final String TAG = "ApkUpdater";
-    private static final String UPDATE_DIR = "apk-update";
+    private static final String UPDATE_DIR = "update";
 
-    private String downloadUrl;
-    private Manifest manifest;
-    private UpdateManager manager;
+    private UpdateManager updateManager;
 
-    private ConnectivityManager cm;
-    private ConnectivityManager.NetworkCallback networkListener;
-    private BroadcastReceiver connectionReceiver;
-
-    private static final int DEFAULT_SLOW_UPDATE_INTERVAL = 30 * 60 * 1000; // 1h
-
-    private static final String CORDOVA_CHECK = "" +
-            "javascript:" +
-            "typeof cordova !== 'undefined' && " +
-            "typeof cordova.plugins !== 'undefined' && " +
-            "typeof cordova.plugins.apkupdater !== 'undefined' && " +
-            "cordova.plugins.apkupdater._";
-
-    private boolean notInitialized(CallbackContext callbackContext) {
-        if (manager == null) {
-            callbackContext.error(CordovaError.NOT_INITIALIZED.getMessage());
-            return true;
-        }
-        return false;
-    }
-
-    private File getUpdateDirectory() {
-        return new File(cordova.getContext().getFilesDir(), UPDATE_DIR);
-    }
-
-    private void checkForUpdate(JSONArray data, CallbackContext callbackContext) {
-        try {
-            String url = data.getString(0);
-
-            // Download url changed
-            if (manager != null && downloadUrl != null && !url.equals(downloadUrl)) {
-                reset(null);
-            }
-
-            if (manager == null) {
-                File updateDir = getUpdateDirectory();
-                if (!updateDir.exists()) {
-                    // noinspection ResultOfMethodCallIgnored
-                    updateDir.mkdir();
-                }
-                downloadUrl = url;
-                manager = new UpdateManager(url, updateDir.getAbsolutePath());
-            }
-
-            manifest = manager.check();
-            JSONObject result = new JSONObject();
-
-            File updateFile = manifest.getUpdateFile();
-            result.put("version", manifest.getVersion());
-            result.put("ready", updateFile != null);
-            if (updateFile != null) {
-                result.put("file", updateFile.getName());
-            }
-            result.put("size", manifest.getCompressedSize());
-            result.put("chunks", manifest.getChunks().size());
-
-            callbackContext.success(result);
-        } catch (Exception e) {
-            handleException(e, callbackContext);
+    private void init() {
+        if (updateManager == null) {
+            File downloadDir = new File(cordova.getContext().getFilesDir(), UPDATE_DIR);
+            updateManager = new UpdateManager(downloadDir);
         }
     }
 
-    private void broadcastDownloadProgress(DownloadProgress progress) {
-        cordova.getActivity().runOnUiThread(() -> webView.loadUrl("" +
-                CORDOVA_CHECK +
-                "downloadProgress(" +
-                progress.getPercent() + ", " +
-                progress.getBytes() + ", " +
-                progress.getBytesWritten() + ", " +
-                progress.getChunks() + ", " +
-                progress.getChunksDownloaded() +
-                ")"
-        ));
+    private void pushEvent(String name, Map<String, String> params) {
+        String js = CordovaEvent.format(name, params);
+        cordova.getActivity().runOnUiThread(() -> webView.loadUrl(js));
     }
 
-    private void broadcastUnzipProgress(UnzipProgress progress) {
-        cordova.getActivity().runOnUiThread(() -> webView.loadUrl("" +
-                CORDOVA_CHECK +
-                "unzipProgress(" +
-                progress.getPercent() + ", " +
-                progress.getBytes() + ", " +
-                progress.getBytesWritten() +
-                ")"
-        ));
+    private Map<String, String> mapProgress(Progress progress) {
+        return new HashMap<String, String>() {{
+            put("progress", "" + progress.getPercent());
+            put("bytes", "" + progress.getBytes());
+            put("bytesWritten", "" + progress.getBytesWritten());
+        }};
     }
 
-    private void broadcastException(String message, String stack) {
-        cordova.getActivity().runOnUiThread(() -> webView.loadUrl(
-                CORDOVA_CHECK + "exception('" + StringEscapeUtils.escapeEcmaScript(message) +
-                        "', '" + StringEscapeUtils.escapeEcmaScript(stack) + "')"
-        ));
-    }
-
-    private void broadcastEvent(Event event) {
-        cordova.getActivity().runOnUiThread(() -> webView.loadUrl(
-                CORDOVA_CHECK + "event('" + event.getMessage() + "')"
-        ));
-    }
-
-    private void handleException(Exception exception, CallbackContext callbackContext) {
-        StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        String stack = sw.toString();
-
-        CordovaError cordovaError = CordovaError.UNKNOWN_EXCEPTION;
-        if (exception instanceof IOException) {
-            cordovaError = CordovaError.DOWNLOAD_FAILED;
-        } else if (exception instanceof ParseException) {
-            cordovaError = CordovaError.INVALID_MANIFEST;
-        } else if (exception instanceof WrongChecksumException) {
-            cordovaError = CordovaError.WRONG_CHECKSUM;
-        } else if (exception instanceof ManifestMissingException) {
-            cordovaError = CordovaError.NOT_INITIALIZED;
-        } else if (exception instanceof AlreadyRunningException) {
-            cordovaError = CordovaError.DOWNLOAD_ALREADY_RUNNING;
-        } else {
-            exception.printStackTrace();
-        }
-
-        broadcastException(cordovaError.getMessage(), stack);
-        if (callbackContext != null) {
-            callbackContext.error(cordovaError.getMessage());
+    private void checkIfRunning() throws DownloadInProgressException {
+        if (updateManager != null && updateManager.isDownloading()) {
+            throw new DownloadInProgressException();
         }
     }
 
-    private void handleException(Exception exception) {
-        handleException(exception, null);
+    private JSONObject getAppInfo() throws JSONException, PackageManager.NameNotFoundException {
+        return getAppInfo(null);
     }
 
-    private void addObserver(UpdateManager manager, CallbackContext callbackContext) {
-        manager.addObserver((o, arg) -> {
-            if (arg instanceof DownloadProgress) {
-                broadcastDownloadProgress((DownloadProgress) arg);
-            }
+    private JSONObject getAppInfo(File apk) throws JSONException, PackageManager.NameNotFoundException {
+        AppData app = new AppData(cordova.getActivity());
+        JSONObject appInfo = new JSONObject();
 
-            if (arg instanceof UnzipProgress) {
-                broadcastUnzipProgress((UnzipProgress) arg);
-            }
+        appInfo.put("name", app.getAppName(apk));
+        appInfo.put("package", app.getPackageName(apk));
 
-            if (arg instanceof Exception) {
-                handleException((Exception) arg);
-            }
+        if (apk == null) {
+            appInfo.put("firstInstallTime", app.getFirstInstallTime());
+        }
 
-            if (arg instanceof UpdateDownloadEvent) {
-                UpdateDownloadEvent event = (UpdateDownloadEvent) arg;
-                boolean downloadStopped = event.equals(UpdateDownloadEvent.STOPPED);
+        JSONObject version = new JSONObject();
+        version.put("code", app.getAppVersionCode(apk));
+        version.put("name", app.getAppVersionName(apk));
+        appInfo.put("version", version);
+        return appInfo;
+    }
 
-                if (callbackContext != null) {
-                    if (event.equals(UpdateDownloadEvent.UPDATE_READY)) {
-                        callbackContext.success();
-                    } else if (downloadStopped && manifest.getUpdateFile() == null) {
-                        callbackContext.error(CordovaError.UPDATE_NOT_READY.getMessage());
-                    }
-                }
+    private JSONObject getInfo(Update update) throws JSONException, PackageManager.NameNotFoundException {
+        JSONObject result = new JSONObject();
+        if (update.getZip() != null) {
+            result.put("zip", update.getZip().getName());
+        }
+        File apk = update.getApk();
+        result.put("update", apk.getName());
+        result.put("path", apk.getParent());
+        result.put("size", apk.length());
+        result.put("checksum", update.getChecksum());
+        result.put("app", getAppInfo(apk));
+        return result;
+    }
 
-                if (downloadStopped) {
-                    unregisterConnectivityActionReceiver();
-                }
+    private Update getUpdate() throws DownloadInProgressException, IOException, UpdateNotFoundException {
+        checkIfRunning();
+        return updateManager.getUpdate();
+    }
 
-                broadcastEvent(event);
+    private void addDownloadObserver() {
+        updateManager.addDownloadObserver((o, arg) -> {
+            if (arg instanceof Progress) {
+                pushEvent("downloadProgress", mapProgress((Progress) arg));
             }
         });
     }
 
-    private void download(CallbackContext callbackContext) {
-        if (notInitialized(callbackContext)) {
-            return;
-        }
+    private void addUnzipObserver() {
+        updateManager.addUnzipObserver((o, arg) -> {
+            if (arg instanceof Progress) {
+                pushEvent("unzipProgress", mapProgress((Progress) arg));
+            }
+        });
+    }
 
+    private void download(JSONArray data, CallbackContext callbackContext) {
         try {
-            if (manifest.getUpdateFile() != null) {
-                callbackContext.success();
-                return;
+            checkIfRunning();
+            String url = data.getString(0);
+            JSONObject options = data.getJSONObject(1);
+
+            if (options.has("addProgressObserver")) {
+                addDownloadObserver();
             }
 
-            addObserver(manager, null);
-            manager.download();
-
-            if (manifest != null && manifest.getUpdateFile() != null) {
-                callbackContext.success();
-            } else {
-                callbackContext.error(CordovaError.UPDATE_NOT_READY.getMessage());
+            if (options.has("addUnzipObserver")) {
+                addUnzipObserver();
             }
+
+            String password = options.has("password") ? options.getString("password") : null;
+            Update update = updateManager.download(url, password);
+
+            callbackContext.success(getInfo(update));
         } catch (Exception e) {
-            handleException(e, callbackContext);
-        }
-    }
-
-    private void adjustSpeed(int slowInterval) {
-        if (cm == null || manager == null) {
-            return;
-        }
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        if (!isConnected || this.cm.isActiveNetworkMetered()) {
-            manager.setDownloadInterval(slowInterval);
-        } else {
-            manager.setDownloadInterval(100);
-        }
-    }
-
-    private void registerConnectivityActionReceiver(int slowInterval) {
-        Context context = cordova.getContext();
-        if (this.cm == null) {
-            this.cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            try {
-                this.networkListener = new ConnectivityManager.NetworkCallback() {
-                    @Override
-                    public void onAvailable(@NonNull Network network) {
-                        adjustSpeed(slowInterval);
-                    }
-
-                    @Override
-                    public void onLost(@NonNull Network network) {
-                        adjustSpeed(slowInterval);
-                    }
-                };
-                this.cm.registerDefaultNetworkCallback(this.networkListener);
-            } catch (Exception e) {
-                //
-            }
-        } else {
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            connectionReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    adjustSpeed(slowInterval);
-                }
-            };
-            context.registerReceiver(connectionReceiver, intentFilter);
-        }
-    }
-
-    private void unregisterConnectivityActionReceiver() {
-        if (cm != null && networkListener != null) {
-            cm.unregisterNetworkCallback(networkListener);
-            networkListener = null;
-        }
-
-        if (connectionReceiver != null) {
-            cordova.getContext().unregisterReceiver(connectionReceiver);
-            connectionReceiver = null;
-        }
-    }
-
-    private void downloadInBackground(JSONArray data, CallbackContext callbackContext) {
-        if (notInitialized(callbackContext)) {
-            return;
-        }
-
-        try {
-            if (manifest.getUpdateFile() != null) {
-                callbackContext.success();
-                return;
-            }
-
-            addObserver(manager, callbackContext);
-
-            int slowInterval = DEFAULT_SLOW_UPDATE_INTERVAL;
-
-            try {
-                slowInterval = data.getInt(0);
-            } catch (org.json.JSONException e) {
-                //
-            }
-
-            manager.downloadInBackground(slowInterval);
-            registerConnectivityActionReceiver(slowInterval);
-        } catch (Exception e) {
-            handleException(e, callbackContext);
-        }
-    }
-
-    private void reset(CallbackContext callbackContext) {
-        try {
-            if (manager == null) {
-                FileTools.clearDirectory(getUpdateDirectory());
-            } else {
-                manager.removeUpdates();
-                manifest = null;
-                manager = null;
-            }
-
-            if (callbackContext != null) {
-                callbackContext.success();
-            }
-            unregisterConnectivityActionReceiver();
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (callbackContext != null) {
-                callbackContext.error(e.toString());
-            }
+            callbackContext.error(StackExtractor.format(e));
         }
     }
 
     private void stop(CallbackContext callbackContext) {
-        if (notInitialized(callbackContext)) {
-            return;
-        }
-
         try {
-            if (manager.isDownloading()) {
-                manager.stop();
-                callbackContext.success();
+            if (updateManager.isDownloading()) {
+                reset(callbackContext);
             } else {
-                callbackContext.error(CordovaError.DOWNLOAD_NOT_RUNNING.getMessage());
+                throw new DownloadNotRunningException();
             }
         } catch (Exception e) {
-            handleException(e, callbackContext);
+            callbackContext.error(StackExtractor.format(e));
         }
     }
 
     private void install(CallbackContext callbackContext) {
         try {
-            if (notInitialized(callbackContext)) {
-                return;
-            }
-
-            File update = manifest.getUpdateFile();
-
-            if (update == null) {
-                callbackContext.error(CordovaError.UPDATE_NOT_READY.getMessage());
-                return;
-            }
-
-            ApkInstaller installer = new ApkInstaller();
-            installer.addObserver((o, arg) -> {
-                if (arg instanceof ApkInstaller.InstallEvent) {
-                    broadcastEvent((ApkInstaller.InstallEvent) arg);
-                }
-            });
-            installer.install(cordova.getContext(), update);
-
+            ApkInstaller.install(cordova.getContext(), getUpdate().getApk());
             callbackContext.success();
         } catch (Exception e) {
-            handleException(e, callbackContext);
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void rootInstall(CallbackContext callbackContext) {
+        try {
+            ApkInstaller.rootInstall(cordova.getContext(), getUpdate().getApk());
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void reset(CallbackContext callbackContext) {
+        try {
+            updateManager.reset();
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void getInstalledVersion(CallbackContext callbackContext) {
+        try {
+            callbackContext.success(getAppInfo());
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void getDownloadedUpdate(CallbackContext callbackContext) {
+        try {
+            callbackContext.success(getInfo(getUpdate()));
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
         }
     }
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
-        Log.v(TAG, "Executing (" + action + ")");
-
+        init();
         switch (action) {
-            case "check":
-                cordova.getThreadPool().execute(() -> checkForUpdate(data, callbackContext));
+            case "getInstalledVersion":
+                cordova.getThreadPool().execute(() -> getInstalledVersion(callbackContext));
                 break;
             case "download":
-                cordova.getThreadPool().execute(() -> download(callbackContext));
-                break;
-            case "backgroundDownload":
-                cordova.getThreadPool().execute(() -> downloadInBackground(data, callbackContext));
+                cordova.getThreadPool().execute(() -> download(data, callbackContext));
                 break;
             case "stop":
                 cordova.getThreadPool().execute(() -> stop(callbackContext));
                 break;
-            case "reset":
-                cordova.getThreadPool().execute(() -> reset(callbackContext));
+            case "getDownloadedUpdate":
+                cordova.getThreadPool().execute(() -> getDownloadedUpdate(callbackContext));
                 break;
             case "install":
                 cordova.getThreadPool().execute(() -> install(callbackContext));
+                break;
+            case "rootInstall":
+                cordova.getThreadPool().execute(() -> rootInstall(callbackContext));
+                break;
+            case "reset":
+                cordova.getThreadPool().execute(() -> reset(callbackContext));
                 break;
             default:
                 return false;
