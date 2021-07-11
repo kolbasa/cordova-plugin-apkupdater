@@ -7,7 +7,8 @@ This plugin enables you to update your Android app completely without the Google
 &#128073; **[DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo)** &#128072;
 
 If you have any problems or suggestions, just [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues)
-. I actively maintain the plugin and will take care of it.
+.  
+I actively maintain the plugin and will take care of it.
 
 ## Plugin requirements
 
@@ -24,12 +25,11 @@ Legacy installation without AndroidX:
 
 ## Ionic installation
 
-For Ionic, you also need `cordova-plugin-androidx-adapter`
-. [Ionic Web View](https://github.com/ionic-team/cordova-plugin-ionic-webview) for Cordova requires this.
+For Ionic, you also need `cordova-plugin-androidx-adapter`.  
+[Ionic Web View](https://github.com/ionic-team/cordova-plugin-ionic-webview) for Cordova requires this.
 
     ionic cordova plugin add cordova-plugin-apkupdater
     ionic cordova plugin add cordova-plugin-androidx-adapter
-
 
 ## Download update
 
@@ -43,38 +43,40 @@ let manifest = await ApkUpdater.download('https://your-domain.com/update/update.
 ApkUpdater.download('https://your-domain.com/update/update.apk', options, success, failure);
 ```
 
-You can also pass a zip file here. 
+You can also pass a zip file here.  
 However, you should make sure that the archive contains only the APK file, nothing else.
 
 The download method accepts the following options:
+
 ```js
 let options = {
-  password: 'aDzEsCceP3BPO5jy', // If the zip file is encrypted.
-  onDownloadProgress: function (e) {
-    console.log('Downloading: ' + e.progress + '%');
-  },
-  onUnzipProgress: function (e) {
-    console.log('Unzipping: ' + e.progress + '%');
-  }
+    password: 'aDzEsCceP3BPO5jy', // If the zip file is encrypted.
+    onDownloadProgress: function (e) {
+        console.log('Downloading: ' + e.progress + '%');
+    },
+    onUnzipProgress: function (e) {
+        console.log('Unzipping: ' + e.progress + '%');
+    }
 }
 ```
 
 If the download is successful, you will receive detailed information about the update file.
+
 ```js
 let response = {
-  "zip": "update-encrypted.zip",
-  "update": "update.apk",
-  "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
-  "size": 1982411,
-  "checksum": "d90916f513b1226e246ecb4d64acffae",
-  "app": {
-    "name": "Apk Updater Demo",
-    "package": "de.kolbasa.apkupdater.demo",
-    "version": {
-      "code": 10000,
-      "name": "1.0.0"
+    "zip": "update-encrypted.zip",
+    "update": "update.apk",
+    "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
+    "size": 1982411,
+    "checksum": "d90916f513b1226e246ecb4d64acffae",
+    "app": {
+        "name": "Apk Updater Demo",
+        "package": "de.kolbasa.apkupdater.demo",
+        "version": {
+            "code": 10000,
+            "name": "1.0.0"
+        }
     }
-  }
 }
 ```
 
@@ -91,15 +93,16 @@ ApkUpdater.getInstalledVersion(success, failure);
 ```
 
 Example output:
+
 ```js
 let response = {
-  "name": "Apk Updater Demo",
-  "package": "de.kolbasa.apkupdater.demo",
-  "firstInstallTime": 1625415754434,
-  "version": {
-    "code": 10000,
-    "name": "1.0.0"
-  }
+    "name": "Apk Updater Demo",
+    "package": "de.kolbasa.apkupdater.demo",
+    "firstInstallTime": 1625415754434,
+    "version": {
+        "code": 10000,
+        "name": "1.0.0"
+    }
 }
 ```
 
@@ -146,7 +149,6 @@ await ApkUpdater.stop();
 // alternative with callbacks
 ApkUpdater.stop(success, failure);
 ```
-
 
 ## Reset
 
