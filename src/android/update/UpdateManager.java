@@ -59,7 +59,7 @@ public class UpdateManager {
     }
 
     private void createDownloadDirectory() {
-        if (downloadDirectory.exists()) {
+        if (!downloadDirectory.exists()) {
             // noinspection ResultOfMethodCallIgnored
             downloadDirectory.mkdir();
         }
