@@ -165,9 +165,15 @@ await ApkUpdater.reset();
 ApkUpdater.reset(success, failure);
 ```
 
-## Workflow
+## Check if update is necessary
 
-TODO: Tomorrow.
+The plugin itself does not make a version comparison.  
+You have to build the logic yourself how the app can determine if an update is needed.
+
+In my case, I simply place a `manifest.json` file next to the update, which stores the latest version number.  
+I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.  
+
+This is also the case with the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
 
 ## License
 
