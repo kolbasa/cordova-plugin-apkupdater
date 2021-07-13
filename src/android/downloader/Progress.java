@@ -1,6 +1,7 @@
 package de.kolbasa.apkupdater.downloader;
 
-import java.util.Locale;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Progress {
 
@@ -31,14 +32,21 @@ public class Progress {
     }
 
     public void setBytesWritten(long downloadedSize) {
-        this.bytesWritten = downloadedSize;
+        bytesWritten = downloadedSize;
         if (bytes > 0) {
-            float percent = ((((float) downloadedSize) / bytes) * 100);
-            this.percent = Float.parseFloat(String.format(Locale.ENGLISH, "%.2f", percent));
-            if (this.percent > 100) {
-                this.percent = 100;
-            }
+            percent = ((((float) downloadedSize) / bytes) * 100);
         }
+        if (percent > 100) {
+            percent = 100;
+        }
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("progress", ((double) (int) (percent * 100.0)) / 100.0); // Trim to 2 decimal places
+        json.put("bytes", bytes);
+        json.put("bytesWritten", bytesWritten);
+        return json;
     }
 
 }

@@ -103,12 +103,6 @@ module.exports = {
         } else {
             API.reset().then(success).catch(failure);
         }
-    },
-
-    /**
-     * Gets called by the cordova plugin itself.
-     * @private
-     */
-    _event: API.event
+    }
 
 };

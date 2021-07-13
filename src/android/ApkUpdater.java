@@ -2,6 +2,7 @@ package de.kolbasa.apkupdater;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,8 +11,6 @@ import android.content.pm.PackageManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.kolbasa.apkupdater.exceptions.DownloadInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
@@ -19,7 +18,6 @@ import de.kolbasa.apkupdater.exceptions.UpdateNotFoundException;
 import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
 import de.kolbasa.apkupdater.downloader.Progress;
-import de.kolbasa.apkupdater.cordova.CordovaEvent;
 import de.kolbasa.apkupdater.cordova.StackExtractor;
 import de.kolbasa.apkupdater.update.Update;
 import de.kolbasa.apkupdater.update.UpdateManager;
@@ -35,19 +33,6 @@ public class ApkUpdater extends CordovaPlugin {
             File downloadDir = new File(cordova.getContext().getFilesDir(), UPDATE_DIR);
             updateManager = new UpdateManager(downloadDir);
         }
-    }
-
-    private void pushEvent(String name, Map<String, String> params) {
-        String js = CordovaEvent.format(name, params);
-        cordova.getActivity().runOnUiThread(() -> webView.loadUrl(js));
-    }
-
-    private Map<String, String> mapProgress(Progress progress) {
-        return new HashMap<String, String>() {{
-            put("progress", "" + progress.getPercent());
-            put("bytes", "" + progress.getBytes());
-            put("bytesWritten", "" + progress.getBytesWritten());
-        }};
     }
 
     private void checkIfRunning() throws DownloadInProgressException {
@@ -97,40 +82,22 @@ public class ApkUpdater extends CordovaPlugin {
         return updateManager.getUpdate();
     }
 
-    private void addDownloadObserver() {
-        updateManager.addDownloadObserver((o, arg) -> {
-            if (arg instanceof Progress) {
-                pushEvent("downloadProgress", mapProgress((Progress) arg));
-            }
-        });
-    }
-
-    private void addUnzipObserver() {
-        updateManager.addUnzipObserver((o, arg) -> {
-            if (arg instanceof Progress) {
-                pushEvent("unzipProgress", mapProgress((Progress) arg));
-            }
-        });
-    }
-
     private void download(JSONArray data, CallbackContext callbackContext) {
         try {
             checkIfRunning();
             String url = data.getString(0);
-            JSONObject options = data.getJSONObject(1);
-
-            if (options.has("addProgressObserver")) {
-                addDownloadObserver();
-            }
-
-            if (options.has("addUnzipObserver")) {
-                addUnzipObserver();
-            }
-
-            String password = options.has("password") ? options.getString("password") : null;
+            String password = data.getString(1);
             Update update = updateManager.download(url, password);
-
             callbackContext.success(getInfo(update));
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void install(CallbackContext callbackContext) {
+        try {
+            ApkInstaller.install(cordova.getContext(), getUpdate().getApk());
+            callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -148,10 +115,32 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private void install(CallbackContext callbackContext) {
+    private void pushProgressEvent(CallbackContext callbackContext, Progress progress) {
+        if (progress == null || callbackContext.isFinished()) {
+            return;
+        }
         try {
-            ApkInstaller.install(cordova.getContext(), getUpdate().getApk());
-            callbackContext.success();
+            PluginResult resp = new PluginResult(PluginResult.Status.OK, progress.toJSON());
+            if (progress.getPercent() < 100) {
+                resp.setKeepCallback(true);
+            }
+            callbackContext.sendPluginResult(resp);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addProgressObserver(CallbackContext callbackContext) {
+        try {
+            updateManager.addDownloadObserver((o, arg) -> pushProgressEvent(callbackContext, (Progress) arg));
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void addUnzipObserver(CallbackContext callbackContext) {
+        try {
+            updateManager.addUnzipObserver((o, arg) -> pushProgressEvent(callbackContext, (Progress) arg));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -200,6 +189,12 @@ public class ApkUpdater extends CordovaPlugin {
                 break;
             case "download":
                 cordova.getThreadPool().execute(() -> download(data, callbackContext));
+                break;
+            case "addProgressObserver":
+                cordova.getThreadPool().execute(() -> addProgressObserver(callbackContext));
+                break;
+            case "addUnzipObserver":
+                cordova.getThreadPool().execute(() -> addUnzipObserver(callbackContext));
                 break;
             case "stop":
                 cordova.getThreadPool().execute(() -> stop(callbackContext));

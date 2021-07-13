@@ -2,7 +2,9 @@ var exec = require('cordova/exec');
 
 var PLUGIN = 'ApkUpdater';
 
-var callbacks = {};
+function emptyFn() {
+    //
+}
 
 module.exports = {
 
@@ -26,24 +28,16 @@ module.exports = {
     download: function (url, opt) {
         opt = opt || {};
 
-        var mappedOpt = {
-            password: opt.password
-        };
-
         if (opt.onDownloadProgress != null) {
-            callbacks.downloadProgress = opt.onDownloadProgress;
-            mappedOpt.addProgressObserver = true;
+            exec(opt.onDownloadProgress, emptyFn, PLUGIN, 'addProgressObserver');
         }
 
         if (opt.onUnzipProgress != null) {
-            callbacks.unzipProgress = opt.onUnzipProgress;
-            mappedOpt.addUnzipObserver = true;
+            exec(opt.onUnzipProgress, emptyFn, PLUGIN, 'addUnzipObserver');
         }
 
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'download', [url, mappedOpt]);
-        }).finally(function () {
-            callbacks = {};
+            exec(resolve, reject, PLUGIN, 'download', [url, opt.password]);
         });
     },
 
@@ -90,18 +84,6 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'reset', []);
         });
-    },
-
-    /**
-     * @param {string} event
-     * @param {object} result
-     *
-     * @returns {void}
-     */
-    event: function (event, result) {
-        if (typeof (callbacks[event]) === 'function') {
-            callbacks[event](result);
-        }
     }
 
 };
