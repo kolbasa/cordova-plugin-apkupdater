@@ -8,7 +8,7 @@ if (args.length < 3) {
     console.error(
         '\nUSAGE: \n' +
         '\tcompress-apk.js <version> <apk-path> <output-path> [<password>]\n\n' +
-        '\tversion:     a string of your choosing, it will not be used by the plugin\n' +
+        '\tversion:     this version-string is stored next to the archive in a manifest.json file\n' +
         '\tapk-path:    the path to the apk-file\n' +
         '\toutput-path: the path to which the update should be copied\n' +
         '\tpassword:    optional password\n'

@@ -19,7 +19,7 @@ I actively maintain the plugin and will take care of it.
 
     cordova plugin add cordova-plugin-apkupdater
 
-Legacy installation without AndroidX:
+Legacy installation without AndroidX (not recommended):
 
     cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
 
@@ -44,18 +44,19 @@ ApkUpdater.download('https://your-domain.com/update/update.apk', options, succes
 ```
 
 You can also pass a zip file here.  
-However, you should make sure that the archive contains only the APK file, nothing else.
+However, you should make sure that the archive contains only the APK file, nothing else.  
+Under `src/nodejs/compress-apk.js` you will find the script I use for automated compression.
 
 The download method accepts the following options:
 
 ```js
 let options = {
-    password: 'aDzEsCceP3BPO5jy', // If the zip file is encrypted.
+    password: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
     onDownloadProgress: function (e) {
-        console.log('Downloading: ' + e.progress + '%');
+        console.log('Downloading: ' + e.progress + '% (' + e.bytesWritten + '/' + e.bytes + ')');
     },
     onUnzipProgress: function (e) {
-        console.log('Unzipping: ' + e.progress + '%');
+        console.log('Unzipping: ' + e.progress + '% (' + e.bytesWritten + '/' + e.bytes + ')');
     }
 }
 ```
@@ -68,7 +69,7 @@ let response = {
     "update": "update.apk",
     "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
     "size": 1982411,
-    "checksum": "d90916f513b1226e246ecb4d64acffae",
+    "checksum": "d90916f513b1226e246ecb4d64acffae", // MD5
     "app": {
         "name": "Apk Updater Demo",
         "package": "de.kolbasa.apkupdater.demo",
@@ -152,7 +153,7 @@ ApkUpdater.stop(success, failure);
 
 ## Reset
 
-The `reset` method deletes all local update files.
+The `reset` method deletes all downloaded files.
 
 It is mostly useful only for debugging purposes. The user himself has no access to the files. The plugin deletes old
 updates automatically.
@@ -165,7 +166,7 @@ await ApkUpdater.reset();
 ApkUpdater.reset(success, failure);
 ```
 
-## Check if update is necessary
+## Version checks
 
 The plugin itself does not make a version comparison.  
 You have to build the logic yourself how the app can determine if an update is needed.
