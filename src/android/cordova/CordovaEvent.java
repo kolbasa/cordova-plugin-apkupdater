@@ -1,7 +1,5 @@
 package de.kolbasa.apkupdater.cordova;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Map;
 
 public class CordovaEvent {
@@ -20,11 +18,7 @@ public class CordovaEvent {
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
             js.append(entry.getKey()).append(":");
-            if (!StringUtils.isNumeric(entry.getValue())) {
-                js.append("'").append(entry.getValue()).append("'");
-            } else {
-                js.append(entry.getValue());
-            }
+            js.append("'").append(entry.getValue()).append("'");
             js.append(",");
         }
         js.setLength(js.length() - 1);
