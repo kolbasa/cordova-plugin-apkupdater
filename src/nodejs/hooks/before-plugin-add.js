@@ -55,11 +55,11 @@ module.exports = function (context) {
         console.log('cordova-plugin-apkupdater - Installing without AndroidX.');
 
         const pluginXml = __dirname + '/../../../plugin.xml';
-        await replace(pluginXml, 51, indent(12) + '<provider android:name="android.support.v4.content.FileProvider"');
-        await remove(pluginXml, 36);
-        await remove(pluginXml, 35);
-        await replace(pluginXml, 34, indent(8) + '<framework src="com.android.support:appcompat-v7:$APPCOMPAT_VERSION"/>');
-        await replace(pluginXml, 33, indent(8) + '<preference name="APPCOMPAT_VERSION" default="28.+" />');
+        await replace(pluginXml, 49, indent(12) + '<provider android:name="android.support.v4.content.FileProvider"');
+        await remove(pluginXml, 34);
+        await remove(pluginXml, 33);
+        await replace(pluginXml, 32, indent(8) + '<framework src="com.android.support:appcompat-v7:$APPCOMPAT_VERSION"/>');
+        await replace(pluginXml, 31, indent(8) + '<preference name="APPCOMPAT_VERSION" default="28.+" />');
 
         const ApkInstaller = __dirname + '/../../android/tools/ApkInstaller.java';
         await replace(ApkInstaller, 8, 'import android.support.v4.content.FileProvider;');

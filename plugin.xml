@@ -27,9 +27,7 @@
 
     <platform name="android">
 
-        <framework src="org.apache.commons:commons-text:1.9"/>
         <framework src="net.lingala.zip4j:zip4j:2.9.0"/>
-
         <framework src="androidx.core:core:1.6.0" />
         <config-file target="config.xml" parent="/*">
             <preference name="AndroidXEnabled" value="true" />

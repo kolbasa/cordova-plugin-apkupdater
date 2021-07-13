@@ -4,55 +4,6 @@ var PLUGIN = 'ApkUpdater';
 
 var callbacks = {};
 
-/**
- * @param {string} str
- * @param {string} replace
- * @param {string} replaceWith
- * @returns {string}
- */
-function replaceAll(str, replace, replaceWith) {
-    if (str == null) {
-        return str;
-    }
-    if (typeof (String.prototype.replaceAll) === 'function') {
-        return str.replaceAll(replace, replaceWith);
-    }
-    var esc = ['-', '[', ']', '/', '{', '}', '(', ')', '*', '+', '?', '.', '\\', '^', '$', '|'].join('\\');
-    replace = replace.replace(new RegExp('[' + esc + ']', 'g'), '\\$&');
-    return str.replace(new RegExp(replace, 'g'), replaceWith);
-}
-
-/**
- * @param {string} str
- * @returns {string}
- */
-function unescapeEcmascript(str) {
-    str = replaceAll(str, '\\"', '"');
-    str = replaceAll(str, '\\/', '/');
-    str = replaceAll(str, '\\\'', '\'');
-    str = replaceAll(str, '\\t', '  ');
-    str = replaceAll(str, '\\n', '\n');
-    return str;
-}
-
-/**
- * @param {function} reject
- * @returns {(function(*=): void)|*}
- */
-function unescapeError(reject) {
-    return function (err) {
-        if (err != null) {
-            if (err.message != null) {
-                err.message = unescapeEcmascript(err.message);
-            }
-            if (err.stack != null) {
-                err.stack = unescapeEcmascript(err.stack);
-            }
-        }
-        reject(err);
-    };
-}
-
 module.exports = {
 
     /**
@@ -60,7 +11,7 @@ module.exports = {
      */
     getInstalledVersion: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'getInstalledVersion', []);
+            exec(resolve, reject, PLUGIN, 'getInstalledVersion', []);
         });
     },
 
@@ -90,7 +41,7 @@ module.exports = {
         }
 
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'download', [url, mappedOpt]);
+            exec(resolve, reject, PLUGIN, 'download', [url, mappedOpt]);
         }).finally(function () {
             callbacks = {};
         });
@@ -101,7 +52,7 @@ module.exports = {
      */
     stop: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'stop', []);
+            exec(resolve, reject, PLUGIN, 'stop', []);
         });
     },
 
@@ -110,7 +61,7 @@ module.exports = {
      */
     getDownloadedUpdate: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'getDownloadedUpdate', []);
+            exec(resolve, reject, PLUGIN, 'getDownloadedUpdate', []);
         });
     },
 
@@ -119,7 +70,7 @@ module.exports = {
      */
     install: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'install', []);
+            exec(resolve, reject, PLUGIN, 'install', []);
         });
     },
 
@@ -128,7 +79,7 @@ module.exports = {
      */
     rootInstall: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'rootInstall', []);
+            exec(resolve, reject, PLUGIN, 'rootInstall', []);
         });
     },
 
@@ -137,7 +88,7 @@ module.exports = {
      */
     reset: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, unescapeError(reject), PLUGIN, 'reset', []);
+            exec(resolve, reject, PLUGIN, 'reset', []);
         });
     },
 

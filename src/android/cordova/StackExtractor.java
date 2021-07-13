@@ -1,6 +1,5 @@
 package de.kolbasa.apkupdater.cordova;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,6 +18,7 @@ public class StackExtractor {
         StringWriter sw = new StringWriter();
         exception.printStackTrace(new PrintWriter(sw));
         String stack = sw.toString();
+        stack = stack.replace("\t", "  ");
 
         CordovaError mapped = null;
         if (exception instanceof IOException) {
@@ -36,8 +36,8 @@ public class StackExtractor {
         JSONObject error = new JSONObject();
         try {
             String message = mapped != null ? mapped.getMessage() : exception.getMessage();
-            error.put("message", StringEscapeUtils.escapeEcmaScript(message));
-            error.put("stack", StringEscapeUtils.escapeEcmaScript(stack));
+            error.put("message", message);
+            error.put("stack", stack);
         } catch (JSONException e) {
             e.printStackTrace();
         }
