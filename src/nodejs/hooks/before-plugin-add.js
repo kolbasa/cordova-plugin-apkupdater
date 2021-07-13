@@ -1,5 +1,3 @@
-const lineReplace = require('line-replace');
-
 module.exports = function (context) {
 
     let cli = context.opts.cli_variables;
@@ -7,63 +5,19 @@ module.exports = function (context) {
         return; // AndroidX enabled
     }
 
-    /**
-     * @param {string} file
-     * @param {number} line
-     * @returns {Promise<void>}
-     */
-    const remove = async (file, line) => {
-        await new Promise((resolve) => {
-            lineReplace({
-                file: file,
-                line: line,
-                text: '',
-                addNewLine: false,
-                callback: resolve
-            });
-        });
-    };
+    let fs = require('fs');
+    let UTF8 = 'utf8';
 
-    /**
-     * @param {string} file
-     * @param {number} line
-     * @param {string} text
-     * @returns {Promise<void>}
-     */
-    const replace = async (file, line, text) => {
-        await new Promise((resolve) => {
-            lineReplace({
-                file: file,
-                line: line,
-                text: text,
-                addNewLine: true,
-                callback: resolve
-            });
-        });
-    };
+    const pluginXml = __dirname + '/../../../plugin.xml';
+    let data = fs.readFileSync(pluginXml, UTF8);
+    data = data.replace(/<provider android:name="androidx.core.content.FileProvider"/g, '<provider android:name="android.support.v4.content.FileProvider"');
+    data = data.replace(/<preference name="AndroidXEnabled" value="true" \/>/g, '');
+    data = data.replace(/<framework src="androidx.core:core:1.6.0" \/>/g, '<preference name="APPCOMPAT_VERSION" default="28.+"/><framework src="com.android.support:appcompat-v7:$APPCOMPAT_VERSION"/>');
+    fs.writeFileSync(pluginXml, data, UTF8);
 
-    /**
-     * @param {number} length
-     * @returns {string}
-     */
-    function indent(length) {
-        return ' '.repeat(length);
-    }
-
-    (async () => {
-        
-        console.log('cordova-plugin-apkupdater - Installing without AndroidX.');
-
-        const pluginXml = __dirname + '/../../../plugin.xml';
-        await replace(pluginXml, 49, indent(12) + '<provider android:name="android.support.v4.content.FileProvider"');
-        await remove(pluginXml, 34);
-        await remove(pluginXml, 33);
-        await replace(pluginXml, 32, indent(8) + '<framework src="com.android.support:appcompat-v7:$APPCOMPAT_VERSION"/>');
-        await replace(pluginXml, 31, indent(8) + '<preference name="APPCOMPAT_VERSION" default="28.+" />');
-
-        const ApkInstaller = __dirname + '/../../android/tools/ApkInstaller.java';
-        await replace(ApkInstaller, 8, 'import android.support.v4.content.FileProvider;');
-
-    })();
+    const ApkInstaller = __dirname + '/../../android/tools/ApkInstaller.java';
+    data = fs.readFileSync(ApkInstaller, UTF8);
+    data = data.replace(/import androidx.core.content.FileProvider;/g, 'import android.support.v4.content.FileProvider;');
+    fs.writeFileSync(ApkInstaller, data, UTF8);
 
 };

@@ -13,7 +13,7 @@ I actively maintain the plugin and will take care of it.
 ## Plugin requirements
 
 * **Android**: 5+
-* **Cordova CLI**: 8.1.0+
+* **cordova**: 10.0.0+
 * **cordova-android**: 9.0.0+
 
 ## Cordova installation

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.0.1 - 2021-07-13
+* [Changed] Removed `line-replace` dependency in `before-plugin-add`-Hook.
+
 ## 2.0.0 - 2021-07-13
 
 **WARNING! Breaking Changes:**
