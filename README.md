@@ -75,8 +75,8 @@ let response = {
         "name": "Apk Updater Demo",
         "package": "de.kolbasa.apkupdater.demo",
         "version": {
-            "code": 10000,
-            "name": "1.0.0"
+            "code": 10001,
+            "name": "1.0.1"
         }
     }
 }
@@ -173,9 +173,27 @@ The plugin itself does not make a version comparison.
 You have to build the logic yourself how the app can determine if an update is needed.
 
 In my case, I simply place a `manifest.json` file next to the update, which stores the latest version number.  
-I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.  
+I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.
 
-This is also the case with the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
+This is also the case with
+the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
+
+Here is a simple example:
+```js
+const REMOTE = 'https://raw.githubusercontent.com/kolbasa/cordova-plugin-apkupdater-demo/master/update';
+
+let response = await new Promise(function (resolve, reject) {
+    cordova.plugin.http.sendRequest(REMOTE + '/manifest.json', {responseType: 'json', method: 'get'}, resolve, reject);
+});
+
+let remoteVersion = response.data.version;
+let installedVersion = (await ApkUpdater.getInstalledVersion()).version.name;
+
+if (remoteVersion > installedVersion) {
+    await ApkUpdater.download(REMOTE + '/update.zip', {password: 'aDzEsCceP3BPO5jy', onDownloadProgress: console.log});
+    await ApkUpdater.install();
+}
+```
 
 ## License
 

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0 - 2021-07-13
+
+**WARNING! Breaking Changes:**
+* [Changed] The complete plugin has been rewritten and greatly simplified. Details can be found in the revised `README.md`.
+
 ## 1.3.0 - 2021-07-03
 
 - [Changed] Minimum version of `cordova-android` was raised to `9.0.0`. This allows the dependency `cordova-plugin-androidx` to be omitted  ([#22](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/1)).
