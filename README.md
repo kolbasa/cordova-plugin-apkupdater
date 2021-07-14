@@ -101,9 +101,10 @@ await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 ApkUpdater.download('https://your-update-server.com/update.apk', options, success, failure);
 ```
 
-You can also pass a zip file here.  
+You can also pass a `zip` file here.  
 However, you should make sure that the archive contains only the APK file, nothing else.  
-Under `src/nodejs/compress-apk.js` you will find the script I use for automated compression.
+Under `src/nodejs/compress-apk.js` you will find the script I use for automated compression.  
+Of course, you can also simply use your own favorite archiver.
 
 The download method accepts the following options:
 
