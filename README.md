@@ -8,7 +8,8 @@ This plugin enables you to update your Android app completely without the Google
 
 If you have any problems or suggestions, just [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues)
 .  
-I actively maintain the plugin and will take care of it. Here is my current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) list.
+I actively maintain the plugin and will take care of it. Here is my
+current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) list.
 
 ## Plugin requirements
 
@@ -32,16 +33,67 @@ For Ionic, you also need `cordova-plugin-androidx-adapter`.
     ionic cordova plugin add cordova-plugin-apkupdater
     ionic cordova plugin add cordova-plugin-androidx-adapter
 
+## Using the plugin
+
+### Ionic 2+ with Typescript
+
+Here I show the simplest example: downloading and then installing the APK:
+
+```ts
+import {Platform} from '@ionic/angular';
+import {Component} from '@angular/core';
+
+@Component({
+    selector: 'app-home',
+    templateUrl: 'home.page.html'
+})
+
+export class HomePage {
+
+    constructor(public platform: Platform) {
+        platform.ready().then(this.update.bind(this)).catch(console.error);
+    }
+
+    async update() {
+        const apkUpdater = (window as any).ApkUpdater;
+        await apkUpdater.download('https://your-update-server.com/update.apk', {onDownloadProgress: console.log});
+        await apkUpdater.install();
+    }
+
+}
+```
+
+### Cordova / Ionic 1
+
+The same example with callbacks:
+
+```js
+function onDeviceReady() {
+    ApkUpdater.download(
+        'https://your-update-server.com/update.apk',
+        {
+            onDownloadProgress: console.log
+        },
+        function () {
+            ApkUpdater.install(console.log, console.error);
+        },
+        console.error
+    );
+}
+
+document.addEventListener("deviceready", onDeviceReady, false);
+```
+
 ## Download update
 
 The JavaScript API supports **promises** and **callbacks** for all methods:
 
 ```js
 // promise
-let manifest = await ApkUpdater.download('https://your-domain.com/update/update.apk', options);
+await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 
 // alternative with callbacks
-ApkUpdater.download('https://your-domain.com/update/update.apk', options, success, failure);
+ApkUpdater.download('https://your-update-server.com/update.apk', options, success, failure);
 ```
 
 You can also pass a zip file here.  
@@ -81,6 +133,46 @@ let response = {
     }
 }
 ```
+
+In case of a failure you get an error object with two attributes: `message` and `stack`.
+
+This example...
+
+```js
+try {
+    await ApkUpdater.download('https://your-server.com/update.zip', {password: 'wrongPassword'});
+} catch (e) {
+    console.error(e.message + '\n' + e.stack);
+}
+```
+
+... leads to the following output:
+
+```
+Download failed
+net.lingala.zip4j.exception.ZipException: Wrong password!
+  at net.lingala.zip4j.crypto.StandardDecrypter.init(StandardDecrypter.java:61)
+  at net.lingala.zip4j.crypto.StandardDecrypter.<init>(StandardDecrypter.java:31)
+  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:20)
+  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:10)
+  at net.lingala.zip4j.io.inputstream.CipherInputStream.<init>(CipherInputStream.java:25)
+  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.<init>(ZipStandardCipherInputStream.java:14)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeCipherInputStream(ZipInputStream.java:236)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeEntryInputStream(ZipInputStream.java:223)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:113)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:83)
+  at de.kolbasa.apkupdater.tools.Unzipper.unzip(Unzipper.java:51)
+  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:90)
+  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:121)
+  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:90)
+  at de.kolbasa.apkupdater.ApkUpdater.lambda$execute$3$ApkUpdater(ApkUpdater.java:191)
+  at de.kolbasa.apkupdater.-$$Lambda$ApkUpdater$i2uPxQeilYT0voSmjrvq6lzNQe0.run(Unknown Source:6)
+  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
+  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+  at java.lang.Thread.run(Thread.java:920)
+```
+
+This also applies to all the remaining methods listed below.
 
 ## Check installed version
 
@@ -179,6 +271,7 @@ This is also the case with
 the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
 
 Here is a simple example:
+
 ```js
 const REMOTE = 'https://raw.githubusercontent.com/kolbasa/cordova-plugin-apkupdater-demo/master/update';
 
@@ -192,6 +285,46 @@ let installedVersion = (await ApkUpdater.getInstalledVersion()).version.name;
 if (remoteVersion > installedVersion) {
     await ApkUpdater.download(REMOTE + '/update.zip', {password: 'aDzEsCceP3BPO5jy', onDownloadProgress: console.log});
     await ApkUpdater.install();
+}
+```
+
+Ionic 2+ with Typescript:
+
+```ts
+import {Platform} from '@ionic/angular';
+import {Component} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+
+@Component({
+    selector: 'app-home',
+    templateUrl: 'home.page.html'
+})
+
+export class HomePage {
+
+    remote = 'https://raw.githubusercontent.com/kolbasa/cordova-plugin-apkupdater-demo/master/update';
+
+    constructor(private httpClient: HttpClient, public platform: Platform) {
+        platform.ready().then(this.update.bind(this)).catch(console.error);
+    }
+
+    async update() {
+        const apkUpdater = (window as any).ApkUpdater;
+
+        const response = await this.httpClient.get<any>(this.remote + '/manifest.json').toPromise();
+
+        const remoteVersion = response.version;
+        const installedVersion = (await apkUpdater.getInstalledVersion()).version.name;
+
+        if (remoteVersion > installedVersion) {
+            await apkUpdater.download(this.remote + '/update.zip', {
+                password: 'aDzEsCceP3BPO5jy',
+                onDownloadProgress: console.log
+            });
+            await apkUpdater.install();
+        }
+    }
+
 }
 ```
 
