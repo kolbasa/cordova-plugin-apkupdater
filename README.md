@@ -56,7 +56,12 @@ export class HomePage {
 
     async update() {
         const apkUpdater = (window as any).ApkUpdater;
-        await apkUpdater.download('https://your-update-server.com/update.apk', {onDownloadProgress: console.log});
+        await apkUpdater.download(
+            'https://your-update-server.com/update.apk',
+            {
+                onDownloadProgress: console.log
+            }
+        );
         await apkUpdater.install();
     }
 
@@ -106,10 +111,16 @@ The download method accepts the following options:
 let options = {
     password: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
     onDownloadProgress: function (e) {
-        console.log('Downloading: ' + e.progress + '% (' + e.bytesWritten + '/' + e.bytes + ')');
+        console.log(
+            'Downloading: ' + e.progress + '%',
+            '(' + e.bytesWritten + '/' + e.bytes + ')'
+        );
     },
     onUnzipProgress: function (e) {
-        console.log('Unzipping: ' + e.progress + '% (' + e.bytesWritten + '/' + e.bytes + ')');
+        console.log(
+            'Unzipping: ' + e.progress + '%',
+            '(' + e.bytesWritten + '/' + e.bytes + ')'
+        );
     }
 }
 ```
@@ -140,7 +151,12 @@ This example...
 
 ```js
 try {
-    await ApkUpdater.download('https://your-server.com/update.zip', {password: 'wrongPassword'});
+    await ApkUpdater.download(
+        'https://your-update-server.com/update.apk',
+        {
+            password: 'wrongPassword'
+        }
+    );
 } catch (e) {
     console.error(e.message + '\n' + e.stack);
 }
@@ -272,23 +288,40 @@ the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-dem
 
 Here is a simple example:
 
+### Cordova:
+
 ```js
-const REMOTE = 'https://raw.githubusercontent.com/kolbasa/cordova-plugin-apkupdater-demo/master/update';
+const REMOTE = 'https://raw.githubusercontent.com/kolbasa/' +
+               'cordova-plugin-apkupdater-demo/master/update';
 
 let response = await new Promise(function (resolve, reject) {
-    cordova.plugin.http.sendRequest(REMOTE + '/manifest.json', {responseType: 'json', method: 'get'}, resolve, reject);
+    cordova.plugin.http.sendRequest(
+        REMOTE + '/manifest.json',
+        {
+            responseType: 'json',
+            method: 'get'
+        },
+        resolve,
+        reject
+    );
 });
 
 let remoteVersion = response.data.version;
 let installedVersion = (await ApkUpdater.getInstalledVersion()).version.name;
 
 if (remoteVersion > installedVersion) {
-    await ApkUpdater.download(REMOTE + '/update.zip', {password: 'aDzEsCceP3BPO5jy', onDownloadProgress: console.log});
+    await ApkUpdater.download(
+        REMOTE + '/update.zip',
+        {
+            password: 'aDzEsCceP3BPO5jy',
+            onDownloadProgress: console.log
+        }
+    );
     await ApkUpdater.install();
 }
 ```
 
-Ionic 2+ with Typescript:
+### Ionic 2+ with Typescript:
 
 ```ts
 import {Platform} from '@ionic/angular';
@@ -302,7 +335,8 @@ import {HttpClient} from '@angular/common/http';
 
 export class HomePage {
 
-    remote = 'https://raw.githubusercontent.com/kolbasa/cordova-plugin-apkupdater-demo/master/update';
+    remote = 'https://raw.githubusercontent.com/kolbasa/' +
+        'cordova-plugin-apkupdater-demo/master/update';
 
     constructor(private httpClient: HttpClient, public platform: Platform) {
         platform.ready().then(this.update.bind(this)).catch(console.error);
@@ -311,16 +345,20 @@ export class HomePage {
     async update() {
         const apkUpdater = (window as any).ApkUpdater;
 
-        const response = await this.httpClient.get<any>(this.remote + '/manifest.json').toPromise();
+        const response = await this.httpClient
+            .get<any>(this.remote + '/manifest.json').toPromise();
 
         const remoteVersion = response.version;
         const installedVersion = (await apkUpdater.getInstalledVersion()).version.name;
 
         if (remoteVersion > installedVersion) {
-            await apkUpdater.download(this.remote + '/update.zip', {
-                password: 'aDzEsCceP3BPO5jy',
-                onDownloadProgress: console.log
-            });
+            await apkUpdater.download(
+                this.remote + '/update.zip',
+                {
+                    password: 'aDzEsCceP3BPO5jy',
+                    onDownloadProgress: console.log
+                }
+            );
             await apkUpdater.install();
         }
     }
