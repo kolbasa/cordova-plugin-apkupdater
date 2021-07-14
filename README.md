@@ -130,7 +130,6 @@ If the download is successful, you will receive detailed information about the u
 
 ```js
 let response = {
-    "zip": "update-encrypted.zip",
     "update": "update.apk",
     "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
     "size": 1982411,
@@ -153,7 +152,7 @@ This example...
 ```js
 try {
     await ApkUpdater.download(
-        'https://your-update-server.com/update.apk',
+        'https://your-update-server.com/encrypted-update.zip',
         {
             password: 'wrongPassword'
         }
