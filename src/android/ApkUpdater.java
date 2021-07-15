@@ -86,8 +86,9 @@ public class ApkUpdater extends CordovaPlugin {
         try {
             checkIfRunning();
             String url = data.getString(0);
-            String password = data.getString(1);
-            Update update = updateManager.download(url, password);
+            String basicAuth = data.getString(1);
+            String zipPassword = data.getString(2);
+            Update update = updateManager.download(url, basicAuth, zipPassword);
             callbackContext.success(getInfo(update));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));

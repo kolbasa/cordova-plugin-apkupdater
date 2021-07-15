@@ -19,7 +19,10 @@ module.exports = {
     /**
      * @param {string} url - Your apk or zip-archive
      * @param {object | undefined} opt - Optional
-     * @param {string=} opt.password
+     * @param {string=} opt.zipPassword
+     * @param {object=} opt.basicAuth
+     * @param {string=} opt.basicAuth.userId
+     * @param {string=} opt.basicAuth.password
      * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onDownloadProgress
      * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onUnzipProgress
      * @param {function=} success

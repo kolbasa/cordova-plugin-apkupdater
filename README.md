@@ -109,7 +109,11 @@ The download method accepts the following options:
 
 ```js
 let options = {
-    password: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
+    zipPassword: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
+    basicAuth: { // Basic access authentication
+        userId: 'username',
+        password: 'JtE+es2GcHrjTAEU'
+    },
     onDownloadProgress: function (e) {
         console.log(
             'Downloading: ' + e.progress + '%',
@@ -153,7 +157,7 @@ try {
     await ApkUpdater.download(
         'https://your-update-server.com/encrypted-update.zip',
         {
-            password: 'wrongPassword'
+            zipPassword: 'wrongPassword'
         }
     );
 } catch (e) {
@@ -312,7 +316,7 @@ if (remoteVersion > installedVersion) {
     await ApkUpdater.download(
         REMOTE + '/update.zip',
         {
-            password: 'aDzEsCceP3BPO5jy',
+            zipPassword: 'aDzEsCceP3BPO5jy',
             onDownloadProgress: console.log
         }
     );
@@ -354,7 +358,7 @@ export class HomePage {
             await apkUpdater.download(
                 this.remote + '/update.zip',
                 {
-                    password: 'aDzEsCceP3BPO5jy',
+                    zipPassword: 'aDzEsCceP3BPO5jy',
                     onDownloadProgress: console.log
                 }
             );

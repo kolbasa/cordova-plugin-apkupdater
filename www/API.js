@@ -20,7 +20,10 @@ module.exports = {
     /**
      * @param {string} url - Your apk or zip-archive
      * @param {object | undefined} opt - Optional
-     * @param {string=} opt.password
+     * @param {string=} opt.zipPassword
+     * @param {object=} opt.basicAuth
+     * @param {string=} opt.basicAuth.userId
+     * @param {string=} opt.basicAuth.password
      * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onDownloadProgress
      * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onUnzipProgress
      * @returns {Promise<object>}
@@ -36,8 +39,13 @@ module.exports = {
             exec(opt.onUnzipProgress, emptyFn, PLUGIN, 'addUnzipObserver');
         }
 
+        var basicAuth;
+        if (opt.basicAuth != null && opt.basicAuth.userId != null && opt.basicAuth.password != null) {
+            basicAuth = opt.basicAuth.userId + ':' + opt.basicAuth.password;
+        }
+
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'download', [url, opt.password]);
+            exec(resolve, reject, PLUGIN, 'download', [url, basicAuth, opt.zipPassword]);
         });
     },
 

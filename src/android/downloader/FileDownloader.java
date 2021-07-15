@@ -1,5 +1,6 @@
 package de.kolbasa.apkupdater.downloader;
 
+import android.util.Base64;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class FileDownloader extends Observable {
         notifyObservers(progress);
     }
 
-    public File download(String fileUrl, File dir) throws IOException {
+    public File download(String fileUrl, File dir, String basicAuth) throws IOException {
 
         String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         File outputFile = new File(dir, fileName);
@@ -36,6 +37,12 @@ public class FileDownloader extends Observable {
             connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(false);
             connection.setAllowUserInteraction(false);
+
+            if (basicAuth != null) {
+                basicAuth = new String(Base64.encode(basicAuth.getBytes(), Base64.NO_WRAP));
+                connection.setRequestProperty("Authorization", "Basic " + basicAuth);
+            }
+
             connection.connect();
 
             String headerFileName = connection.getHeaderField("Content-Disposition");

@@ -65,13 +65,13 @@ public class UpdateManager {
         }
     }
 
-    private File downloadFile(String path) throws IOException {
+    private File downloadFile(String path, String basicAuth) throws IOException {
         try {
             fileDownloader = new FileDownloader();
             if (downloadObserver != null) {
                 fileDownloader.addObserver(downloadObserver);
             }
-            return fileDownloader.download(path, downloadDirectory);
+            return fileDownloader.download(path, downloadDirectory, basicAuth);
         } finally {
             fileDownloader = null;
             downloadObserver = null;
@@ -112,13 +112,9 @@ public class UpdateManager {
         return wrap(update, null);
     }
 
-    public Update download(String path) throws IOException {
-        return download(path, null);
-    }
-
-    public Update download(String path, String password) throws IOException {
-        File zip = downloadFile(path);
-        File apk = unzipFile(zip, password);
+    public Update download(String path, String basicAuth, String zipPassword) throws IOException {
+        File zip = downloadFile(path, basicAuth);
+        File apk = unzipFile(zip, zipPassword);
 
         if (apk != null) {
             // noinspection ResultOfMethodCallIgnored
