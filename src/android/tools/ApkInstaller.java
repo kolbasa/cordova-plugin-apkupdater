@@ -1,9 +1,11 @@
 package de.kolbasa.apkupdater.tools;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.view.WindowManager;
 
 import androidx.core.content.FileProvider;
 
@@ -16,11 +18,18 @@ import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
 
 public class ApkInstaller {
 
+    private static boolean isFullScreen(Context context) {
+        return (((Activity) context).getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
+
     public static void install(Context context, File update) throws IOException {
         Intent intent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (!isFullScreen(context)) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             String fileProvider = context.getPackageName() + ".apkupdater.provider";
             intent.setData(FileProvider.getUriForFile(context, fileProvider, update));
         } else {
