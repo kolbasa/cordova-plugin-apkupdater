@@ -20,8 +20,8 @@ import de.kolbasa.apkupdater.exceptions.PlatformNotSupportedException;
 
 public class ApkInstaller {
 
-    private static boolean isFullScreen(Context context) {
-        return (((Activity) context).getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    private static boolean isNotFullscreen(Context context) {
+        return (((Activity) context).getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == 0;
     }
 
     public static void install(Context context, File update) throws IOException {
@@ -29,7 +29,7 @@ public class ApkInstaller {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            if (!isFullScreen(context)) {
+            if (isNotFullscreen(context)) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
             String fileProvider = context.getPackageName() + ".apkupdater.provider";
@@ -92,7 +92,9 @@ public class ApkInstaller {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
             intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (isNotFullscreen(context)) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             context.startActivity(intent);
         } else {
             throw new PlatformNotSupportedException("SDK: " + Build.VERSION.SDK_INT);
