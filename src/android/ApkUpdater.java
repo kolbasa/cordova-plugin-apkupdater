@@ -104,6 +104,27 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
+    private void openInstallSetting(CallbackContext callbackContext) {
+        try {
+            ApkInstaller.openInstallSetting(cordova.getContext());
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void canRequestPackageInstalls(CallbackContext callbackContext) {
+        try {
+            if (ApkInstaller.canRequestPackageInstalls(cordova.getContext())) {
+                callbackContext.success("Authorized");
+            } else {
+                callbackContext.success("Not authorized");
+            }
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
     private void stop(CallbackContext callbackContext) {
         try {
             if (updateManager.isDownloading()) {
@@ -208,6 +229,12 @@ public class ApkUpdater extends CordovaPlugin {
                 break;
             case "rootInstall":
                 cordova.getThreadPool().execute(() -> rootInstall(callbackContext));
+                break;
+            case "canRequestPackageInstalls":
+                cordova.getThreadPool().execute(() -> canRequestPackageInstalls(callbackContext));
+                break;
+            case "openInstallSetting":
+                cordova.getThreadPool().execute(() -> openInstallSetting(callbackContext));
                 break;
             case "reset":
                 cordova.getThreadPool().execute(() -> reset(callbackContext));

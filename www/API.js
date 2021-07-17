@@ -88,6 +88,24 @@ module.exports = {
     /**
      * @returns {Promise}
      */
+    canRequestPackageInstalls: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'canRequestPackageInstalls', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
+    openInstallSetting: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'openInstallSetting', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
     reset: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'reset', []);

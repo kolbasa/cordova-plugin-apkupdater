@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.core.content.FileProvider;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
+import de.kolbasa.apkupdater.exceptions.PlatformNotSupportedException;
 
 public class ApkInstaller {
 
@@ -65,6 +67,27 @@ public class ApkInstaller {
 
         if (builder.length() > 0) {
             throw new InstallationFailedException(builder.toString());
+        }
+    }
+
+    public static boolean canRequestPackageInstalls(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return context.getPackageManager().canRequestPackageInstalls();
+        } else {
+            // noinspection deprecation
+            String name = Settings.Global.INSTALL_NON_MARKET_APPS;
+            return Settings.Global.getInt(null, name, 0) == 1;
+        }
+    }
+
+    public static void openInstallSetting(Context context) throws PlatformNotSupportedException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+            intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } else {
+            throw new PlatformNotSupportedException("SDK: " + Build.VERSION.SDK_INT);
         }
     }
 

@@ -100,6 +100,34 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
+    canRequestPackageInstalls: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.canRequestPackageInstalls();
+        } else {
+            API.canRequestPackageInstalls().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<void>|void}
+     */
+    openInstallSetting: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.openInstallSetting();
+        } else {
+            API.openInstallSetting().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<void>|void}
+     */
     reset: function (success, failure) {
         if (success == null && failure == null) {
             return API.reset();

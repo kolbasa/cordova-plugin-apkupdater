@@ -20,22 +20,22 @@ public class StackExtractor {
         String stack = sw.toString();
         stack = stack.replace("\t", "  ");
 
-        CordovaError mapped = null;
+        String mapped = null;
         if (exception instanceof IOException) {
-            mapped = CordovaError.DOWNLOAD_FAILED;
+            mapped = "Download failed";
         } else if (exception instanceof InstallationFailedException) {
-            mapped = CordovaError.INSTALLATION_FAILED;
+            mapped = "Could not install the update";
         } else if (exception instanceof UpdateNotFoundException) {
-            mapped = CordovaError.DOWNLOAD_DIRECTORY_EMPTY;
+            mapped = "Download directory is empty";
         } else if (exception instanceof DownloadInProgressException) {
-            mapped = CordovaError.DOWNLOAD_IN_PROGRESS;
+            mapped = "Download is in progress";
         } else if (exception instanceof DownloadNotRunningException) {
-            mapped = CordovaError.DOWNLOAD_NOT_RUNNING;
+            mapped = "Download not running";
         }
 
         JSONObject error = new JSONObject();
         try {
-            String message = mapped != null ? mapped.getMessage() : exception.getMessage();
+            String message = mapped != null ? mapped : exception.getMessage();
             error.put("message", message);
             error.put("stack", stack);
         } catch (JSONException e) {
