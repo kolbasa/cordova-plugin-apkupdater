@@ -91,6 +91,8 @@ module.exports = {
     canRequestPackageInstalls: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'canRequestPackageInstalls', []);
+        }).then(function (resp) {
+            return resp === 'Authorized';
         });
     },
 

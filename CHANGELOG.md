@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.1.0 - 2021-07-17
+
+- [Added] Support for HTTP Basic Auth added ([#23](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/23)).
+- [Added] Two new functions: `canRequestPackageInstalls()`, `openInstallSetting()`
+- [Fixed] The installation did not work with fullscreen apps ([#27](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/27)).
+- [Changed] **Breaking Change:** `download()`-option `password` was renamed to `zipPassword`.
+
 ## 2.0.1 - 2021-07-13
 
 - [Changed] Removed `line-replace` dependency in `before-plugin-add`-Hook.

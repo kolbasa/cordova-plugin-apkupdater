@@ -22,7 +22,9 @@ public class StackExtractor {
 
         String mapped = null;
         if (exception instanceof IOException) {
-            mapped = "Download failed";
+            if (!stack.contains("\"su\"")) {
+                mapped = "Download failed";
+            }
         } else if (exception instanceof InstallationFailedException) {
             mapped = "Could not install the update";
         } else if (exception instanceof UpdateNotFoundException) {

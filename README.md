@@ -278,6 +278,28 @@ await ApkUpdater.reset();
 ApkUpdater.reset(success, failure);
 ```
 
+## Check if the application is authorized to install packages
+
+The `install` method asks the user for permission.  
+If you want more control, there are two functions for that:
+
+```js
+// promise
+await ApkUpdater.canRequestPackageInstalls(); // true/false
+
+// alternative with callbacks
+ApkUpdater.canRequestPackageInstalls(success, failure);
+```
+
+To open the settings menu:
+```js
+// promise
+await ApkUpdater.openInstallSetting();
+
+// alternative with callbacks
+ApkUpdater.openInstallSetting(success, failure);
+```
+
 ## Version checks
 
 The plugin itself does not make a version comparison.  
