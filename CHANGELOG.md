@@ -1,11 +1,18 @@
 # CHANGELOG
 
+## 2.2.0 - 2021-07-18
+
+- [Added] TypeScript API ([#17](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/17), [#19](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/19))
+- [Added] Capacitor instructions ([#25](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/25))
+- [Changed] **Breaking Change:** Download option `basicAuth.userId` renamed to `basicAuth.user`
+- [Changed] **Breaking Change:** `download()` result parameter `update` was renamed to `name`.
+
 ## 2.1.0 - 2021-07-17
 
 - [Added] Support for HTTP Basic Auth added ([#23](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/23)).
 - [Added] Two new functions: `canRequestPackageInstalls()`, `openInstallSetting()`
 - [Fixed] The installation did not work with fullscreen apps ([#27](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/27)).
-- [Changed] **Breaking Change:** `download()`-option `password` was renamed to `zipPassword`.
+- [Changed] **Breaking Change:** `download()` config option `password` was renamed to `zipPassword`.
 
 ## 2.0.1 - 2021-07-13
 
@@ -81,7 +88,7 @@
 
     The order of the arguments has been changed for the `backgroundDownload`-method.
 
-    ```javascript
+    ```
     // Version 1.0.0:
     cordova.plugins.apkupdater.backgroundDownload(success?: function, failure?: function, interval: number)
 

@@ -22,7 +22,9 @@ public class StackExtractor {
 
         String mapped = null;
         if (exception instanceof IOException) {
-            if (!stack.contains("\"su\"")) {
+            if (stack.contains("\"su\"")) {
+                mapped = "Device not rooted";
+            } else {
                 mapped = "Download failed";
             }
         } else if (exception instanceof InstallationFailedException) {

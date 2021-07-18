@@ -65,11 +65,8 @@ public class ApkUpdater extends CordovaPlugin {
 
     private JSONObject getInfo(Update update) throws JSONException, PackageManager.NameNotFoundException {
         JSONObject result = new JSONObject();
-        if (update.getZip() != null) {
-            result.put("zip", update.getZip().getName());
-        }
         File apk = update.getApk();
-        result.put("update", apk.getName());
+        result.put("name", apk.getName());
         result.put("path", apk.getParent());
         result.put("size", apk.length());
         result.put("checksum", update.getChecksum());

@@ -1,10 +1,11 @@
-# Cordova Apk Updater Plugin
+Cordova Apk Updater Plugin &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/cordova-plugin-apkupdater.svg)]() [![npm](https://img.shields.io/npm/dm/cordova-plugin-apkupdater.svg)]()
+---------------------------------------------------------------------------
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE)
+![Installation dialog](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Images/CordovaBot.png)
 
 This plugin enables you to update your Android app completely without the Google Play Store.
 
-&#128073; **[DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo)** &#128072;
+:point_right: **[DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo)** :point_left:
 
 If you have any problems or suggestions, just [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues)
 .  
@@ -13,80 +14,79 @@ current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) 
 
 ## Plugin requirements
 
-* **Android**: 5+
-* **cordova**: 10.0.0+
-* **cordova-android**: 9.0.0+
+* **Android**: `5+`
+* **cordova**: `10.0.0+`
+* **cordova-android**: `9.0.0+`
 
-## Cordova installation
+## installation
+
+### Cordova
 
     cordova plugin add cordova-plugin-apkupdater
 
-Legacy installation without AndroidX (not recommended):
-
-    cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
-
-## Ionic installation
-
-For Ionic, you also need `cordova-plugin-androidx-adapter`.  
-[Ionic Web View](https://github.com/ionic-team/cordova-plugin-ionic-webview) for Cordova requires this.
+### Ionic + Cordova + Android
 
     ionic cordova plugin add cordova-plugin-apkupdater
     ionic cordova plugin add cordova-plugin-androidx-adapter
+
+### Capacitor
+
+    npm install cordova-plugin-apkupdater
+
+### Android Legacy Support Libraries
+
+It is not recommended, but you can install the plugin without AndroidX. Just set the following variable:
+
+`--variable AndroidXEnabled=false`
 
 ## Using the plugin
 
 ### Ionic 2+ with Typescript
 
-Here I show the simplest example: downloading and then installing the APK:
+Here is the simplest example: downloading and then installing the APK:
+
+[**Sample Implementation**](
+https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/doc/ionic-sample/simple/home/home.page.ts
+)
 
 ```ts
-import {Platform} from '@ionic/angular';
-import {Component} from '@angular/core';
-
-@Component({
-    selector: 'app-home',
-    templateUrl: 'home.page.html'
-})
+import ApkUpdater from 'cordova-plugin-apkupdater';
 
 export class HomePage {
 
-    constructor(public platform: Platform) {
-        platform.ready().then(this.update.bind(this)).catch(console.error);
-    }
+    // .
+    // .
+    // .
 
     async update() {
-        const apkUpdater = (window as any).ApkUpdater;
-        await apkUpdater.download(
+        await ApkUpdater.download(
             'https://your-update-server.com/update.apk',
             {
-                onDownloadProgress: console.log
+                onDownloadProgress: progress => console.log,
             }
         );
-        await apkUpdater.install();
+        await ApkUpdater.install();
     }
 
 }
+
 ```
 
-### Cordova / Ionic 1
+### Cordova
 
 The same example with callbacks:
 
 ```js
-function onDeviceReady() {
-    ApkUpdater.download(
-        'https://your-update-server.com/update.apk',
-        {
-            onDownloadProgress: console.log
-        },
-        function () {
-            ApkUpdater.install(console.log, console.error);
-        },
-        console.error
-    );
-}
-
-document.addEventListener("deviceready", onDeviceReady, false);
+ApkUpdater.download(
+    'https://your-update-server.com/update.apk',
+    {
+        onDownloadProgress: console.log
+    },
+    function () {
+        ApkUpdater.install(console.log, console.error);
+    },
+    console.error
+);
 ```
 
 ## Download update
@@ -102,16 +102,15 @@ ApkUpdater.download('https://your-update-server.com/update.apk', options, succes
 ```
 
 You can also pass a `zip` file here. The zip file can even be encrypted with a password.  
-However, you should make sure that the archive contains only the APK file at root level, nothing else.  
+However, you should make sure that the archive contains only the APK file at root level, nothing else.
 
-
-The download method accepts the following options:
+The download method can be configured as follows. The settings are optional.
 
 ```js
 let options = {
     zipPassword: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
     basicAuth: { // Basic access authentication
-        userId: 'username',
+        user: 'username',
         password: 'JtE+es2GcHrjTAEU'
     },
     onDownloadProgress: function (e) {
@@ -132,8 +131,8 @@ let options = {
 If the download is successful, you will receive detailed information about the update file.
 
 ```js
-let response = {
-    "update": "update.apk",
+let result = {
+    "name": "update.apk",
     "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
     "size": 1982411,
     "checksum": "d90916f513b1226e246ecb4d64acffae", // MD5
@@ -208,10 +207,10 @@ ApkUpdater.getInstalledVersion(success, failure);
 Example output:
 
 ```js
-let response = {
+let result = {
     "name": "Apk Updater Demo",
     "package": "de.kolbasa.apkupdater.demo",
-    "firstInstallTime": 1625415754434,
+    "firstInstallTime": 1625415754434, // Unix timestamp
     "version": {
         "code": 10000,
         "name": "1.0.0"
@@ -230,6 +229,8 @@ await ApkUpdater.getDownloadedUpdate();
 // alternative with callbacks
 ApkUpdater.getDownloadedUpdate(success, failure);
 ```
+
+This will give the same output as the `download` method.
 
 ## Installation prompt
 
@@ -278,20 +279,21 @@ await ApkUpdater.reset();
 ApkUpdater.reset(success, failure);
 ```
 
-## Check if the application is authorized to install packages
+## Check if the app is authorized to install packages
 
 The `install` method asks the user for permission.  
 If you want more control, there are two functions for that:
 
 ```js
 // promise
-await ApkUpdater.canRequestPackageInstalls(); // true/false
+await ApkUpdater.canRequestPackageInstalls(); // -> true, false
 
 // alternative with callbacks
 ApkUpdater.canRequestPackageInstalls(success, failure);
 ```
 
 To open the settings menu:
+
 ```js
 // promise
 await ApkUpdater.openInstallSetting();
@@ -303,91 +305,43 @@ ApkUpdater.openInstallSetting(success, failure);
 ## Version checks
 
 The plugin itself does not make a version comparison.  
-You have to build the logic yourself how the app can determine if an update is needed.
+Here you need to find a solution that best suits your use case.
 
-In my case, I simply place a `manifest.json` file next to the update, which stores the latest version number.  
+If you always have Wi-Fi, you could download the entire apk at regular intervals and check whether the version has changed.  
+If you use mobile data, which is usually limited, then you should have a different strategy.  
+You may already have a remote API and can request the latest version there.
+
+In my case, I simply place a small `manifest.json` file next to the update, which stores the latest version number.  
 I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.
 
 This is also the case with
 the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
 
-Here is a simple example:
-
-### Cordova:
-
-```js
-const REMOTE = 'https://raw.githubusercontent.com/kolbasa/' +
-               'cordova-plugin-apkupdater-demo/master/update';
-
-let response = await new Promise(function (resolve, reject) {
-    cordova.plugin.http.sendRequest(
-        REMOTE + '/manifest.json',
-        {
-            responseType: 'json',
-            method: 'get'
-        },
-        resolve,
-        reject
-    );
-});
-
-let remoteVersion = response.data.version;
-let installedVersion = (await ApkUpdater.getInstalledVersion()).version.name;
-
-if (remoteVersion > installedVersion) {
-    await ApkUpdater.download(
-        REMOTE + '/update.zip',
-        {
-            zipPassword: 'aDzEsCceP3BPO5jy',
-            onDownloadProgress: console.log
-        }
-    );
-    await ApkUpdater.install();
-}
-```
-
-### Ionic 2+ with Typescript:
+Sample Implementation:
 
 ```ts
-import {Platform} from '@ionic/angular';
-import {Component} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-
-@Component({
-    selector: 'app-home',
-    templateUrl: 'home.page.html'
-})
+import ApkUpdater from 'cordova-plugin-apkupdater';
 
 export class HomePage {
 
-    remote = 'https://raw.githubusercontent.com/kolbasa/' +
-        'cordova-plugin-apkupdater-demo/master/update';
-
-    constructor(private httpClient: HttpClient, public platform: Platform) {
-        platform.ready().then(this.update.bind(this)).catch(console.error);
-    }
+    // .
+    // .
+    // .
+    
+    remote = 'https://your-update-server.com'
 
     async update() {
-        const apkUpdater = (window as any).ApkUpdater;
 
-        const response = await this.httpClient
-            .get<any>(this.remote + '/manifest.json').toPromise();
+        const manifest = await this.http.get<any>(this.remote + '/manifest.json').toPromise();
 
-        const remoteVersion = response.version;
-        const installedVersion = (await apkUpdater.getInstalledVersion()).version.name;
+        const remoteVersion = manifest.version.code;
+        const installedVersion = (await ApkUPdater.getInstalledVersion()).version.code;
 
         if (remoteVersion > installedVersion) {
-            await apkUpdater.download(
-                this.remote + '/update.zip',
-                {
-                    zipPassword: 'aDzEsCceP3BPO5jy',
-                    onDownloadProgress: console.log
-                }
-            );
-            await apkUpdater.install();
+            await ApkUPdater.download(this.remote + '/update.apk');
+            await ApkUPdater.install();
         }
     }
-
 }
 ```
 

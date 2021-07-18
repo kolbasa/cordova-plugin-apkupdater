@@ -22,7 +22,7 @@ module.exports = {
      * @param {object | undefined} opt - Optional
      * @param {string=} opt.zipPassword
      * @param {object=} opt.basicAuth
-     * @param {string=} opt.basicAuth.userId
+     * @param {string=} opt.basicAuth.user
      * @param {string=} opt.basicAuth.password
      * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onDownloadProgress
      * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onUnzipProgress
@@ -40,8 +40,8 @@ module.exports = {
         }
 
         var basicAuth;
-        if (opt.basicAuth != null && opt.basicAuth.userId != null && opt.basicAuth.password != null) {
-            basicAuth = opt.basicAuth.userId + ':' + opt.basicAuth.password;
+        if (opt.basicAuth != null && opt.basicAuth.user != null && opt.basicAuth.password != null) {
+            basicAuth = opt.basicAuth.user + ':' + opt.basicAuth.password;
         }
 
         return new Promise(function (resolve, reject) {
