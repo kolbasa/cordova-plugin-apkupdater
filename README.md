@@ -1,4 +1,4 @@
-Cordova Apk Updater Plugin &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/cordova-plugin-apkupdater.svg)]() [![npm](https://img.shields.io/npm/dm/cordova-plugin-apkupdater.svg)]()
+Cordova Apk Updater Plugin &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/cordova-plugin-apkupdater.svg)](https://www.npmjs.com/package/cordova-plugin-apkupdater) [![npm](https://img.shields.io/npm/dm/cordova-plugin-apkupdater.svg)](https://www.npmjs.com/package/cordova-plugin-apkupdater)
 ---------------------------------------------------------------------------
 
 ![Installation dialog](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Images/CordovaBot.png)
