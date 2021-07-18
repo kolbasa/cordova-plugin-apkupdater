@@ -4,7 +4,7 @@
 
 - [Added] TypeScript API ([#17](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/17), [#19](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/19))
 - [Added] Capacitor instructions ([#25](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/25))
-- [Changed] **Breaking Change:** Download config option `basicAuth.userId` renamed to `basicAuth.user`
+- [Changed] **Breaking Change:** Download config option `basicAuth.userId` was renamed to `basicAuth.user`
 - [Changed] **Breaking Change:** Download result parameter `update` was renamed to `name`.
 
 ## 2.1.0 - 2021-07-17
