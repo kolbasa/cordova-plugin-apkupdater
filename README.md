@@ -45,9 +45,7 @@ It is not recommended, but you can install the plugin without AndroidX. Just set
 
 Here is the simplest example: downloading and then installing the APK:
 
-[**Sample Implementation**](
-https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/doc/ionic-sample/simple/home/home.page.ts
-)
+[**Sample Implementation**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Implementation)
 
 ```ts
 import ApkUpdater from 'cordova-plugin-apkupdater';
