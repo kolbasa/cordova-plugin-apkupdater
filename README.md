@@ -24,7 +24,7 @@ current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) 
 
     cordova plugin add cordova-plugin-apkupdater
 
-### Ionic + Cordova + Android
+### Ionic + Cordova
 
     ionic cordova plugin add cordova-plugin-apkupdater
     ionic cordova plugin add cordova-plugin-androidx-adapter
