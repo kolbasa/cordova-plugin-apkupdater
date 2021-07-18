@@ -242,7 +242,8 @@ await ApkUpdater.install();
 ApkUpdater.install(success, failure);
 ```
 
-If you have a rooted device, then you do not need to ask the user for permission to install the update.
+If you have a rooted device, then you do not need to ask the user for permission to install the update.  
+The app is even restarted directly afterwards ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
 
 ```js
 // promise
@@ -303,17 +304,18 @@ ApkUpdater.openInstallSetting(success, failure);
 ## Version checks
 
 The plugin itself does not make a version comparison.  
-Here you need to find a solution that best suits your use case.
+You need to find a solution that best suits your use case.
 
-If you always have Wi-Fi, you could download the entire apk at regular intervals and check whether the version has changed.  
+If you always have Wi-Fi, you could download the entire apk at regular intervals and check whether the version has
+changed.  
 If you use mobile data, which is usually limited, then you should have a different strategy.  
 You may already have a remote API and can request the latest version there.
 
 In my case, I simply place a small `manifest.json` file next to the update, which stores the latest version number.  
 I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.
 
-This is also the case with
-the [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
+This is also the case with the
+[demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
 
 Sample Implementation:
 
@@ -325,7 +327,7 @@ export class HomePage {
     // .
     // .
     // .
-    
+
     remote = 'https://your-update-server.com'
 
     async update() {
