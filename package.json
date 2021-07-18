@@ -32,9 +32,6 @@
     "type": "git",
     "url": "git+https://github.com/kolbasa/cordova-plugin-apkupdater.git"
   },
-  "devDependencies": {
-    "archiver-zip-encryptable": "^1.0.9"
-  },
   "bugs": {
     "url": "https://github.com/kolbasa/cordova-plugin-apkupdater/issues"
   },
