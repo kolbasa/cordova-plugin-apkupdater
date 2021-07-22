@@ -18,30 +18,31 @@ current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) 
 * **cordova**: `10.0.0+`
 * **cordova-android**: `9.0.0+`
 
-## installation
+## Installation
 
-### Cordova
+#### Cordova
 
     cordova plugin add cordova-plugin-apkupdater
 
-### Ionic + Cordova
+#### Ionic + Cordova
 
     ionic cordova plugin add cordova-plugin-apkupdater
     ionic cordova plugin add cordova-plugin-androidx-adapter
 
-### Capacitor
+#### Capacitor
 
     npm install cordova-plugin-apkupdater
 
-### Android Legacy Support Libraries
+#### Android Legacy Support Libraries
 
 It is not recommended, but you can install the plugin without AndroidX. Just set the following variable:
 
-`--variable AndroidXEnabled=false`
+    cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
+
 
 ## Using the plugin
 
-### Ionic 2+ with Typescript
+#### Ionic 2+ with Typescript
 
 Here is the simplest example: downloading and then installing the APK:
 
@@ -70,7 +71,7 @@ export class HomePage {
 
 ```
 
-### Cordova
+#### Cordova
 
 The same example with callbacks:
 
@@ -87,7 +88,7 @@ ApkUpdater.download(
 );
 ```
 
-## Download update
+## Download
 
 The JavaScript API supports **promises** and **callbacks** for all methods:
 
