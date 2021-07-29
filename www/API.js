@@ -88,11 +88,20 @@ module.exports = {
     /**
      * @returns {Promise}
      */
+    ownerInstall: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'ownerInstall', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
     canRequestPackageInstalls: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'canRequestPackageInstalls', []);
         }).then(function (resp) {
-            return resp === 'Authorized';
+            return resp === 'true';
         });
     },
 
@@ -102,6 +111,17 @@ module.exports = {
     openInstallSetting: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'openInstallSetting', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
+    isDeviceOwner: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'isDeviceOwner', []);
+        }).then(function (resp) {
+            return resp === 'true';
         });
     },
 
