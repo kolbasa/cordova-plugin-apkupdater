@@ -68,7 +68,7 @@ public class ApkInstaller {
         PackageInstaller pi = pm.getPackageInstaller();
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
                 PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-        params.setAppPackageName(context.getPackageName());
+        // params.setAppPackageName(context.getPackageName());
 
         int sessionId = pi.createSession(params);
         PackageInstaller.Session s = pi.openSession(sessionId);
