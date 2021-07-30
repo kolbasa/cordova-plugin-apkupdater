@@ -336,11 +336,11 @@ export class HomePage {
         const manifest = await this.http.get<any>(this.remote + '/manifest.json').toPromise();
 
         const remoteVersion = manifest.version.code;
-        const installedVersion = (await ApkUPdater.getInstalledVersion()).version.code;
+        const installedVersion = (await ApkUpdater.getInstalledVersion()).version.code;
 
         if (remoteVersion > installedVersion) {
-            await ApkUPdater.download(this.remote + '/update.apk');
-            await ApkUPdater.install();
+            await ApkUpdater.download(this.remote + '/update.apk');
+            await ApkUpdater.install();
         }
     }
 }
