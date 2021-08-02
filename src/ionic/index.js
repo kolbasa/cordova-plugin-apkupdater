@@ -40,6 +40,10 @@ var ApkUpdater = /** @class */ (function () {
         var apkUpdater = plugin();
         return apkUpdater.openInstallSetting.apply(apkUpdater, arguments);
     };
+    ApkUpdater.isDeviceRooted = function () {
+        var apkUpdater = plugin();
+        return apkUpdater.isDeviceRooted.apply(apkUpdater, arguments);
+    };
     return ApkUpdater;
 }());
 export default ApkUpdater;

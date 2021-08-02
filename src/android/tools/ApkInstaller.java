@@ -44,6 +44,53 @@ public class ApkInstaller {
         context.startActivity(intent);
     }
 
+    /**
+     * @author Kevin Kowalewski
+     * https://stackoverflow.com/questions/1101380
+     */
+    public static boolean isDeviceRooted() {
+
+        String buildTags = android.os.Build.TAGS;
+        if (buildTags != null && buildTags.contains("test-keys")) {
+            return true;
+        }
+
+        String[] paths = {
+                "/system/app/Superuser.apk",
+                "/sbin/su",
+                "/system/bin/su",
+                "/system/xbin/su",
+                "/data/local/xbin/su",
+                "/data/local/bin/su",
+                "/system/sd/xbin/su",
+                "/system/bin/failsafe/su",
+                "/data/local/su"
+        };
+
+        for (String path : paths) {
+            if (new File(path).exists()) {
+                return true;
+            }
+        }
+
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec(new String[]{"/system/xbin/which", "su"});
+            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            if (in.readLine() != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            //
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+
+        return false;
+    }
+
     public static void rootInstall(Context context, File update) throws InstallationFailedException, IOException, InterruptedException {
         String packageName = context.getPackageName();
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);

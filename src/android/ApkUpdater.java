@@ -112,11 +112,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void canRequestPackageInstalls(CallbackContext callbackContext) {
         try {
-            if (ApkInstaller.canRequestPackageInstalls(cordova.getContext())) {
-                callbackContext.success("Authorized");
-            } else {
-                callbackContext.success("Not authorized");
-            }
+            callbackContext.success(Boolean.toString(ApkInstaller.canRequestPackageInstalls(cordova.getContext())));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -199,6 +195,14 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
+    private void isDeviceRooted(CallbackContext callbackContext) {
+        try {
+            callbackContext.success(Boolean.toString(ApkInstaller.isDeviceRooted()));
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         init();
@@ -226,6 +230,9 @@ public class ApkUpdater extends CordovaPlugin {
                 break;
             case "rootInstall":
                 cordova.getThreadPool().execute(() -> rootInstall(callbackContext));
+                break;
+            case "isDeviceRooted":
+                cordova.getThreadPool().execute(() -> isDeviceRooted(callbackContext));
                 break;
             case "canRequestPackageInstalls":
                 cordova.getThreadPool().execute(() -> canRequestPackageInstalls(callbackContext));

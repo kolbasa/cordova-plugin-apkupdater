@@ -231,7 +231,7 @@ ApkUpdater.getDownloadedUpdate(success, failure);
 
 This will give the same output as the `download` method.
 
-## Installation prompt
+## Installation
 
 As soon as the download has been completed, you can use this method to ask the user to install the apk.
 
@@ -253,6 +253,40 @@ await ApkUpdater.rootInstall();
 // alternative with callbacks
 ApkUpdater.rootInstall(success, failure);
 ```
+
+## Check if the app is authorized to install packages
+
+The `install` method asks the user for permission.  
+If you want more control, there are two functions for that:
+
+```js
+// promise
+await ApkUpdater.canRequestPackageInstalls(); // -> true, false
+
+// alternative with callbacks
+ApkUpdater.canRequestPackageInstalls(success, failure);
+```
+
+To open the settings menu:
+
+```js
+// promise
+await ApkUpdater.openInstallSetting();
+
+// alternative with callbacks
+ApkUpdater.openInstallSetting(success, failure);
+```
+
+For rooted devices there is this:
+
+```js
+// promise
+await ApkUpdater.isDeviceRooted(); // -> true, false
+
+// alternative with callbacks
+ApkUpdater.isDeviceRooted(success, failure);
+```
+
 
 ## Interrupt download
 
@@ -277,29 +311,6 @@ await ApkUpdater.reset();
 
 // alternative with callbacks
 ApkUpdater.reset(success, failure);
-```
-
-## Check if the app is authorized to install packages
-
-The `install` method asks the user for permission.  
-If you want more control, there are two functions for that:
-
-```js
-// promise
-await ApkUpdater.canRequestPackageInstalls(); // -> true, false
-
-// alternative with callbacks
-ApkUpdater.canRequestPackageInstalls(success, failure);
-```
-
-To open the settings menu:
-
-```js
-// promise
-await ApkUpdater.openInstallSetting();
-
-// alternative with callbacks
-ApkUpdater.openInstallSetting(success, failure);
 ```
 
 ## Version checks

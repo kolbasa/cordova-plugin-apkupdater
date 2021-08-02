@@ -128,6 +128,34 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
+    isDeviceRooted: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.isDeviceRooted();
+        } else {
+            API.isDeviceRooted().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<void>|void}
+     */
+    requestRootAccess: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.requestRootAccess();
+        } else {
+            API.requestRootAccess().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<void>|void}
+     */
     reset: function (success, failure) {
         if (success == null && failure == null) {
             return API.reset();

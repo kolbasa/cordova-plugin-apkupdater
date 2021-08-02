@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.3.0 - 2021-08-02
+
+- [Added] New method: `isDeviceRooted()`
+- [Fixed] Removed `ACCESS_NETWORK_STATE` permission
+
 ## 2.2.0 - 2021-07-18
 
 - [Added] TypeScript API ([#17](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/17), [#19](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/19))

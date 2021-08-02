@@ -49,4 +49,9 @@ export default class ApkUpdater {
         return apkUpdater.openInstallSetting.apply(apkUpdater, arguments);
     }
 
+    static isDeviceRooted() {
+        let apkUpdater = plugin();
+        return apkUpdater.isDeviceRooted.apply(apkUpdater, arguments);
+    }
+
 }

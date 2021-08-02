@@ -92,7 +92,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'canRequestPackageInstalls', []);
         }).then(function (resp) {
-            return resp === 'Authorized';
+            return resp === 'true';
         });
     },
 
@@ -102,6 +102,26 @@ module.exports = {
     openInstallSetting: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'openInstallSetting', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
+    isDeviceRooted: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'isDeviceRooted', []);
+        }).then(function (resp) {
+            return resp === 'true';
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
+    requestRootAccess: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'requestRootAccess', []);
         });
     },
 
