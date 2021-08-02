@@ -50,7 +50,7 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<void>}
      */
     stop: function () {
         return new Promise(function (resolve, reject) {
@@ -68,34 +68,16 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<void>}
      */
-    install: function () {
+    reset: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'install', []);
+            exec(resolve, reject, PLUGIN, 'reset', []);
         });
     },
 
     /**
-     * @returns {Promise}
-     */
-    rootInstall: function () {
-        return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'rootInstall', []);
-        });
-    },
-
-    /**
-     * @returns {Promise}
-     */
-    ownerInstall: function () {
-        return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'ownerInstall', []);
-        });
-    },
-
-    /**
-     * @returns {Promise}
+     * @returns {Promise<boolean>}
      */
     canRequestPackageInstalls: function () {
         return new Promise(function (resolve, reject) {
@@ -106,7 +88,7 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<void>}
      */
     openInstallSetting: function () {
         return new Promise(function (resolve, reject) {
@@ -115,7 +97,16 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<void>}
+     */
+    install: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'install', []);
+        });
+    },
+
+    /**
+     * @returns {Promise<boolean>}
      */
     isDeviceRooted: function () {
         return new Promise(function (resolve, reject) {
@@ -126,16 +117,27 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<boolean>}
      */
     requestRootAccess: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'requestRootAccess', []);
+        }).then(function (resp) {
+            return resp === 'true';
         });
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<void>}
+     */
+    rootInstall: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'rootInstall', []);
+        });
+    },
+
+    /**
+     * @returns {Promise<boolean>}
      */
     isDeviceOwner: function () {
         return new Promise(function (resolve, reject) {
@@ -146,11 +148,11 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise}
+     * @returns {Promise<void>}
      */
-    reset: function () {
+    ownerInstall: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'reset', []);
+            exec(resolve, reject, PLUGIN, 'ownerInstall', []);
         });
     }
 

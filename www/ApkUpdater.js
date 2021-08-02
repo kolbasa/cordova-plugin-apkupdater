@@ -72,11 +72,11 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
-    install: function (success, failure) {
+    reset: function (success, failure) {
         if (success == null && failure == null) {
-            return API.install();
+            return API.reset();
         } else {
-            API.install().then(success).catch(failure);
+            API.reset().then(success).catch(failure);
         }
     },
 
@@ -84,35 +84,7 @@ module.exports = {
      * @param {function=} success
      * @param {function=} failure
      *
-     * @returns {Promise<void>|void}
-     */
-    rootInstall: function (success, failure) {
-        if (success == null && failure == null) {
-            return API.rootInstall();
-        } else {
-            API.rootInstall().then(success).catch(failure);
-        }
-    },
-
-    /**
-     * @param {function=} success
-     * @param {function=} failure
-     *
-     * @returns {Promise<void>|void}
-     */
-    ownerInstall: function (success, failure) {
-        if (success == null && failure == null) {
-            return API.ownerInstall();
-        } else {
-            API.ownerInstall().then(success).catch(failure);
-        }
-    },
-
-    /**
-     * @param {function=} success
-     * @param {function=} failure
-     *
-     * @returns {Promise<void>|void}
+     * @returns {Promise<boolean>|void}
      */
     canRequestPackageInstalls: function (success, failure) {
         if (success == null && failure == null) {
@@ -142,6 +114,20 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
+    install: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.install();
+        } else {
+            API.install().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<boolean>|void}
+     */
     isDeviceRooted: function (success, failure) {
         if (success == null && failure == null) {
             return API.isDeviceRooted();
@@ -154,7 +140,7 @@ module.exports = {
      * @param {function=} success
      * @param {function=} failure
      *
-     * @returns {Promise<void>|void}
+     * @returns {Promise<boolean>|void}
      */
     requestRootAccess: function (success, failure) {
         if (success == null && failure == null) {
@@ -170,6 +156,20 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
+    rootInstall: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.rootInstall();
+        } else {
+            API.rootInstall().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<boolean>|void}
+     */
     isDeviceOwner: function (success, failure) {
         if (success == null && failure == null) {
             return API.isDeviceOwner();
@@ -184,11 +184,11 @@ module.exports = {
      *
      * @returns {Promise<void>|void}
      */
-    reset: function (success, failure) {
+    ownerInstall: function (success, failure) {
         if (success == null && failure == null) {
-            return API.reset();
+            return API.ownerInstall();
         } else {
-            API.reset().then(success).catch(failure);
+            API.ownerInstall().then(success).catch(failure);
         }
     }
 

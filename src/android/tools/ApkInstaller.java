@@ -2,6 +2,7 @@ package de.kolbasa.apkupdater.tools;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
@@ -104,8 +105,69 @@ public class ApkInstaller {
         return false;
     }
 
+    /**
+     * https://stackoverflow.com/a/39420232
+     */
+    public static boolean requestRootAccess() throws IOException {
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
+            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String output = in.readLine();
+            return output != null && output.toLowerCase().contains("uid=0");
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+    }
+
+    public static void rootInstall(Context context, File update) throws InstallationFailedException, IOException, InterruptedException {
+        String packageName = context.getPackageName();
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        String mainActivity = launchIntent.getComponent().getClassName();
+
+        // -r Reinstall if needed
+        // -d Downgrade if needed
+        String command = "pm install -r -d " + update.getAbsolutePath() +
+                " && am start -n " + packageName + "/" + mainActivity;
+
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
+            StringBuilder builder = new StringBuilder();
+
+            BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String s;
+            while ((s = stdOut.readLine()) != null) {
+                builder.append(s);
+            }
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            while ((s = stdError.readLine()) != null) {
+                builder.append(s);
+            }
+
+            process.waitFor();
+            stdOut.close();
+            stdError.close();
+
+            if (builder.length() > 0) {
+                throw new InstallationFailedException(builder.toString());
+            }
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+    }
+
+    public static boolean isDeviceOwner(Context context) {
+        DevicePolicyManager mDPM = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        return mDPM.isDeviceOwnerApp(context.getPackageName());
+    }
+
     public static void ownerInstall(Context context, File update) throws IOException {
-        if (!DeviceOwnerTools.isOwner(context)) {
+        if (!isDeviceOwner(context)) {
             throw new SecurityException("App is not device owner");
         }
 
@@ -139,40 +201,6 @@ public class ApkInstaller {
         Intent intent = pm.getLaunchIntentForPackage(context.getPackageName()); // Restart app after update
         PendingIntent pendingIntent = PendingIntent.getActivity(((Activity) context), 0, intent, flags);
         s.commit(pendingIntent.getIntentSender());
-    }
-
-    public static void rootInstall(Context context, File update) throws InstallationFailedException, IOException, InterruptedException {
-        String packageName = context.getPackageName();
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-        String mainActivity = launchIntent.getComponent().getClassName();
-
-        // -r Reinstall if needed
-        // -d Downgrade if needed
-        String command = "pm install -r -d " + update.getAbsolutePath() +
-                " && am start -n " + packageName + "/" + mainActivity;
-
-        Process process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
-        StringBuilder builder = new StringBuilder();
-
-        BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String s;
-        while ((s = stdOut.readLine()) != null) {
-            builder.append(s);
-        }
-        BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        while ((s = stdError.readLine()) != null) {
-            builder.append(s);
-        }
-
-        process.waitFor();
-        process.destroy();
-
-        stdOut.close();
-        stdError.close();
-
-        if (builder.length() > 0) {
-            throw new InstallationFailedException(builder.toString());
-        }
     }
 
     public static boolean canRequestPackageInstalls(Context context) {
