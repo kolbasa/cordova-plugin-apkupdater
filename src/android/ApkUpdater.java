@@ -19,6 +19,7 @@ import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
 import de.kolbasa.apkupdater.downloader.Progress;
 import de.kolbasa.apkupdater.cordova.StackExtractor;
+import de.kolbasa.apkupdater.tools.DeviceOwnerTools;
 import de.kolbasa.apkupdater.update.Update;
 import de.kolbasa.apkupdater.update.UpdateManager;
 
@@ -92,15 +93,6 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private void install(CallbackContext callbackContext) {
-        try {
-            ApkInstaller.install(cordova.getContext(), getUpdate().getApk());
-            callbackContext.success();
-        } catch (Exception e) {
-            callbackContext.error(StackExtractor.format(e));
-        }
-    }
-
     private void openInstallSetting(CallbackContext callbackContext) {
         try {
             ApkInstaller.openInstallSetting(cordova.getContext());
@@ -161,9 +153,27 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
+    private void install(CallbackContext callbackContext) {
+        try {
+            ApkInstaller.install(cordova.getContext(), getUpdate().getApk());
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
     private void rootInstall(CallbackContext callbackContext) {
         try {
             ApkInstaller.rootInstall(cordova.getContext(), getUpdate().getApk());
+            callbackContext.success();
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void ownerInstall(CallbackContext callbackContext) {
+        try {
+            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate().getApk());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
@@ -203,9 +213,18 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
+    private void isDeviceOwner(CallbackContext callbackContext) {
+        try {
+            callbackContext.success(Boolean.toString(DeviceOwnerTools.isOwner(cordova.getContext())));
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         init();
+
         switch (action) {
             case "getInstalledVersion":
                 cordova.getThreadPool().execute(() -> getInstalledVersion(callbackContext));
@@ -234,11 +253,17 @@ public class ApkUpdater extends CordovaPlugin {
             case "isDeviceRooted":
                 cordova.getThreadPool().execute(() -> isDeviceRooted(callbackContext));
                 break;
+            case "ownerInstall":
+                cordova.getThreadPool().execute(() -> ownerInstall(callbackContext));
+                break;
             case "canRequestPackageInstalls":
                 cordova.getThreadPool().execute(() -> canRequestPackageInstalls(callbackContext));
                 break;
             case "openInstallSetting":
                 cordova.getThreadPool().execute(() -> openInstallSetting(callbackContext));
+                break;
+            case "isDeviceOwner":
+                cordova.getThreadPool().execute(() -> isDeviceOwner(callbackContext));
                 break;
             case "reset":
                 cordova.getThreadPool().execute(() -> reset(callbackContext));

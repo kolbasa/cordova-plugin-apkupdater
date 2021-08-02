@@ -88,6 +88,15 @@ module.exports = {
     /**
      * @returns {Promise}
      */
+    ownerInstall: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'ownerInstall', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
     canRequestPackageInstalls: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'canRequestPackageInstalls', []);
@@ -122,6 +131,17 @@ module.exports = {
     requestRootAccess: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'requestRootAccess', []);
+        });
+    },
+
+    /**
+     * @returns {Promise}
+     */
+    isDeviceOwner: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'isDeviceOwner', []);
+        }).then(function (resp) {
+            return resp === 'true';
         });
     },
 
