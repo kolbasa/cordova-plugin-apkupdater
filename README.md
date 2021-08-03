@@ -391,7 +391,7 @@ changed.
 If you use mobile data, which is usually limited, then you should have a different strategy.  
 You may already have a remote API and can request the latest version there.
 
-In my case, I simply place a small `manifest.json` file next to the update, which stores the latest version number.  
+In my case, I simply place a small `update.json` file next to the update, which stores the latest version number.  
 I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.
 
 This is also the case with the
