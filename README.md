@@ -1,5 +1,5 @@
 Cordova Apk Updater Plugin &middot; [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kolbasa/cordova-plugin-apkupdater/blob/master/LICENSE) [![npm](https://img.shields.io/npm/v/cordova-plugin-apkupdater.svg)](https://www.npmjs.com/package/cordova-plugin-apkupdater) [![npm](https://img.shields.io/npm/dm/cordova-plugin-apkupdater.svg)](https://www.npmjs.com/package/cordova-plugin-apkupdater)
----------------------------------------------------------------------------
+=========================
 
 ![Installation dialog](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Images/CordovaBot.png)
 
@@ -12,37 +12,69 @@ If you have any problems or suggestions, just [write to me](https://github.com/k
 I actively maintain the plugin and will take care of it. Here is my
 current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) list.
 
-## Plugin requirements
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Plugin requirements](#plugin-requirements)
+- [Installation](#installation)
+    - [Cordova](#cordova)
+    - [Ionic + Cordova](#ionic--cordova)
+    - [Capacitor](#capacitor)
+    - [Android Legacy Support Libraries](#android-legacy-support-libraries)
+- [Basic example](#basic-example)
+    - [Ionic 2+ with Typescript](#ionic-2-with-typescript)
+    - [Cordova](#cordova-1)
+- [API](#api)
+  - [download()](#download)
+  - [stop()](#stop)
+  - [getInstalledVersion()](#getinstalledversion)
+  - [getDownloadedUpdate()](#getdownloadedupdate)
+  - [reset()](#reset)
+  - [install()](#install)
+    - [canRequestPackageInstalls()](#canrequestpackageinstalls)
+    - [openInstallSetting()](#openinstallsetting)
+  - [rootInstall()](#rootinstall)
+    - [isDeviceRooted()](#isdevicerooted)
+    - [requestRootAccess()](#requestrootaccess)
+  - [ownerInstall()](#ownerinstall)
+    - [isDeviceOwner()](#isdeviceowner)
+- [Version checks](#version-checks)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Plugin requirements
 
 * **Android**: `5+`
 * **cordova**: `10.0.0+`
 * **cordova-android**: `9.0.0+`
 
-## Installation
+# Installation
 
-#### Cordova
+### Cordova
 
     cordova plugin add cordova-plugin-apkupdater
 
-#### Ionic + Cordova
+### Ionic + Cordova
 
     ionic cordova plugin add cordova-plugin-apkupdater
     ionic cordova plugin add cordova-plugin-androidx-adapter
 
-#### Capacitor
+### Capacitor
 
     npm install cordova-plugin-apkupdater
 
-#### Android Legacy Support Libraries
+### Android Legacy Support Libraries
 
 It is not recommended, but you can install the plugin without AndroidX. Just set the following variable:
 
     cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
 
 
-## Using the plugin
+# Basic example
 
-#### Ionic 2+ with Typescript
+### Ionic 2+ with Typescript
 
 Here is the simplest example: downloading and then installing the APK:
 
@@ -71,7 +103,7 @@ export class HomePage {
 
 ```
 
-#### Cordova
+### Cordova
 
 The same example with callbacks:
 
@@ -88,9 +120,10 @@ ApkUpdater.download(
 );
 ```
 
-## Download
+# API
 
-The JavaScript API supports **promises** and **callbacks** for all methods:
+The JavaScript API supports **promises** and **callbacks** for all methods.  
+The callback functions occupy the last two parameters.
 
 ```js
 // promise
@@ -98,6 +131,58 @@ await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 
 // alternative with callbacks
 ApkUpdater.download('https://your-update-server.com/update.apk', options, success, failure);
+```
+
+In the following examples, I show only Promises for simplicity.
+
+In case of a failure you get an error object with two attributes: `message` and `stack`.
+
+This example...
+
+```js
+try {
+    await ApkUpdater.download(
+        'https://your-update-server.com/encrypted-update.zip',
+        {
+            zipPassword: 'wrongPassword'
+        }
+    );
+} catch (e) {
+    console.error(e.message + '\n' + e.stack);
+}
+```
+
+... leads to the following output:
+
+```
+Download failed
+net.lingala.zip4j.exception.ZipException: Wrong password!
+  at net.lingala.zip4j.crypto.StandardDecrypter.init(StandardDecrypter.java:61)
+  at net.lingala.zip4j.crypto.StandardDecrypter.<init>(StandardDecrypter.java:31)
+  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:20)
+  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:10)
+  at net.lingala.zip4j.io.inputstream.CipherInputStream.<init>(CipherInputStream.java:25)
+  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.<init>(ZipStandardCipherInputStream.java:14)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeCipherInputStream(ZipInputStream.java:236)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeEntryInputStream(ZipInputStream.java:223)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:113)
+  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:83)
+  at de.kolbasa.apkupdater.tools.Unzipper.unzip(Unzipper.java:51)
+  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:90)
+  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:121)
+  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:90)
+  at de.kolbasa.apkupdater.ApkUpdater.lambda$execute$3$ApkUpdater(ApkUpdater.java:191)
+  at de.kolbasa.apkupdater.-$$Lambda$ApkUpdater$i2uPxQeilYT0voSmjrvq6lzNQe0.run(Unknown Source:6)
+  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
+  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
+  at java.lang.Thread.run(Thread.java:920)
+```
+
+
+## download()
+
+```js
+await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 ```
 
 You can also pass a `zip` file here. The zip file can even be encrypted with a password.  
@@ -146,61 +231,21 @@ let result = {
 }
 ```
 
-In case of a failure you get an error object with two attributes: `message` and `stack`.
 
-This example...
+## stop()
 
-```js
-try {
-    await ApkUpdater.download(
-        'https://your-update-server.com/encrypted-update.zip',
-        {
-            zipPassword: 'wrongPassword'
-        }
-    );
-} catch (e) {
-    console.error(e.message + '\n' + e.stack);
-}
-```
-
-... leads to the following output:
-
-```
-Download failed
-net.lingala.zip4j.exception.ZipException: Wrong password!
-  at net.lingala.zip4j.crypto.StandardDecrypter.init(StandardDecrypter.java:61)
-  at net.lingala.zip4j.crypto.StandardDecrypter.<init>(StandardDecrypter.java:31)
-  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:20)
-  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:10)
-  at net.lingala.zip4j.io.inputstream.CipherInputStream.<init>(CipherInputStream.java:25)
-  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.<init>(ZipStandardCipherInputStream.java:14)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeCipherInputStream(ZipInputStream.java:236)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeEntryInputStream(ZipInputStream.java:223)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:113)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:83)
-  at de.kolbasa.apkupdater.tools.Unzipper.unzip(Unzipper.java:51)
-  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:90)
-  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:121)
-  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:90)
-  at de.kolbasa.apkupdater.ApkUpdater.lambda$execute$3$ApkUpdater(ApkUpdater.java:191)
-  at de.kolbasa.apkupdater.-$$Lambda$ApkUpdater$i2uPxQeilYT0voSmjrvq6lzNQe0.run(Unknown Source:6)
-  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
-  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
-  at java.lang.Thread.run(Thread.java:920)
-```
-
-This also applies to all the remaining methods listed below.
-
-## Check installed version
-
-You can also get detailed information about the currently used version.
+Stops the download.
 
 ```js
-// promise
+await ApkUpdater.stop();
+```
+
+## getInstalledVersion()
+
+Provides detailed information about the currently installed app version.
+
+```js
 await ApkUpdater.getInstalledVersion();
-
-// alternative with callbacks
-ApkUpdater.getInstalledVersion(success, failure);
 ```
 
 Example output:
@@ -217,88 +262,17 @@ let result = {
 }
 ```
 
-## Check cached update version
+## getDownloadedUpdate()
 
 The downloaded update remains saved even after an app restart and can be queried as follows:
 
 ```js
-// promise
 await ApkUpdater.getDownloadedUpdate();
-
-// alternative with callbacks
-ApkUpdater.getDownloadedUpdate(success, failure);
 ```
 
-This will give the same output as the `download` method.
+The result uses the same format as the output from the `download()` method.
 
-## Installation
-
-As soon as the download has been completed, you can use this method to ask the user to install the apk.
-
-```js
-// promise
-await ApkUpdater.install();
-
-// alternative with callbacks
-ApkUpdater.install(success, failure);
-```
-
-If you have a rooted device, then you do not need to ask the user for permission to install the update.  
-The app is even restarted directly afterwards ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
-
-```js
-// promise
-await ApkUpdater.rootInstall();
-
-// alternative with callbacks
-ApkUpdater.rootInstall(success, failure);
-```
-
-## Check if the app is authorized to install packages
-
-The `install` method asks the user for permission.  
-If you want more control, there are two functions for that:
-
-```js
-// promise
-await ApkUpdater.canRequestPackageInstalls(); // -> true, false
-
-// alternative with callbacks
-ApkUpdater.canRequestPackageInstalls(success, failure);
-```
-
-To open the settings menu:
-
-```js
-// promise
-await ApkUpdater.openInstallSetting();
-
-// alternative with callbacks
-ApkUpdater.openInstallSetting(success, failure);
-```
-
-For rooted devices there is this:
-
-```js
-// promise
-await ApkUpdater.isDeviceRooted(); // -> true, false
-
-// alternative with callbacks
-ApkUpdater.isDeviceRooted(success, failure);
-```
-
-
-## Interrupt download
-
-```js
-// promise
-await ApkUpdater.stop();
-
-// alternative with callbacks
-ApkUpdater.stop(success, failure);
-```
-
-## Reset
+## reset()
 
 The `reset` method deletes all downloaded files.
 
@@ -306,14 +280,78 @@ It is mostly useful only for debugging purposes. The user himself has no access 
 updates automatically.
 
 ```js
-// promise
 await ApkUpdater.reset();
-
-// alternative with callbacks
-ApkUpdater.reset(success, failure);
 ```
 
-## Version checks
+---
+
+## install()
+
+As soon as the download has been completed, you can use this method to ask the user to install the apk.
+
+```js
+await ApkUpdater.install();
+```
+
+When the method is invoked for the first time, the user is asked to enable a setting for installing third-party applications.
+
+### canRequestPackageInstalls()
+
+If you want more control, there are two functions for that:
+
+```js
+await ApkUpdater.canRequestPackageInstalls(); // -> true, false
+```
+
+### openInstallSetting()
+
+Opens the settings page.
+
+```js
+await ApkUpdater.openInstallSetting();
+```
+
+---
+
+## rootInstall()
+
+If you have a rooted device, then you do not need to ask the user for permission to install the update.  
+The app is even restarted directly afterwards ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
+
+```js
+await ApkUpdater.rootInstall();
+```
+
+### isDeviceRooted()
+
+```js
+await ApkUpdater.isDeviceRooted(); // -> true, false
+```
+
+### requestRootAccess()
+
+```js
+await ApkUpdater.requestRootAccess(); // -> true, false
+```
+
+---
+
+## ownerInstall()
+
+```js
+await ApkUpdater.ownerInstall();
+```
+
+### isDeviceOwner()
+
+```js
+await ApkUpdater.isDeviceOwner(); // -> true, false
+```
+
+
+---
+
+# Version checks
 
 The plugin itself does not make a version comparison.  
 You need to find a solution that best suits your use case.
@@ -357,7 +395,7 @@ export class HomePage {
 }
 ```
 
-## License
+# License
 
 MIT License
 
