@@ -49,6 +49,8 @@ I actively maintain the plugin.
 * **cordova**: `10.0.0+`
 * **cordova-android**: `9.0.0+`
 
+<br>
+
 # Installation
 
 ### Cordova
@@ -69,6 +71,8 @@ I actively maintain the plugin.
 It is not recommended, but you can install the plugin without AndroidX. Just set the following variable:
 
     cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
+
+<br>
 
 # Basic example
 
@@ -117,6 +121,8 @@ ApkUpdater.download(
     console.error
 );
 ```
+
+<br>
 
 # API
 
@@ -230,6 +236,8 @@ let result = {
 }
 ```
 
+<br>
+
 ## stop()
 
 Stops the download.
@@ -237,6 +245,8 @@ Stops the download.
 ```js
 await ApkUpdater.stop();
 ```
+
+<br>
 
 ## getInstalledVersion()
 
@@ -260,6 +270,8 @@ let result = {
 }
 ```
 
+<br>
+
 ## getDownloadedUpdate()
 
 The downloaded update remains saved even after an app restart and can be queried as follows:
@@ -269,6 +281,8 @@ await ApkUpdater.getDownloadedUpdate();
 ```
 
 The result uses the same format as the output from the `download()` method.
+
+<br>
 
 ## reset()
 
@@ -281,7 +295,7 @@ updates automatically.
 await ApkUpdater.reset();
 ```
 
----
+<br>
 
 ## install()
 
@@ -315,7 +329,7 @@ Opens the settings page
 await ApkUpdater.openInstallSetting();
 ```
 
----
+<br>
 
 ## rootInstall()
 
@@ -343,7 +357,7 @@ await ApkUpdater.requestRootAccess(); // -> true, false
 
 `false` = The user has declined the request.
 
----
+<br>
 
 ## ownerInstall()
 
@@ -362,7 +376,7 @@ await ApkUpdater.ownerInstall();
 await ApkUpdater.isDeviceOwner(); // -> true, false
 ```
 
----
+<br>
 
 # Version checks
 
@@ -407,6 +421,8 @@ export class HomePage {
     }
 }
 ```
+
+<br>
 
 # License
 
