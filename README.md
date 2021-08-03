@@ -293,11 +293,14 @@ As soon as the download has been completed, you can use this method to ask the u
 await ApkUpdater.install();
 ```
 
-When the method is invoked for the first time, the user is asked to enable a setting for installing third-party applications.
+When the method is invoked for the first time, the user is asked to enable a setting for installing third-party applications ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/InstallSettings.gif)).  
+
+You may want to ask the user for this permission before installing the first update.  
+The following two methods `canRequestPackageInstalls` and `openInstallSetting` are intended for this purpose.
 
 ### canRequestPackageInstalls()
 
-If you want more control, there are two functions for that:
+Queries the status of the installation authorization.
 
 ```js
 await ApkUpdater.canRequestPackageInstalls(); // -> true, false
@@ -305,7 +308,7 @@ await ApkUpdater.canRequestPackageInstalls(); // -> true, false
 
 ### openInstallSetting()
 
-Opens the settings page.
+Opens the settings page ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OpenInstallSettings.gif)).
 
 ```js
 await ApkUpdater.openInstallSetting();
@@ -315,8 +318,7 @@ await ApkUpdater.openInstallSetting();
 
 ## rootInstall()
 
-If you have a rooted device, then you do not need to ask the user for permission to install the update.  
-The app is even restarted directly afterwards ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
+If you have a rooted device, then you can even set up unattended app update installations ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
 
 ```js
 await ApkUpdater.rootInstall();
@@ -330,13 +332,20 @@ await ApkUpdater.isDeviceRooted(); // -> true, false
 
 ### requestRootAccess()
 
+Requests root access ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RequestRootAccess.gif)).
+
 ```js
 await ApkUpdater.requestRootAccess(); // -> true, false
 ```
 
+`false` = The user has declined the request.
+
 ---
 
 ## ownerInstall()
+
+Unattended updates can also be used by apps that are registered as device owners ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OnwerInstall.gif)).
+See: https://developers.google.com/android/work/play/emm-api/prov-devices
 
 ```js
 await ApkUpdater.ownerInstall();
