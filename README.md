@@ -9,7 +9,7 @@ This plugin enables you to update your Android app completely without the Google
 
 If you have any problems or suggestions, just
 [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues).  
-I actively maintain the plugin and will take care of it.
+I actively maintain the plugin.
 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -175,6 +175,8 @@ net.lingala.zip4j.exception.ZipException: Wrong password!
   at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
   at java.lang.Thread.run(Thread.java:920)
 ```
+
+<br>
 
 ## download()
 
