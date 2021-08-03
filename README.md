@@ -11,6 +11,7 @@ If you have any problems or suggestions, just
 [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues).  
 I actively maintain the plugin.
 
+<br>
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -42,6 +43,8 @@ I actively maintain the plugin.
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+<br>
 
 # Plugin requirements
 
