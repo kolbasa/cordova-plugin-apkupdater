@@ -7,10 +7,9 @@ This plugin enables you to update your Android app completely without the Google
 
 :point_right: **[DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo)** :point_left:
 
-If you have any problems or suggestions, just [write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues)
-.  
-I actively maintain the plugin and will take care of it. Here is my
-current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) list.
+If you have any problems or suggestions, just
+[write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues).  
+I actively maintain the plugin and will take care of it.
 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -26,19 +25,19 @@ current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) 
     - [Ionic 2+ with Typescript](#ionic-2-with-typescript)
     - [Cordova](#cordova-1)
 - [API](#api)
-  - [download()](#download)
-  - [stop()](#stop)
-  - [getInstalledVersion()](#getinstalledversion)
-  - [getDownloadedUpdate()](#getdownloadedupdate)
-  - [reset()](#reset)
-  - [install()](#install)
-    - [canRequestPackageInstalls()](#canrequestpackageinstalls)
-    - [openInstallSetting()](#openinstallsetting)
-  - [rootInstall()](#rootinstall)
-    - [isDeviceRooted()](#isdevicerooted)
-    - [requestRootAccess()](#requestrootaccess)
-  - [ownerInstall()](#ownerinstall)
-    - [isDeviceOwner()](#isdeviceowner)
+    - [download()](#download)
+    - [stop()](#stop)
+    - [getInstalledVersion()](#getinstalledversion)
+    - [getDownloadedUpdate()](#getdownloadedupdate)
+    - [reset()](#reset)
+    - [install()](#install)
+        - [canRequestPackageInstalls()](#canrequestpackageinstalls)
+        - [openInstallSetting()](#openinstallsetting)
+    - [rootInstall()](#rootinstall)
+        - [isDeviceRooted()](#isdevicerooted)
+        - [requestRootAccess()](#requestrootaccess)
+    - [ownerInstall()](#ownerinstall)
+        - [isDeviceOwner()](#isdeviceowner)
 - [Version checks](#version-checks)
 - [License](#license)
 
@@ -70,7 +69,6 @@ current [TODO](https://github.com/kolbasa/cordova-plugin-apkupdater/projects/9) 
 It is not recommended, but you can install the plugin without AndroidX. Just set the following variable:
 
     cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
-
 
 # Basic example
 
@@ -178,7 +176,6 @@ net.lingala.zip4j.exception.ZipException: Wrong password!
   at java.lang.Thread.run(Thread.java:920)
 ```
 
-
 ## download()
 
 ```js
@@ -230,7 +227,6 @@ let result = {
     }
 }
 ```
-
 
 ## stop()
 
@@ -293,7 +289,9 @@ As soon as the download has been completed, you can use this method to ask the u
 await ApkUpdater.install();
 ```
 
-When the method is invoked for the first time, the user is asked to enable a setting for installing third-party applications ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/InstallSettings.gif)).  
+When the method is invoked for the first time, the user is asked to enable a setting for installing third-party
+applications
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/InstallSettings.gif)).
 
 You may want to ask the user for this permission before installing the first update.  
 The following two methods `canRequestPackageInstalls` and `openInstallSetting` are intended for this purpose.
@@ -308,7 +306,8 @@ await ApkUpdater.canRequestPackageInstalls(); // -> true, false
 
 ### openInstallSetting()
 
-Opens the settings page ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OpenInstallSettings.gif)).
+Opens the settings page
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OpenInstallSettings.gif)).
 
 ```js
 await ApkUpdater.openInstallSetting();
@@ -318,7 +317,8 @@ await ApkUpdater.openInstallSetting();
 
 ## rootInstall()
 
-If you have a rooted device, then you can even set up unattended app update installations ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
+If you have a rooted device, then you can even set up unattended app update installations
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
 
 ```js
 await ApkUpdater.rootInstall();
@@ -332,7 +332,8 @@ await ApkUpdater.isDeviceRooted(); // -> true, false
 
 ### requestRootAccess()
 
-Requests root access ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RequestRootAccess.gif)).
+Requests root access
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RequestRootAccess.gif)).
 
 ```js
 await ApkUpdater.requestRootAccess(); // -> true, false
@@ -344,10 +345,10 @@ await ApkUpdater.requestRootAccess(); // -> true, false
 
 ## ownerInstall()
 
-Unattended updates can also be used by apps that are registered as device owners ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).  
-See: https://developers.google.com/android/work/play/emm-api/prov-devices
+Unattended updates can also be used by apps that are registered as device owners
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).
 
-This can also be achieved with `adb` if you have physical access to the device.
+This can be achieved with `adb` if you have physical access to the device. I will provide a tutorial for this soon.
 
 ```js
 await ApkUpdater.ownerInstall();
@@ -358,7 +359,6 @@ await ApkUpdater.ownerInstall();
 ```js
 await ApkUpdater.isDeviceOwner(); // -> true, false
 ```
-
 
 ---
 
