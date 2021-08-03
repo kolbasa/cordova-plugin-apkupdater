@@ -300,7 +300,7 @@ The following two methods `canRequestPackageInstalls` and `openInstallSetting` a
 
 ### canRequestPackageInstalls()
 
-Queries the status of the installation authorization.
+Queries whether the installation of updates has been allowed.
 
 ```js
 await ApkUpdater.canRequestPackageInstalls(); // -> true, false
@@ -344,8 +344,10 @@ await ApkUpdater.requestRootAccess(); // -> true, false
 
 ## ownerInstall()
 
-Unattended updates can also be used by apps that are registered as device owners ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OnwerInstall.gif)).
+Unattended updates can also be used by apps that are registered as device owners ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).  
 See: https://developers.google.com/android/work/play/emm-api/prov-devices
+
+This can also be achieved with `adb` if you have physical access to the device.
 
 ```js
 await ApkUpdater.ownerInstall();
