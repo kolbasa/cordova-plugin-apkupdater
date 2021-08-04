@@ -1,10 +1,10 @@
 # CHANGELOG
 
-## 2.3.0 - 2021-08-02
+## 2.3.0 - 2021-08-04
 
-- [Added] New installation method for device owner apps
-- [Added] Two helper methods for root installation: `isDeviceRooted()` and `requestRootAccess()`
-- [Fixed] Removed `ACCESS_NETWORK_STATE` permission
+- [Added] New installation method for device owner apps ([#13](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/13)).
+- [Added] Two helper methods for root installation: `isDeviceRooted()` and `requestRootAccess()`.
+- [Fixed] Removed `ACCESS_NETWORK_STATE` permission.
 
 ## 2.2.0 - 2021-07-18
 
