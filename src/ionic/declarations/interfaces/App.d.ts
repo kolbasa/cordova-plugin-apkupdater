@@ -17,6 +17,11 @@ declare module 'cordova-plugin-apkupdater' {
          */
         version: Version;
 
+        /**
+         * Unix timestamp;
+         */
+        firstInstallTime?: number;
+
     }
 
 }
