@@ -194,7 +194,8 @@ await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 ```
 
 You can also pass a `zip` file here. The zip file can even be encrypted with a password.  
-However, you should make sure that the archive contains only the APK file at root level, nothing else.
+However, you should make sure that the archive contains only the APK file at root level, nothing else.  
+If you want to automate this, then you can also use [my script](https://github.com/kolbasa/apk-update).
 
 The download method can be configured as follows. The settings are optional.
 
@@ -396,7 +397,8 @@ In my case, I simply place a small `update.json` file next to the update, which 
 I then simply compare this version with the internal one, which I request with the `getInstalledVersion` method.
 
 This is also the case with the
-[demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).
+[demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).  
+Here is [my script](https://github.com/kolbasa/apk-update) that I use to create the compressed update and info file.
 
 Sample Implementation:
 
