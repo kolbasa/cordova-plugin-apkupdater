@@ -26,20 +26,20 @@ I actively maintain the plugin.
     - [Ionic 2+ with Typescript](#ionic-2-with-typescript)
     - [Cordova](#cordova-1)
 - [API](#api)
-    - [download()](#download)
-    - [stop()](#stop)
-    - [getInstalledVersion()](#getinstalledversion)
-    - [getDownloadedUpdate()](#getdownloadedupdate)
-    - [reset()](#reset)
-    - [install()](#install)
-        - [canRequestPackageInstalls()](#canrequestpackageinstalls)
-        - [openInstallSetting()](#openinstallsetting)
-    - [rootInstall()](#rootinstall)
-        - [isDeviceRooted()](#isdevicerooted)
-        - [requestRootAccess()](#requestrootaccess)
-    - [ownerInstall()](#ownerinstall)
-        - [isDeviceOwner()](#isdeviceowner)
-- [Version checks](#version-checks)
+  - [download()](#download)
+  - [stop()](#stop)
+  - [getInstalledVersion()](#getinstalledversion)
+  - [getDownloadedUpdate()](#getdownloadedupdate)
+  - [reset()](#reset)
+  - [install()](#install)
+    - [canRequestPackageInstalls()](#canrequestpackageinstalls)
+    - [openInstallSetting()](#openinstallsetting)
+  - [rootInstall()](#rootinstall)
+    - [isDeviceRooted()](#isdevicerooted)
+    - [requestRootAccess()](#requestrootaccess)
+  - [ownerInstall()](#ownerinstall)
+    - [isDeviceOwner()](#isdeviceowner)
+- [Update versioning](#update-versioning)
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -381,7 +381,7 @@ await ApkUpdater.isDeviceOwner(); // -> true, false
 
 <br>
 
-# Version checks
+# Update versioning
 
 The plugin itself does not make a version comparison.  
 You need to find a solution that best suits your use case.
