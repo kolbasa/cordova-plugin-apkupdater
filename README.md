@@ -140,7 +140,7 @@ await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 ApkUpdater.download('https://your-update-server.com/update.apk', options, success, failure);
 ```
 
-In the following examples, I show only Promises for simplicity.
+On this page I only show Promise examples for simplicity.
 
 In case of a failure you get an error object with two attributes: `message` and `stack`.
 
@@ -199,7 +199,7 @@ However, you should make sure that the archive contains only the APK file at roo
 The download method can be configured as follows. The settings are optional.
 
 ```js
-let options = {
+const options = {
     zipPassword: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
     basicAuth: { // Basic access authentication
         user: 'username',
@@ -223,7 +223,7 @@ let options = {
 If the download is successful, you will receive detailed information about the update file.
 
 ```js
-let result = {
+const result = {
     "name": "update.apk",
     "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
     "size": 1982411,
@@ -262,7 +262,7 @@ await ApkUpdater.getInstalledVersion();
 Example output:
 
 ```js
-let result = {
+const result = {
     "name": "Apk Updater Demo",
     "package": "de.kolbasa.apkupdater.demo",
     "firstInstallTime": 1625415754434, // Unix timestamp
@@ -367,7 +367,8 @@ await ApkUpdater.requestRootAccess(); // -> true, false
 Unattended updates can also be used by apps that are registered as device owners
 ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).
 
-This can be achieved with `adb` if you have physical access to the device. I will provide a tutorial for this soon.
+This can be achieved with `adb` if you have physical access to the device.   
+I will provide a tutorial for this soon.
 
 ```js
 await ApkUpdater.ownerInstall();
@@ -412,7 +413,7 @@ export class HomePage {
 
     async update() {
 
-        const manifest = await this.http.get<any>(this.remote + '/manifest.json').toPromise();
+        const manifest = await this.http.get<any>(this.remote + '/update.json').toPromise();
 
         const remoteVersion = manifest.version.code;
         const installedVersion = (await ApkUpdater.getInstalledVersion()).version.code;
