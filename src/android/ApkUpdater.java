@@ -191,7 +191,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void isDeviceRooted(CallbackContext callbackContext) {
         try {
-            callbackContext.success(Boolean.toString(ApkInstaller.isDeviceRooted()));
+            callbackContext.success(Boolean.toString(ApkInstaller.isDeviceRooted(cordova.getContext())));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }

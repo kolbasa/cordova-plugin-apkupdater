@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
 import de.kolbasa.apkupdater.exceptions.PlatformNotSupportedException;
 
+import com.scottyab.rootbeer.RootBeer;
+
 public class ApkInstaller {
 
     private static boolean isNotFullscreen(Context context) {
@@ -58,51 +60,9 @@ public class ApkInstaller {
         context.startActivity(intent);
     }
 
-    /**
-     * @author Kevin Kowalewski
-     * https://stackoverflow.com/questions/1101380
-     */
-    public static boolean isDeviceRooted() {
-
-        String buildTags = android.os.Build.TAGS;
-        if (buildTags != null && buildTags.contains("test-keys")) {
-            return true;
-        }
-
-        String[] paths = {
-                "/system/app/Superuser.apk",
-                "/sbin/su",
-                "/system/bin/su",
-                "/system/xbin/su",
-                "/data/local/xbin/su",
-                "/data/local/bin/su",
-                "/system/sd/xbin/su",
-                "/system/bin/failsafe/su",
-                "/data/local/su"
-        };
-
-        for (String path : paths) {
-            if (new File(path).exists()) {
-                return true;
-            }
-        }
-
-        Process process = null;
-        try {
-            process = Runtime.getRuntime().exec(new String[]{"/system/xbin/which", "su"});
-            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            if (in.readLine() != null) {
-                return true;
-            }
-        } catch (Exception e) {
-            //
-        } finally {
-            if (process != null) {
-                process.destroy();
-            }
-        }
-
-        return false;
+    public static boolean isDeviceRooted(Context context) {
+        RootBeer rootBeer = new RootBeer(context);
+        return (rootBeer.checkSuExists() && (rootBeer.checkForRWPaths() || rootBeer.checkForRootNative()));
     }
 
     /**
@@ -177,7 +137,6 @@ public class ApkInstaller {
         PackageInstaller pi = pm.getPackageInstaller();
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
                 PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-        // params.setAppPackageName(context.getPackageName());
 
         int sessionId = pi.createSession(params);
         PackageInstaller.Session s = pi.openSession(sessionId);
