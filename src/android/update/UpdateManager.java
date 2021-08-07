@@ -116,6 +116,7 @@ public class UpdateManager {
     }
 
     public Update download(String path, String basicAuth, String zipPassword) throws IOException, UnzipException {
+        reset();
         File downloadedFile = downloadFile(path, basicAuth);
         File unzippedFile = unzipFile(downloadedFile, zipPassword);
 

@@ -42,7 +42,7 @@ public class ApkUpdater extends CordovaPlugin {
     }
 
     private JSONObject getAppInfo(File apk) throws Exception {
-        AppData app = new AppData(cordova.getActivity());
+        AppData app = new AppData(cordova.getContext());
         JSONObject appInfo = new JSONObject();
 
         appInfo.put("name", app.getAppName(apk));
