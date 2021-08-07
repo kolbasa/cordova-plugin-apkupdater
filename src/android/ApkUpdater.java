@@ -14,7 +14,7 @@ import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
 import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
 import de.kolbasa.apkupdater.downloader.Progress;
-import de.kolbasa.apkupdater.cordova.StackExtractor;
+import de.kolbasa.apkupdater.tools.StackExtractor;
 import de.kolbasa.apkupdater.update.Update;
 import de.kolbasa.apkupdater.update.UpdateManager;
 

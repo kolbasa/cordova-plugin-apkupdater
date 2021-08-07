@@ -62,14 +62,15 @@
 
         <!-- source-files -->
         <source-file src="src/android/ApkUpdater.java" target-dir="src/de/kolbasa/apkupdater"/>
-        <source-file src="src/android/cordova/StackExtractor.java" target-dir="src/de/kolbasa/apkupdater/cordova"/>
         <source-file src="src/android/downloader/FileDownloader.java" target-dir="src/de/kolbasa/apkupdater/downloader"/>
         <source-file src="src/android/downloader/Progress.java" target-dir="src/de/kolbasa/apkupdater/downloader"/>
+        <source-file src="src/android/exceptions/DownloadFailedException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/DownloadInProgressException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/DownloadNotRunningException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/InstallationFailedException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/InvalidPackageException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/PlatformNotSupportedException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/exceptions/RootException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/UnzipException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/UpdateNotFoundException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/tools/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
@@ -77,6 +78,7 @@
         <source-file src="src/android/tools/ChecksumGenerator.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/FileProvider.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/FileTools.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
+        <source-file src="src/android/tools/StackExtractor.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/Unzipper.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/update/Update.java" target-dir="src/de/kolbasa/apkupdater/update"/>
         <source-file src="src/android/update/UpdateManager.java" target-dir="src/de/kolbasa/apkupdater/update"/>

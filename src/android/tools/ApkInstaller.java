@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
 import de.kolbasa.apkupdater.exceptions.InvalidPackageException;
 import de.kolbasa.apkupdater.exceptions.PlatformNotSupportedException;
+import de.kolbasa.apkupdater.exceptions.RootException;
 
 import com.scottyab.rootbeer.RootBeer;
 
@@ -70,13 +71,15 @@ public class ApkInstaller {
     /**
      * https://stackoverflow.com/a/39420232
      */
-    public static boolean requestRootAccess() throws IOException {
+    public static boolean requestRootAccess() throws RootException {
         Process process = null;
         try {
             process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String output = in.readLine();
             return output != null && output.toLowerCase().contains("uid=0");
+        } catch (Exception e) {
+            throw new RootException(e);
         } finally {
             if (process != null) {
                 process.destroy();
@@ -84,8 +87,8 @@ public class ApkInstaller {
         }
     }
 
-    public static void rootInstall(Context context, File update) throws InstallationFailedException,
-            IOException, InterruptedException, PackageManager.NameNotFoundException, InvalidPackageException {
+    public static void rootInstall(Context context, File update) throws IOException,
+            PackageManager.NameNotFoundException, InvalidPackageException, RootException {
         String packageName = context.getPackageName();
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
         String mainActivity = launchIntent.getComponent().getClassName();
@@ -121,6 +124,8 @@ public class ApkInstaller {
             if (builder.length() > 0 && !builder.toString().equals("Success")) {
                 throw new InstallationFailedException(builder.toString());
             }
+        } catch (Exception e) {
+            throw new RootException(e);
         } finally {
             if (process != null) {
                 process.destroy();

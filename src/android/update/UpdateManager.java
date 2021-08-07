@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Observer;
 
 import de.kolbasa.apkupdater.downloader.FileDownloader;
+import de.kolbasa.apkupdater.exceptions.DownloadFailedException;
 import de.kolbasa.apkupdater.exceptions.UnzipException;
 import de.kolbasa.apkupdater.exceptions.UpdateNotFoundException;
 import de.kolbasa.apkupdater.tools.ChecksumGenerator;
@@ -66,13 +67,15 @@ public class UpdateManager {
         }
     }
 
-    private File downloadFile(String path, String basicAuth) throws IOException {
+    private File downloadFile(String path, String basicAuth) throws DownloadFailedException {
         try {
             fileDownloader = new FileDownloader();
             if (downloadObserver != null) {
                 fileDownloader.addObserver(downloadObserver);
             }
             return fileDownloader.download(path, downloadDirectory, basicAuth);
+        } catch (Exception e) {
+            throw new DownloadFailedException(e);
         } finally {
             fileDownloader = null;
             downloadObserver = null;
@@ -115,7 +118,8 @@ public class UpdateManager {
         return wrap(update);
     }
 
-    public Update download(String path, String basicAuth, String zipPassword) throws IOException, UnzipException {
+    public Update download(String path, String basicAuth, String zipPassword) throws IOException,
+            UnzipException, DownloadFailedException {
         reset();
         File downloadedFile = downloadFile(path, basicAuth);
         File unzippedFile = unzipFile(downloadedFile, zipPassword);
