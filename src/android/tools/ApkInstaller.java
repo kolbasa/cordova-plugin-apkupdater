@@ -213,9 +213,7 @@ public class ApkInstaller {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return context.getPackageManager().canRequestPackageInstalls();
         } else {
-            // noinspection deprecation
-            String name = Settings.Global.INSTALL_NON_MARKET_APPS;
-            return Settings.Global.getInt(null, name, 0) == 1;
+            return true;
         }
     }
 
@@ -228,7 +226,7 @@ public class ApkInstaller {
             }
             context.startActivity(intent);
         } else {
-            throw new PlatformNotSupportedException("SDK: " + Build.VERSION.SDK_INT);
+            throw new PlatformNotSupportedException("Not supported for Android < 8");
         }
     }
 
