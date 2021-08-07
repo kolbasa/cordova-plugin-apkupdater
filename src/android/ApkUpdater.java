@@ -7,14 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.pm.PackageManager;
-
 import java.io.File;
-import java.io.IOException;
 
 import de.kolbasa.apkupdater.exceptions.DownloadInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
-import de.kolbasa.apkupdater.exceptions.UpdateNotFoundException;
 import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
 import de.kolbasa.apkupdater.downloader.Progress;
@@ -41,11 +37,11 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private JSONObject getAppInfo() throws JSONException, PackageManager.NameNotFoundException {
+    private JSONObject getAppInfo() throws Exception {
         return getAppInfo(null);
     }
 
-    private JSONObject getAppInfo(File apk) throws JSONException, PackageManager.NameNotFoundException {
+    private JSONObject getAppInfo(File apk) throws Exception {
         AppData app = new AppData(cordova.getActivity());
         JSONObject appInfo = new JSONObject();
 
@@ -63,7 +59,7 @@ public class ApkUpdater extends CordovaPlugin {
         return appInfo;
     }
 
-    private JSONObject getInfo(Update update) throws JSONException, PackageManager.NameNotFoundException {
+    private JSONObject getInfo(Update update) throws Exception {
         JSONObject result = new JSONObject();
         File apk = update.getApk();
         result.put("name", apk.getName());
@@ -74,9 +70,11 @@ public class ApkUpdater extends CordovaPlugin {
         return result;
     }
 
-    private Update getUpdate() throws DownloadInProgressException, IOException, UpdateNotFoundException {
+    private Update getUpdate() throws Exception {
         checkIfRunning();
-        return updateManager.getUpdate();
+        Update update = updateManager.getUpdate();
+        getAppInfo(update.getApk());
+        return update;
     }
 
     private void pushProgressEvent(CallbackContext callbackContext, Progress progress) {

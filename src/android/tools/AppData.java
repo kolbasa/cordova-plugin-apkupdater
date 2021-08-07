@@ -5,6 +5,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 import java.io.File;
+import java.io.IOException;
+
+import de.kolbasa.apkupdater.exceptions.InvalidPackageException;
 
 public class AppData {
 
@@ -44,8 +47,15 @@ public class AppData {
         return getPackageInfo(null).firstInstallTime;
     }
 
-    public String getAppName(File apk) throws PackageManager.NameNotFoundException {
-        return (String) getPackageManager().getApplicationLabel(getPackageInfo(apk).applicationInfo);
+    public String getAppName(File apk) throws PackageManager.NameNotFoundException, InvalidPackageException, IOException {
+        PackageInfo info = getPackageInfo(apk);
+
+        if (info == null) {
+            throw new InvalidPackageException(apk.getName() + " (size=" + apk.length() +
+                    ", md5=" + ChecksumGenerator.getFileChecksum(apk) + ")");
+        }
+
+        return (String) getPackageManager().getApplicationLabel(info.applicationInfo);
     }
 
 }

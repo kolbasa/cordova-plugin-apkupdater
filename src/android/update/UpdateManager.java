@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Observer;
 
 import de.kolbasa.apkupdater.downloader.FileDownloader;
+import de.kolbasa.apkupdater.exceptions.UnzipException;
 import de.kolbasa.apkupdater.exceptions.UpdateNotFoundException;
 import de.kolbasa.apkupdater.tools.ChecksumGenerator;
 import de.kolbasa.apkupdater.tools.FileTools;
@@ -78,7 +79,7 @@ public class UpdateManager {
         }
     }
 
-    private File unzipFile(File file, String password) throws IOException {
+    private File unzipFile(File file, String password) throws UnzipException {
         if (!FileTools.isType(file, SUPPORTED_ARCHIVE)) {
             return null;
         }
@@ -91,17 +92,19 @@ public class UpdateManager {
             File parentDir = file.getParentFile();
             assert parentDir != null;
             return FileTools.findByFileType(parentDir, APK);
+        } catch (Exception e) {
+            throw new UnzipException(e);
         } finally {
             unzipper = null;
             unzipObserver = null;
         }
     }
 
-    private Update wrap(File apk, File zip) throws IOException {
+    private Update wrap(File apk) throws IOException {
         if (apk == null) {
             return null;
         }
-        return new Update(apk, zip, ChecksumGenerator.getFileChecksum(apk));
+        return new Update(apk, ChecksumGenerator.getFileChecksum(apk));
     }
 
     public Update getUpdate() throws IOException, UpdateNotFoundException {
@@ -109,22 +112,20 @@ public class UpdateManager {
         if (update == null) {
             throw new UpdateNotFoundException(downloadDirectory.getAbsolutePath());
         }
-        return wrap(update, null);
+        return wrap(update);
     }
 
-    public Update download(String path, String basicAuth, String zipPassword) throws IOException {
-        File zip = downloadFile(path, basicAuth);
-        File apk = unzipFile(zip, zipPassword);
+    public Update download(String path, String basicAuth, String zipPassword) throws IOException, UnzipException {
+        File downloadedFile = downloadFile(path, basicAuth);
+        File unzippedFile = unzipFile(downloadedFile, zipPassword);
 
-        if (apk != null) {
+        if (unzippedFile != null) {
             // noinspection ResultOfMethodCallIgnored
-            zip.delete();
+            downloadedFile.delete();
+            return wrap(unzippedFile);
         } else {
-            apk = zip;
-            zip = null;
+            return wrap(downloadedFile);
         }
-
-        return wrap(apk, zip);
     }
 
     public boolean isDownloading() {
