@@ -226,7 +226,7 @@ public class ApkInstaller {
             }
             context.startActivity(intent);
         } else {
-            throw new PlatformNotSupportedException("Not supported for Android < 8");
+            throw new PlatformNotSupportedException("Not supported on Android < 8");
         }
     }
 
