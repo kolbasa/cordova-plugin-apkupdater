@@ -66,7 +66,9 @@
         <source-file src="src/android/exceptions/DownloadInProgressException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/DownloadNotRunningException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/InstallationFailedException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/exceptions/InvalidPackageException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/PlatformNotSupportedException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
+        <source-file src="src/android/exceptions/UnzipException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/exceptions/UpdateNotFoundException.java" target-dir="src/de/kolbasa/apkupdater/exceptions"/>
         <source-file src="src/android/tools/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/AppData.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
