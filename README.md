@@ -162,8 +162,8 @@ try {
 ... leads to the following output:
 
 ```
-Download failed
-net.lingala.zip4j.exception.ZipException: Wrong password!
+Unzip failed: Wrong password! (net.lingala.zip4j.exception.ZipException)
+de.kolbasa.apkupdater.exceptions.UnzipException:
   at net.lingala.zip4j.crypto.StandardDecrypter.init(StandardDecrypter.java:61)
   at net.lingala.zip4j.crypto.StandardDecrypter.<init>(StandardDecrypter.java:31)
   at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:20)
@@ -175,10 +175,10 @@ net.lingala.zip4j.exception.ZipException: Wrong password!
   at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:113)
   at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:83)
   at de.kolbasa.apkupdater.tools.Unzipper.unzip(Unzipper.java:51)
-  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:90)
-  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:121)
-  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:90)
-  at de.kolbasa.apkupdater.ApkUpdater.lambda$execute$3$ApkUpdater(ApkUpdater.java:191)
+  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:91)
+  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:120)
+  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:110)
+  at de.kolbasa.apkupdater.ApkUpdater.lambda$execute$3$ApkUpdater(ApkUpdater.java:243)
   at de.kolbasa.apkupdater.-$$Lambda$ApkUpdater$i2uPxQeilYT0voSmjrvq6lzNQe0.run(Unknown Source:6)
   at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
   at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)

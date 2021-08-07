@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.3.1 - 2021-08-07
+
+- [Changed] The error handling for the download method has been improved. The thrown exception for an invalid apk/zip file is now more readable ([#28](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/28)).
+
 ## 2.3.0 - 2021-08-04
 
 - [Added] New installation method for device owner apps ([#13](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/13)).
