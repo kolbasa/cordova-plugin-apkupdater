@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 2.4.1 - 2021-08-07
+- [Fixed] Under certain circumstances, the update dialog did not open. Only with the second call of the `install()` method it showed up.
 ## 2.4.0 - 2021-08-07
 
 - [Added] Root installation can now install third-party applications.
