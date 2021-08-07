@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
+import de.kolbasa.apkupdater.exceptions.InvalidPackageException;
 import de.kolbasa.apkupdater.exceptions.PlatformNotSupportedException;
 
 import com.scottyab.rootbeer.RootBeer;
@@ -82,15 +83,20 @@ public class ApkInstaller {
         }
     }
 
-    public static void rootInstall(Context context, File update) throws InstallationFailedException, IOException, InterruptedException {
+    public static void rootInstall(Context context, File update) throws InstallationFailedException,
+            IOException, InterruptedException, PackageManager.NameNotFoundException, InvalidPackageException {
         String packageName = context.getPackageName();
         Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
         String mainActivity = launchIntent.getComponent().getClassName();
 
         // -r Reinstall if needed
         // -d Downgrade if needed
-        String command = "pm install -r -d " + update.getAbsolutePath() +
-                " && am start -n " + packageName + "/" + mainActivity;
+        String command = "pm install -r -d '" + update.getAbsolutePath() + "'";
+
+        if (new AppData(context).getPackageName(update).equals(packageName)) {
+            // Restart app if same package
+            command += " && am start -n " + packageName + "/" + mainActivity;
+        }
 
         Process process = null;
         try {
@@ -111,7 +117,7 @@ public class ApkInstaller {
             stdOut.close();
             stdError.close();
 
-            if (builder.length() > 0) {
+            if (builder.length() > 0 && !builder.toString().equals("Success")) {
                 throw new InstallationFailedException(builder.toString());
             }
         } finally {
@@ -158,7 +164,7 @@ public class ApkInstaller {
         }
 
         Intent intent = pm.getLaunchIntentForPackage(context.getPackageName()); // Restart app after update
-        PendingIntent pendingIntent = PendingIntent.getActivity(((Activity) context), 0, intent, flags);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, flags);
         s.commit(pendingIntent.getIntentSender());
     }
 
