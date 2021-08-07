@@ -1,7 +1,9 @@
 # CHANGELOG
 
-## 2.3.1 - 2021-08-07
+## 2.4.0 - 2021-08-07
 
+- [Added] Root installation can now install third-party applications.
+- [Fixed] Root installation failed if the update file had spaces in the name.
 - [Changed] The error handling for the download method has been improved. The thrown exception for an invalid apk/zip file is now more readable ([#28](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/28)).
 
 ## 2.3.0 - 2021-08-04
