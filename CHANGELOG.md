@@ -1,8 +1,12 @@
 # CHANGELOG
 
-## 2.4.1 - 2021-08-07
+## 2.5.0 - 2021-08-07
+- [Changed] [rootbeer](https://github.com/scottyab/rootbeer) is now used for the `isDeviceRooted()` method. This should make the result more reliable ([#29](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/29)).
 - [Fixed] Under certain circumstances, the update dialog did not open. Only with the second call of the `install()` method it showed up.
 - [Fixed] `canRequestPackageInstalls()` returned an error on Android < 8.
+
+**WARNING! Breaking Changes:**
+- [Changed] Some error messages have been changed. If you parse the message text here, you should check if everything still works.
 
 ## 2.4.0 - 2021-08-07
 
