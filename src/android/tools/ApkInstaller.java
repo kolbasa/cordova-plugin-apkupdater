@@ -47,14 +47,15 @@ public class ApkInstaller {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            if (isNotFullscreen(context)) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            }
             intent.setData(getUpdate(context, update));
         } else {
             intent = new Intent(Intent.ACTION_VIEW);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setDataAndType(getUpdate(context, update), "application/vnd.android.package-archive");
+        }
+        if (isNotFullscreen(context)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         }
         context.startActivity(intent);
     }
