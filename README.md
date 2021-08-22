@@ -417,7 +417,6 @@ export class HomePage {
     remote = 'https://your-update-server.com'
 
     async update() {
-
         const manifest = await this.http.get<Update>(this.remote + '/update.json').toPromise();
 
         const remoteVersion = manifest.app.version.code;
