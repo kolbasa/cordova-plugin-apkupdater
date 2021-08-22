@@ -17,6 +17,10 @@ public class StackExtractor {
         JSONObject error = new JSONObject();
         try {
             String message = exception.getMessage();
+            if (message != null) {
+                stack = stack.replace(": " + message, "");
+            }
+
             error.put("message", message);
             error.put("stack", stack);
         } catch (JSONException e) {

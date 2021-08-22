@@ -74,8 +74,6 @@ public class UpdateManager {
                 fileDownloader.addObserver(downloadObserver);
             }
             return fileDownloader.download(path, downloadDirectory, basicAuth);
-        } catch (Exception e) {
-            throw new DownloadFailedException(e);
         } finally {
             fileDownloader = null;
             downloadObserver = null;

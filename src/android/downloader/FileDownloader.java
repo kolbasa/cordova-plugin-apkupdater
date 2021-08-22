@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Observable;
 
+import de.kolbasa.apkupdater.exceptions.DownloadFailedException;
+
 public class FileDownloader extends Observable {
 
     private static final int BROADCAST_LOCK_MILLIS = 100;
@@ -28,7 +30,7 @@ public class FileDownloader extends Observable {
         notifyObservers(progress);
     }
 
-    public File download(String fileUrl, File dir, String basicAuth) throws IOException {
+    public File download(String fileUrl, File dir, String basicAuth) throws DownloadFailedException {
 
         String fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         File outputFile = new File(dir, fileName);
@@ -56,15 +58,8 @@ public class FileDownloader extends Observable {
 
             // noinspection ResultOfMethodCallIgnored
             outputFile.createNewFile();
-            FileOutputStream fos = new FileOutputStream(outputFile);
-            InputStream is;
-            try {
-                is = connection.getInputStream();
-            } catch (Exception err) {
-                //noinspection ResultOfMethodCallIgnored
-                outputFile.delete();
-                throw err;
-            }
+
+            InputStream is = connection.getInputStream();
             byte[] buffer = new byte[1024];
 
             int bytes;
@@ -74,6 +69,7 @@ public class FileDownloader extends Observable {
             Progress progress = new Progress(fileLength);
             broadcast(progress);
 
+            FileOutputStream fos = new FileOutputStream(outputFile);
             long startTimeMillis = 0;
             while ((bytes = is.read(buffer)) != -1) {
                 bytesDownloaded += bytes;
@@ -92,6 +88,27 @@ public class FileDownloader extends Observable {
             fos.flush();
             fos.close();
             is.close();
+
+        } catch (Exception err) {
+            if (outputFile.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                outputFile.delete();
+            }
+
+            if (connection != null) {
+                try {
+                    int responseCode = connection.getResponseCode();
+                    String responseMessage = connection.getResponseMessage();
+                    if (responseMessage != null) {
+                        throw new DownloadFailedException("{ response: " + "{ message: '" +
+                                responseMessage + "', code: " + responseCode + " } }", err);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            throw new DownloadFailedException(err);
         } finally {
             interrupt();
         }
