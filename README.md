@@ -83,7 +83,7 @@ It is not recommended, but you can install the plugin without AndroidX. Just set
 
 Here is the simplest example: downloading and then installing the APK:
 
-[**Sample Implementation**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Implementation):
+Sample Implementation:
 
 ```ts
 import ApkUpdater from 'cordova-plugin-apkupdater';
@@ -105,8 +105,9 @@ export class HomePage {
     }
 
 }
-
 ```
+
+([**Complete code sample**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Implementation))
 
 ### Cordova
 
@@ -403,7 +404,7 @@ This is also the case with the
 [demo linked above](https://github.com/kolbasa/cordova-plugin-apkupdater-demo/tree/master/update).  
 Here is [my script](https://github.com/kolbasa/apk-update) that I use to create the compressed update and info file.
 
-[**Sample Implementation**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Versioning):
+Sample Implementation:
 
 ```ts
 import ApkUpdater from 'cordova-plugin-apkupdater';
@@ -429,6 +430,8 @@ export class HomePage {
     }
 }
 ```
+
+([**Complete code sample**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Versioning))
 
 <br>
 
