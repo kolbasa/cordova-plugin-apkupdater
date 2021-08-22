@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.6.0 - 2021-08-22
+- [Changed] The download method now returns the server response message and code in case of an error.
+
 ## 2.5.0 - 2021-08-07
 - [Changed] [rootbeer](https://github.com/scottyab/rootbeer) is now used for the `isDeviceRooted()` method. This should make the result more reliable ([#29](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/29)).
 - [Fixed] Under certain circumstances, the update dialog did not open. Only with the second call of the `install()` method it showed up.
