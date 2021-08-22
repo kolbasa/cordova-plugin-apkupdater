@@ -362,7 +362,7 @@ Requests root access
 await ApkUpdater.requestRootAccess(); // -> true, false
 ```
 
-`false` = The user has declined the request.
+`false` := The user has declined the request.
 
 <br>
 
