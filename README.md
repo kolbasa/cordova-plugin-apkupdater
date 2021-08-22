@@ -98,7 +98,7 @@ export class HomePage {
         await ApkUpdater.download(
             'https://your-update-server.com/update.apk',
             {
-                onDownloadProgress: progress => console.log,
+                onDownloadProgress: console.log
             }
         );
         await ApkUpdater.install();
