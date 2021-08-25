@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-apkupdater" version="2.6.0">
+        id="cordova-plugin-apkupdater" version="2.6.1">
 
     <name>Apk Updater</name>
     <license>MIT</license>

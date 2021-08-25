@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 2.6.1 - 2021-08-25
+- [Fixed] Authorization headers were always sent even if `basicAuth` was not configured ([#35](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/35)).
+
 ## 2.6.0 - 2021-08-22
 - [Changed] The download method now returns the server response message and code in case of an error.
 
