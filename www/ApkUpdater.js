@@ -20,6 +20,7 @@ module.exports = {
      * @param {string} url - Your apk or zip-archive
      * @param {object | undefined} opt - Optional
      * @param {string=} opt.zipPassword
+     * @param {string=} opt.generateChecksum
      * @param {object=} opt.basicAuth
      * @param {string=} opt.basicAuth.user
      * @param {string=} opt.basicAuth.password
@@ -53,16 +54,19 @@ module.exports = {
     },
 
     /**
+     * @param {object | undefined} opt - Optional
+     * @param {string=} opt.generateChecksum
+     *
      * @param {function=} success
      * @param {function=} failure
      *
      * @returns {Promise<object>|object}
      */
-    getDownloadedUpdate: function (success, failure) {
+    getDownloadedUpdate: function (opt, success, failure) {
         if (success == null && failure == null) {
-            return API.getDownloadedUpdate();
+            return API.getDownloadedUpdate(opt);
         } else {
-            API.getDownloadedUpdate().then(success).catch(failure);
+            API.getDownloadedUpdate(opt).then(success).catch(failure);
         }
     },
 
@@ -98,7 +102,7 @@ module.exports = {
      * @param {function=} success
      * @param {function=} failure
      *
-     * @returns {Promise<void>|void}
+     * @returns {Promise<boolean>|void}
      */
     openInstallSetting: function (success, failure) {
         if (success == null && failure == null) {
@@ -112,13 +116,44 @@ module.exports = {
      * @param {function=} success
      * @param {function=} failure
      *
+     * @returns {Promise<boolean>|void}
+     */
+    isExternalStorageAuthorized: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.isExternalStorageAuthorized();
+        } else {
+            API.isExternalStorageAuthorized().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<boolean>|void}
+     */
+    requestExternalStorageAuthorization: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.requestExternalStorageAuthorization();
+        } else {
+            API.requestExternalStorageAuthorization().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {object | undefined} opt - Optional
+     * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onUnzipProgress
+     *
+     * @param {function=} success
+     * @param {function=} failure
+     *
      * @returns {Promise<void>|void}
      */
-    install: function (success, failure) {
+    install: function (opt, success, failure) {
         if (success == null && failure == null) {
-            return API.install();
+            return API.install(opt);
         } else {
-            API.install().then(success).catch(failure);
+            API.install(opt).then(success).catch(failure);
         }
     },
 

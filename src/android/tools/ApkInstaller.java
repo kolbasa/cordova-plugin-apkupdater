@@ -1,6 +1,5 @@
 package de.kolbasa.apkupdater.tools;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
@@ -9,8 +8,6 @@ import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.view.WindowManager;
-import android.provider.Settings;
 
 import androidx.core.content.FileProvider;
 
@@ -23,16 +20,11 @@ import java.io.OutputStream;
 
 import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
 import de.kolbasa.apkupdater.exceptions.InvalidPackageException;
-import de.kolbasa.apkupdater.exceptions.PlatformNotSupportedException;
 import de.kolbasa.apkupdater.exceptions.RootException;
 
 import com.scottyab.rootbeer.RootBeer;
 
 public class ApkInstaller {
-
-    private static boolean isNotFullscreen(Context context) {
-        return (((Activity) context).getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == 0;
-    }
 
     private static Uri getUpdate(Context context, File update) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -55,7 +47,7 @@ public class ApkInstaller {
             intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(getUpdate(context, update), "application/vnd.android.package-archive");
         }
-        if (isNotFullscreen(context)) {
+        if (WindowStatus.isWindowed(context)) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -95,9 +87,9 @@ public class ApkInstaller {
 
         // -r Reinstall if needed
         // -d Downgrade if needed
-        String command = "pm install -r -d '" + update.getAbsolutePath() + "'";
+        String command = "pm install -r -d '" + update.getCanonicalPath() + "'";
 
-        if (new AppData(context).getPackageName(update).equals(packageName)) {
+        if (AppData.getPackageInfo(context, update).getPackageName().equals(packageName)) {
             // Restart app if same package
             command += " && am start -n " + packageName + "/" + mainActivity;
         }
@@ -172,27 +164,6 @@ public class ApkInstaller {
         Intent intent = pm.getLaunchIntentForPackage(context.getPackageName()); // Restart app after update
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, flags);
         s.commit(pendingIntent.getIntentSender());
-    }
-
-    public static boolean canRequestPackageInstalls(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return context.getPackageManager().canRequestPackageInstalls();
-        } else {
-            return true;
-        }
-    }
-
-    public static void openInstallSetting(Context context) throws PlatformNotSupportedException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
-            intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
-            if (isNotFullscreen(context)) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            }
-            context.startActivity(intent);
-        } else {
-            throw new PlatformNotSupportedException("Not supported on Android < 8");
-        }
     }
 
 }

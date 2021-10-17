@@ -8,52 +8,34 @@ import java.io.File;
 import java.io.IOException;
 
 import de.kolbasa.apkupdater.exceptions.InvalidPackageException;
+import de.kolbasa.apkupdater.update.AppInfo;
 
 public class AppData {
 
-    private final Context context;
-
-    public AppData(Context context) {
-        this.context = context;
+    public static AppInfo getPackageInfo(Context context) throws PackageManager.NameNotFoundException, InvalidPackageException, IOException {
+        return getPackageInfo(context, null);
     }
 
-    private PackageManager getPackageManager() {
-        return this.context.getPackageManager();
-    }
+    public static AppInfo getPackageInfo(Context context, File apk) throws PackageManager.NameNotFoundException, InvalidPackageException, IOException {
+        if (context == null) {
+            return null;
+        }
 
-    private PackageInfo getPackageInfo(File apk) throws PackageManager.NameNotFoundException, IOException, InvalidPackageException {
+        PackageManager packageManager = context.getPackageManager();
+
         PackageInfo info;
         if (apk == null) {
-            info = getPackageManager().getPackageInfo(this.context.getPackageName(), 0);
+            info = packageManager.getPackageInfo(context.getPackageName(), 0);
         } else {
-            info = getPackageManager().getPackageArchiveInfo(apk.getAbsolutePath(), 0);
-
+            info = packageManager.getPackageArchiveInfo(apk.getCanonicalPath(), 0);
             if (info == null) {
-                throw new InvalidPackageException(apk.getName() + " (size=" + apk.length() +
-                        ", md5=" + ChecksumGenerator.getFileChecksum(apk) + ")");
+                throw new InvalidPackageException(apk.getName() + " (size=" + apk.length() + ")");
             }
         }
-        return info;
-    }
 
-    public String getPackageName(File apk) throws PackageManager.NameNotFoundException, IOException, InvalidPackageException {
-        return getPackageInfo(apk).packageName;
-    }
+        String name = (String) packageManager.getApplicationLabel(info.applicationInfo);
 
-    public String getAppVersionName(File apk) throws PackageManager.NameNotFoundException, IOException, InvalidPackageException {
-        return getPackageInfo(apk).versionName;
-    }
-
-    public Integer getAppVersionCode(File apk) throws PackageManager.NameNotFoundException, IOException, InvalidPackageException {
-        return getPackageInfo(apk).versionCode;
-    }
-
-    public Long getFirstInstallTime() throws PackageManager.NameNotFoundException, IOException, InvalidPackageException {
-        return getPackageInfo(null).firstInstallTime;
-    }
-
-    public String getAppName(File apk) throws PackageManager.NameNotFoundException, IOException, InvalidPackageException {
-        return (String) getPackageManager().getApplicationLabel(getPackageInfo(apk).applicationInfo);
+        return new AppInfo(name, info.packageName, info.versionName, info.versionCode, info.firstInstallTime);
     }
 
 }

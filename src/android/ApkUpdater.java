@@ -5,15 +5,16 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 
+import de.kolbasa.apkupdater.exceptions.ActionInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
 import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
 import de.kolbasa.apkupdater.downloader.Progress;
+import de.kolbasa.apkupdater.tools.PermissionManager;
 import de.kolbasa.apkupdater.tools.StackExtractor;
 import de.kolbasa.apkupdater.update.Update;
 import de.kolbasa.apkupdater.update.UpdateManager;
@@ -27,7 +28,7 @@ public class ApkUpdater extends CordovaPlugin {
     private void init() {
         if (updateManager == null) {
             File downloadDir = new File(cordova.getContext().getFilesDir(), UPDATE_DIR);
-            updateManager = new UpdateManager(downloadDir);
+            updateManager = new UpdateManager(downloadDir, cordova.getContext());
         }
     }
 
@@ -37,44 +38,9 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private JSONObject getAppInfo() throws Exception {
-        return getAppInfo(null);
-    }
-
-    private JSONObject getAppInfo(File apk) throws Exception {
-        AppData app = new AppData(cordova.getContext());
-        JSONObject appInfo = new JSONObject();
-
-        appInfo.put("name", app.getAppName(apk));
-        appInfo.put("package", app.getPackageName(apk));
-
-        if (apk == null) {
-            appInfo.put("firstInstallTime", app.getFirstInstallTime());
-        }
-
-        JSONObject version = new JSONObject();
-        version.put("code", app.getAppVersionCode(apk));
-        version.put("name", app.getAppVersionName(apk));
-        appInfo.put("version", version);
-        return appInfo;
-    }
-
-    private JSONObject getInfo(Update update) throws Exception {
-        JSONObject result = new JSONObject();
-        File apk = update.getApk();
-        result.put("name", apk.getName());
-        result.put("path", apk.getParent());
-        result.put("size", apk.length());
-        result.put("checksum", update.getChecksum());
-        result.put("app", getAppInfo(apk));
-        return result;
-    }
-
-    private Update getUpdate() throws Exception {
+    private Update getUpdate(boolean calcSum) throws Exception {
         checkIfRunning();
-        Update update = updateManager.getUpdate();
-        getAppInfo(update.getApk());
-        return update;
+        return updateManager.getUpdate(calcSum);
     }
 
     private void pushProgressEvent(CallbackContext callbackContext, Progress progress) {
@@ -92,17 +58,20 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
+    private int toBit(boolean bool) {
+        return bool ? 1 : 0;
+    }
 
     private void getInstalledVersion(CallbackContext callbackContext) {
         try {
-            callbackContext.success(getAppInfo());
+            callbackContext.success(AppData.getPackageInfo(cordova.getContext()).toJSON());
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
     }
 
     private String parseString(String str) {
-        return str.equals("null") ? null: str;
+        return str.equals("null") ? null : str;
     }
 
     private void download(JSONArray data, CallbackContext callbackContext) {
@@ -112,9 +81,10 @@ public class ApkUpdater extends CordovaPlugin {
             String url = parseString(data.getString(0));
             String basicAuth = parseString(data.getString(1));
             String zipPassword = parseString(data.getString(2));
+            boolean calculateChecksum = data.getBoolean(3);
 
-            Update update = updateManager.download(url, basicAuth, zipPassword);
-            callbackContext.success(getInfo(update));
+            Update update = updateManager.download(url, basicAuth, zipPassword, calculateChecksum);
+            callbackContext.success(update.toJSON());
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -148,9 +118,10 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private void getDownloadedUpdate(CallbackContext callbackContext) {
+    private void getDownloadedUpdate(JSONArray data, CallbackContext callbackContext) {
         try {
-            callbackContext.success(getInfo(getUpdate()));
+            boolean calculateChecksum = data.getBoolean(0);
+            callbackContext.success(getUpdate(calculateChecksum).toJSON());
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -165,10 +136,65 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
+    private boolean canRequestInstalls = false;
+    private boolean hasWritePermissions = false;
+    private CallbackContext cbcInstallSettings;
+    private CallbackContext cbcStoragePermission;
+
+    private void updatePermissionStatus() {
+        canRequestInstalls = PermissionManager.canRequestPackageInstalls(cordova.getContext());
+        hasWritePermissions = PermissionManager.hasWritePermission(cordova.getContext());
+    }
+
+    private boolean isWaitingForPermissionStatusChange() {
+        return cbcInstallSettings != null || cbcStoragePermission != null;
+    }
+
+    private void monitorPermissions() {
+        if (!isWaitingForPermissionStatusChange()) {
+            return;
+        }
+        updatePermissionStatus();
+    }
+
+    private void checkPermissionStatus() {
+        if (!isWaitingForPermissionStatusChange()) {
+            return;
+        }
+
+        boolean _canRequestInstalls = canRequestInstalls;
+        boolean _hasWritePermissions = hasWritePermissions;
+        updatePermissionStatus();
+
+        if (cbcInstallSettings != null) {
+            canRequestPackageInstalls(cbcInstallSettings);
+        } else {
+            isExternalStorageAuthorized(cbcStoragePermission);
+        }
+
+        if (canRequestInstalls && hasWritePermissions && (!_canRequestInstalls || !_hasWritePermissions)) {
+            PermissionManager.restartApp(cordova.getContext());
+        }
+
+        cbcInstallSettings = null;
+        cbcStoragePermission = null;
+    }
+
+    @Override
+    public void onPause(boolean multitasking) {
+        super.onPause(multitasking);
+        monitorPermissions();
+    }
+
+    @Override
+    public void onResume(boolean multitasking) {
+        super.onResume(multitasking);
+        checkPermissionStatus();
+    }
 
     private void canRequestPackageInstalls(CallbackContext callbackContext) {
         try {
-            callbackContext.success(Boolean.toString(ApkInstaller.canRequestPackageInstalls(cordova.getContext())));
+            callbackContext.success(toBit(PermissionManager.canRequestPackageInstalls(cordova.getContext())));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -176,8 +202,35 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void openInstallSetting(CallbackContext callbackContext) {
         try {
-            ApkInstaller.openInstallSetting(cordova.getContext());
-            callbackContext.success();
+            if (isWaitingForPermissionStatusChange()) {
+                throw new ActionInProgressException();
+            }
+            cbcInstallSettings = callbackContext;
+            PermissionManager.openInstallSetting(cordova.getContext());
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void isExternalStorageAuthorized(CallbackContext callbackContext) {
+        try {
+            callbackContext.success(toBit(PermissionManager.hasWritePermission(cordova.getContext())));
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void requestExternalStorageAuthorization(CallbackContext callbackContext) {
+        try {
+            if (PermissionManager.hasWritePermission(cordova.getContext())) {
+                callbackContext.success(1);
+            } else {
+                if (isWaitingForPermissionStatusChange()) {
+                    throw new ActionInProgressException();
+                }
+                cbcStoragePermission = callbackContext;
+                PermissionManager.requestWritePermission(cordova.getContext());
+            }
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -185,17 +238,18 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void install(CallbackContext callbackContext) {
         try {
-            ApkInstaller.install(cordova.getContext(), getUpdate().getApk());
+            Update update = getUpdate(false);
+            updateManager.unzipBundle(update);
+            ApkInstaller.install(cordova.getContext(), update.getUpdate());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
     }
 
-
     private void isDeviceRooted(CallbackContext callbackContext) {
         try {
-            callbackContext.success(Boolean.toString(ApkInstaller.isDeviceRooted(cordova.getContext())));
+            callbackContext.success(toBit(ApkInstaller.isDeviceRooted(cordova.getContext())));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -203,7 +257,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void requestRootAccess(CallbackContext callbackContext) {
         try {
-            callbackContext.success(Boolean.toString(ApkInstaller.requestRootAccess()));
+            callbackContext.success(toBit(ApkInstaller.requestRootAccess()));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -211,17 +265,16 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void rootInstall(CallbackContext callbackContext) {
         try {
-            ApkInstaller.rootInstall(cordova.getContext(), getUpdate().getApk());
+            ApkInstaller.rootInstall(cordova.getContext(), getUpdate(false).getUpdate());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
     }
 
-
     private void isDeviceOwner(CallbackContext callbackContext) {
         try {
-            callbackContext.success(Boolean.toString(ApkInstaller.isDeviceOwner(cordova.getContext())));
+            callbackContext.success(toBit(ApkInstaller.isDeviceOwner(cordova.getContext())));
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -229,13 +282,12 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void ownerInstall(CallbackContext callbackContext) {
         try {
-            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate().getApk());
+            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate(false).getUpdate());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
     }
-
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
@@ -258,7 +310,7 @@ public class ApkUpdater extends CordovaPlugin {
                 cordova.getThreadPool().execute(() -> stop(callbackContext));
                 break;
             case "getDownloadedUpdate":
-                cordova.getThreadPool().execute(() -> getDownloadedUpdate(callbackContext));
+                cordova.getThreadPool().execute(() -> getDownloadedUpdate(data, callbackContext));
                 break;
             case "reset":
                 cordova.getThreadPool().execute(() -> reset(callbackContext));
@@ -286,6 +338,12 @@ public class ApkUpdater extends CordovaPlugin {
                 break;
             case "ownerInstall":
                 cordova.getThreadPool().execute(() -> ownerInstall(callbackContext));
+                break;
+            case "isExternalStorageAuthorized":
+                cordova.getThreadPool().execute(() -> isExternalStorageAuthorized(callbackContext));
+                break;
+            case "requestExternalStorageAuthorization":
+                cordova.getThreadPool().execute(() -> requestExternalStorageAuthorization(callbackContext));
                 break;
             default:
                 return false;
