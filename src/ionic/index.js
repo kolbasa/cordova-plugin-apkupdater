@@ -32,6 +32,14 @@ var ApkUpdater = /** @class */ (function () {
         var apkUpdater = plugin();
         return apkUpdater.openInstallSetting.apply(apkUpdater, arguments);
     };
+    ApkUpdater.isExternalStorageAuthorized = function () {
+        var apkUpdater = plugin();
+        return apkUpdater.isExternalStorageAuthorized.apply(apkUpdater, arguments);
+    };
+    ApkUpdater.requestExternalStorageAuthorization = function () {
+        var apkUpdater = plugin();
+        return apkUpdater.requestExternalStorageAuthorization.apply(apkUpdater, arguments);
+    };
     ApkUpdater.install = function () {
         var apkUpdater = plugin();
         return apkUpdater.install.apply(apkUpdater, arguments);
