@@ -69,14 +69,6 @@ I actively maintain the plugin.
 
     npm install cordova-plugin-apkupdater
 
-### Android Legacy Support Libraries
-
-It is not recommended, but you can install the plugin without AndroidX. Just set the following variable:
-
-    cordova plugin add cordova-plugin-apkupdater --variable AndroidXEnabled=false
-
-<br>
-
 # Basic example
 
 ### Ionic 2+ with Typescript
