@@ -188,14 +188,14 @@ Caused by: net.lingala.zip4j.exception.ZipException: Wrong password!
 ## download()
 
 ```js
-await ApkUpdater.download('https://your-update-server.com/update.apk', options); // "options" is optional
+await ApkUpdater.download('https://your-update-server.com/update.apk', options);
 ```
 
 You can also pass a `zip` file here. The zip file can even be encrypted with a password.  
 However, you should make sure that the archive contains only the APK file at root level, nothing else.  
 If you want to automate this, then you can also use [my script](https://github.com/kolbasa/apk-update).
 
-Configuration:
+Configuration (optional):
 
 ```js
 const options = {
@@ -280,10 +280,10 @@ const result = {
 The downloaded update remains saved even after an app restart and can be queried as follows:
 
 ```js
-await ApkUpdater.getDownloadedUpdate(options); // "options" is optional
+await ApkUpdater.getDownloadedUpdate(options);
 ```
 
-Configuration:
+Configuration (optional):
 
 ```js
 const options = {
@@ -313,10 +313,10 @@ await ApkUpdater.reset();
 As soon as the download has been completed, you can use this method to ask the user to install the (X)APK.
 
 ```js
-await ApkUpdater.install(options); // "options" is optional
+await ApkUpdater.install(options);
 ```
 
-Configuration:
+Configuration (optional):
 
 ```js
 // Used only for extracting OBB data for XAPK updates.
