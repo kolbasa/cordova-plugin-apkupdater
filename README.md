@@ -366,6 +366,8 @@ await ApkUpdater.isExternalStorageAuthorized(); // -> true, false
 
 ### requestExternalStorageAuthorization()
 
+Not needed if you only install APK updates.
+
 ```js
 await ApkUpdater.requestExternalStorageAuthorization(); // -> true, false
 ```
