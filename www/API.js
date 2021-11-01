@@ -133,6 +133,7 @@ module.exports = {
      * @returns {Promise<void>}
      */
     install: function (opt) {
+        opt = opt || {};
         if (opt.onUnzipProgress != null) {
             exec(opt.onUnzipProgress, emptyFn, PLUGIN, 'addUnzipObserver');
         }

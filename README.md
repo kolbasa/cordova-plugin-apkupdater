@@ -21,7 +21,6 @@ I actively maintain the plugin.
     - [Cordova](#cordova)
     - [Ionic + Cordova](#ionic--cordova)
     - [Capacitor](#capacitor)
-    - [Android Legacy Support Libraries](#android-legacy-support-libraries)
 - [Basic example](#basic-example)
     - [Ionic 2+ with Typescript](#ionic-2-with-typescript)
     - [Cordova](#cordova-1)
@@ -34,6 +33,8 @@ I actively maintain the plugin.
   - [install()](#install)
     - [canRequestPackageInstalls()](#canrequestpackageinstalls)
     - [openInstallSetting()](#openinstallsetting)
+    - [isExternalStorageAuthorized()](#isexternalstorageauthorized)
+    - [requestExternalStorageAuthorization()](#requestexternalstorageauthorization)
   - [rootInstall()](#rootinstall)
     - [isDeviceRooted()](#isdevicerooted)
     - [requestRootAccess()](#requestrootaccess)
@@ -62,8 +63,8 @@ I actively maintain the plugin.
 
 ### Ionic + Cordova
 
+    ionic cordova plugin add cordova-androidx-build
     ionic cordova plugin add cordova-plugin-apkupdater
-    ionic cordova plugin add cordova-plugin-androidx-adapter
 
 ### Capacitor
 
@@ -112,7 +113,8 @@ ApkUpdater.download(
         onDownloadProgress: console.log
     },
     function () {
-        ApkUpdater.install(console.log, console.error);
+        // Note here that the first parameter is used for configuration.
+        ApkUpdater.install({}, console.log, console.error);
     },
     console.error
 );
@@ -186,18 +188,19 @@ Caused by: net.lingala.zip4j.exception.ZipException: Wrong password!
 ## download()
 
 ```js
-await ApkUpdater.download('https://your-update-server.com/update.apk', options);
+await ApkUpdater.download('https://your-update-server.com/update.apk', options); // "options" is optional
 ```
 
 You can also pass a `zip` file here. The zip file can even be encrypted with a password.  
 However, you should make sure that the archive contains only the APK file at root level, nothing else.  
 If you want to automate this, then you can also use [my script](https://github.com/kolbasa/apk-update).
 
-The download method can be configured as follows. The settings are optional.
+Configuration:
 
 ```js
 const options = {
     zipPassword: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
+    generateChecksum: true, // Generate an MD5 hash. Defaults to false.
     basicAuth: { // Basic access authentication
         user: 'username',
         password: 'JtE+es2GcHrjTAEU'
@@ -219,20 +222,20 @@ const options = {
 
 If the download is successful, you will receive detailed information about the update file.
 
-```js
-const result = {
-    "name": "update.apk",
-    "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
-    "size": 1982411,
-    "checksum": "d90916f513b1226e246ecb4d64acffae", // MD5
-    "app": {
-        "name": "Apk Updater Demo",
-        "package": "de.kolbasa.apkupdater.demo",
-        "version": {
-            "code": 10001,
-            "name": "1.0.1"
-        }
+```json
+{
+  "name": "update.apk",
+  "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
+  "size": 1982411,
+  "checksum": "d90916f513b1226e246ecb4d64acffae",
+  "app": {
+    "name": "Apk Updater Demo",
+    "package": "de.kolbasa.apkupdater.demo",
+    "version": {
+      "code": 10001,
+      "name": "1.0.1"
     }
+  }
 }
 ```
 
@@ -277,7 +280,15 @@ const result = {
 The downloaded update remains saved even after an app restart and can be queried as follows:
 
 ```js
-await ApkUpdater.getDownloadedUpdate();
+await ApkUpdater.getDownloadedUpdate(options); // "options" is optional
+```
+
+Configuration:
+
+```js
+const options = {
+    generateChecksum: true // Generate an MD5 hash. Defaults to false.
+}
 ```
 
 The result uses the same format as the output from the `download()` method.
@@ -299,10 +310,24 @@ await ApkUpdater.reset();
 
 ## install()
 
-As soon as the download has been completed, you can use this method to ask the user to install the apk.
+As soon as the download has been completed, you can use this method to ask the user to install the (X)APK.
 
 ```js
-await ApkUpdater.install();
+await ApkUpdater.install(options); // "options" is optional
+```
+
+Configuration:
+
+```js
+// Used only for extracting OBB data for XAPK updates.
+const options = {
+    onUnzipProgress: function (e) {
+        console.log(
+            'Unzipping: ' + e.progress + '%',
+            '(' + e.bytesWritten + '/' + e.bytes + ')'
+        );
+    }
+}
 ```
 
 When the method is invoked for the first time, the user is asked to enable a setting for installing third-party
@@ -311,6 +336,10 @@ applications
 
 You may want to ask the user for this permission before installing the first update.  
 The following two methods `canRequestPackageInstalls` and `openInstallSetting` are intended for this purpose.
+
+If you are installing an **XAPK** file with **OBB** data, then you must also ask for the external storage permission.  
+The installation of OBB data is only possible if both calls `canRequestPackageInstalls()` and `isExternalStorageAuthorized()` return `true`.  
+If both permissions have been granted, the app will restart itself.
 
 ### canRequestPackageInstalls()
 
@@ -326,7 +355,19 @@ Opens the settings page
 ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OpenInstallSettings.gif)).
 
 ```js
-await ApkUpdater.openInstallSetting();
+await ApkUpdater.openInstallSetting(); // -> true, false
+```
+
+### isExternalStorageAuthorized()
+
+```js
+await ApkUpdater.isExternalStorageAuthorized(); // -> true, false
+```
+
+### requestExternalStorageAuthorization()
+
+```js
+await ApkUpdater.requestExternalStorageAuthorization(); // -> true, false
 ```
 
 <br>
@@ -335,6 +376,8 @@ await ApkUpdater.openInstallSetting();
 
 If you have a rooted device, then you can even set up unattended app update installations
 ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
+
+Supports APKs only, no XAPKs.
 
 ```js
 await ApkUpdater.rootInstall();
@@ -355,21 +398,34 @@ Requests root access
 await ApkUpdater.requestRootAccess(); // -> true, false
 ```
 
-`false` := The user has declined the request.
-
 <br>
 
 ## ownerInstall()
 
 Unattended updates can also be used by apps that are registered as device owners
-([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).  
+This can be achieved with `adb` if you have physical access to the device.
 
-This can be achieved with `adb` if you have physical access to the device.   
-I will provide a tutorial for this soon.
+Supports APKs only, no XAPKs.
 
 ```js
 await ApkUpdater.ownerInstall();
 ```
+
+To use this, the app must be declared as the device owner (replace the `your.app.id` appropriately):
+```
+adb shell dpm set-device-owner your.app.id/de.kolbasa.apkupdater.tools.DAReceiver
+```
+
+**Beware**, after executing this command, **the app can no longer be uninstalled**.  
+In this case, only the factory reset setting will help. So I wouldn't try this on your personal phone.
+
+If you want to remove the device owner with `adb` later, you have to declare the app as `testOnly` in `AndroidManifest.xml` ([doc](https://developer.android.com/guide/topics/manifest/application-element)).
+```
+adb shell dpm remove-active-admin your.app.id/de.kolbasa.apkupdater.tools.DAReceiver
+```
+
+The recommended way, however, is to reset to the factory settings.
 
 ### isDeviceOwner()
 

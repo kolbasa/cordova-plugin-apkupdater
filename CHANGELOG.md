@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 3.0.0 - 2021-11-01
+
+- [Added] XAPK-Support
+- [Added] Device owner status can now be set without an additional plugin.
+- [Added] Calling `openInstallSetting()` now waits for user input.
+
+**WARNING! Breaking Changes:**
+- [Removed] Can no longer be installed with Android Legacy Support Libraries.
+- [Changed] Calculating the MD5 checksum is now opt-in.
+- [Changed] The `getDownloadedUpdate` and `install` methods now have a configuration object as the first parameter. 
+
 ## 2.6.1 - 2021-08-25
 - [Fixed] Authorization headers were always sent even if `basicAuth` was not configured ([#35](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/35)).
 
