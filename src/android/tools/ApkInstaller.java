@@ -154,16 +154,11 @@ public class ApkInstaller {
         in.close();
         out.close();
 
-        int flags;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            flags = PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT;
-        } else {
-            flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        }
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(),
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0);
 
-        Intent intent = pm.getLaunchIntentForPackage(context.getPackageName()); // Restart app after update
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, flags);
         s.commit(pendingIntent.getIntentSender());
+        s.close();
     }
 
 }
