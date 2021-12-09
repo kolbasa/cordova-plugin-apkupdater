@@ -40,17 +40,6 @@ export default class ApkUpdater {
         return apkUpdater.openInstallSetting.apply(apkUpdater, arguments);
     }
 
-    static isExternalStorageAuthorized() {
-        let apkUpdater = plugin();
-        return apkUpdater.isExternalStorageAuthorized.apply(apkUpdater, arguments);
-    }
-
-    static requestExternalStorageAuthorization() {
-        let apkUpdater = plugin();
-        return apkUpdater.requestExternalStorageAuthorization.apply(apkUpdater, arguments);
-    }
-
-
     static install() {
         let apkUpdater = plugin();
         return apkUpdater.install.apply(apkUpdater, arguments);

@@ -21,7 +21,6 @@ module.exports = {
      * @param {string} url - Your apk or zip-archive
      * @param {object | undefined} opt - Optional
      * @param {string=} opt.zipPassword
-     * @param {string=} opt.generateChecksum
      * @param {object=} opt.basicAuth
      * @param {string=} opt.basicAuth.user
      * @param {string=} opt.basicAuth.password
@@ -45,10 +44,8 @@ module.exports = {
             basicAuth = opt.basicAuth.user + ':' + opt.basicAuth.password;
         }
 
-        opt.generateChecksum = opt.generateChecksum == null ? false: opt.generateChecksum;
-
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'download', [url, basicAuth, opt.zipPassword, opt.generateChecksum]);
+            exec(resolve, reject, PLUGIN, 'download', [url, basicAuth, opt.zipPassword]);
         });
     },
 
@@ -62,15 +59,11 @@ module.exports = {
     },
 
     /**
-     * @param {object | undefined} opt - Optional
-     * @param {string=} opt.generateChecksum
      * @returns {Promise<object>}
      */
-    getDownloadedUpdate: function (opt) {
-        opt = opt || {};
-        opt.generateChecksum = opt.generateChecksum == null ? false: opt.generateChecksum;
+    getDownloadedUpdate: function () {
         return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'getDownloadedUpdate', [opt.generateChecksum]);
+            exec(resolve, reject, PLUGIN, 'getDownloadedUpdate', []);
         });
     },
 
@@ -106,37 +99,9 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise<boolean>}
-     */
-    isExternalStorageAuthorized: function () {
-        return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'isExternalStorageAuthorized', []);
-        }).then(function (resp) {
-            return resp === 1;
-        });
-    },
-
-    /**
-     * @returns {Promise<boolean>}
-     */
-    requestExternalStorageAuthorization: function () {
-        return new Promise(function (resolve, reject) {
-            exec(resolve, reject, PLUGIN, 'requestExternalStorageAuthorization', []);
-        }).then(function (resp) {
-            return resp === 1;
-        });
-    },
-
-    /**
-     * @param {object | undefined} opt - Optional
-     * @param {function({progress: number, bytes: number, bytesWritten: number}): void=} opt.onUnzipProgress
      * @returns {Promise<void>}
      */
-    install: function (opt) {
-        opt = opt || {};
-        if (opt.onUnzipProgress != null) {
-            exec(opt.onUnzipProgress, emptyFn, PLUGIN, 'addUnzipObserver');
-        }
+    install: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'install', []);
         });
