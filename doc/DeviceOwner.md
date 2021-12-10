@@ -12,7 +12,7 @@ There are several ways how to unlock this mode. I will describe two ways here.
 
 Install the app on the device along with the ApkUpdater plugin. Activate the developer mode on the device and connect it
 to the PC.  
-The device must not be connected to a Google account, otherwise the setup will fail.  
+The device must not be connected to a Google account, otherwise the setup will fail.
 
 Execute the command (replace the `de.kolbasa.apkupdater.demo/` with your app id):
 
@@ -25,14 +25,15 @@ Do not modify `/de.kolbasa.apkupdater.tools.DAReceiver`.
 ## QR code
 
 The QR code is scanned during the initial setup of the device.  
-This can also be done by a person who is less technically skilled.  
+This can also be done by a person who is less technically skilled.
 
 The QR code only needs to be generated once and can then be used indefinitely.
 
 ### Contents
 
 The content of the QR code is a JSON object with three fields.
-[Here](https://developers.google.com/android/management/provision-device#example_qr_code_bundle) you can find the official documentation for the format.  
+[Here](https://developers.google.com/android/management/provision-device#example_qr_code_bundle) you can find the
+official documentation for the format.  
 In the example below, my [demo](https://github.com/kolbasa/cordova-plugin-apkupdater-demo) app is used:
 
 ```json
@@ -43,7 +44,8 @@ In the example below, my [demo](https://github.com/kolbasa/cordova-plugin-apkupd
 }
 ```
 
-You can automate many other things here. For example, you can configure the Wi-Fi credentials here if you want to set up a lot of devices at once.
+You can automate many other things here. For example, you can configure the Wi-Fi credentials if you want to set up a
+lot of devices at once.
 
 #### PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME
 
@@ -77,7 +79,8 @@ For Windows, I don't have a one-liner.
 
 ### QR Code Generator
 
-Now you just take the text content of the JSON object and convert it to a QR image using a generator such as [ZXing](https://zxing.appspot.com/generator/)
+Now you just take the text content of the JSON object and convert it to a QR image using a generator such
+as [ZXing](https://zxing.appspot.com/generator/)
 (select `Text` under `Contents`).
 
 This is what the final result looks like:
@@ -87,9 +90,11 @@ This is what the final result looks like:
 ### Device setup
 
 You can now set up your devices as follows:
+
 * You need a clean device. That means you need to reset it first.
 * On the welcome screen, tap the "Hello" text 6 times.
 * You will be prompted to connect the device to the Internet. Do it. After a while, a QR scan app should launch.
-* Now it's time to scan the QR code. If everything goes well, the app is now automatically downloaded and activated as a device owner.
+* Now it's time to scan the QR code. If everything goes well, the app is now automatically downloaded and activated as a
+  device owner.
 
 You can also use the demo QR code shown here for testing.
