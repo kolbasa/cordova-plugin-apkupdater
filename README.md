@@ -98,7 +98,7 @@ export class HomePage {
 }
 ```
 
-([**Complete code sample**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Implementation))
+([**Complete code sample**](doc/sample/Implementation.md))
 
 ### Cordova
 
@@ -393,7 +393,7 @@ export class HomePage {
 }
 ```
 
-([**Complete code sample**](https://github.com/kolbasa/cordova-plugin-apkupdater/wiki/Sample-Versioning))
+([**Complete code sample**](doc/sample/Versioning.md))
 
 <br>
 
