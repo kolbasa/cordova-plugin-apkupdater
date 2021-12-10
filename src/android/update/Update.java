@@ -4,47 +4,28 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.Map;
 
 public class Update {
 
-    private final File update;
+    private final File installFile;
 
     private final AppInfo appInfo;
 
-    private final File bundle;
-
-    private final Map<String, File> updateData;
-
-    public Update(File update, AppInfo appInfo) {
-        this(update, appInfo, null, null);
-    }
-
-    public Update(File update, AppInfo appInfo, File bundle, Map<String, File> updateData) {
-        this.update = update;
+    public Update(File installFile, AppInfo appInfo) {
+        this.installFile = installFile;
         this.appInfo = appInfo;
-        this.bundle = bundle;
-        this.updateData = updateData;
     }
 
-    public File getUpdate() {
-        return update;
-    }
-
-    public File getBundle() {
-        return bundle;
-    }
-
-    public Map<String, File> getUpdateData() {
-        return updateData;
+    public File getInstallFile() {
+        return installFile;
     }
 
     public JSONObject toJSON() throws JSONException {
         JSONObject result = new JSONObject();
 
-        result.put("name", update.getName());
-        result.put("path", update.getParent());
-        result.put("size", update.length());
+        result.put("name", installFile.getName());
+        result.put("path", installFile.getParent());
+        result.put("size", installFile.length());
 
         if (appInfo != null) {
             result.put("app", appInfo.toJSON());

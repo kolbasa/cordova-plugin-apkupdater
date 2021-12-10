@@ -11,6 +11,8 @@ import android.os.Build;
 
 import androidx.core.content.FileProvider;
 
+import com.scottyab.rootbeer.RootBeer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +23,6 @@ import java.io.OutputStream;
 import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
 import de.kolbasa.apkupdater.exceptions.InvalidPackageException;
 import de.kolbasa.apkupdater.exceptions.RootException;
-
-import com.scottyab.rootbeer.RootBeer;
 
 public class ApkInstaller {
 

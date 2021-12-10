@@ -8,12 +8,12 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import de.kolbasa.apkupdater.downloader.Progress;
 import de.kolbasa.apkupdater.exceptions.ActionInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
 import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
-import de.kolbasa.apkupdater.downloader.Progress;
 import de.kolbasa.apkupdater.tools.PermissionManager;
 import de.kolbasa.apkupdater.tools.StackExtractor;
 import de.kolbasa.apkupdater.update.Update;
@@ -167,9 +167,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void install(CallbackContext callbackContext) {
         try {
-            Update update = getUpdate();
-            updateManager.unzipBundle(update);
-            ApkInstaller.install(cordova.getContext(), update.getUpdate());
+            ApkInstaller.install(cordova.getContext(), getUpdate().getInstallFile());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
@@ -194,7 +192,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void rootInstall(CallbackContext callbackContext) {
         try {
-            ApkInstaller.rootInstall(cordova.getContext(), getUpdate().getUpdate());
+            ApkInstaller.rootInstall(cordova.getContext(), getUpdate().getInstallFile());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
@@ -211,7 +209,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void ownerInstall(CallbackContext callbackContext) {
         try {
-            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate().getUpdate());
+            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate().getInstallFile());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
