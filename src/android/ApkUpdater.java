@@ -136,60 +136,15 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private boolean canRequestInstalls = false;
-    private boolean hasWritePermissions = false;
     private CallbackContext cbcInstallSettings;
-    private CallbackContext cbcStoragePermission;
-
-    private void updatePermissionStatus() {
-        canRequestInstalls = PermissionManager.canRequestPackageInstalls(cordova.getContext());
-        hasWritePermissions = PermissionManager.hasWritePermission(cordova.getContext());
-    }
-
-    private boolean isWaitingForPermissionStatusChange() {
-        return cbcInstallSettings != null || cbcStoragePermission != null;
-    }
-
-    private void monitorPermissions() {
-        if (!isWaitingForPermissionStatusChange()) {
-            return;
-        }
-        updatePermissionStatus();
-    }
-
-    private void checkPermissionStatus() {
-        if (!isWaitingForPermissionStatusChange()) {
-            return;
-        }
-
-        boolean _canRequestInstalls = canRequestInstalls;
-        boolean _hasWritePermissions = hasWritePermissions;
-        updatePermissionStatus();
-
-        if (cbcInstallSettings != null) {
-            canRequestPackageInstalls(cbcInstallSettings);
-        } else {
-            isExternalStorageAuthorized(cbcStoragePermission);
-        }
-
-        if (canRequestInstalls && hasWritePermissions && (!_canRequestInstalls || !_hasWritePermissions)) {
-            PermissionManager.restartApp(cordova.getContext());
-        }
-
-        cbcInstallSettings = null;
-        cbcStoragePermission = null;
-    }
-
-    @Override
-    public void onPause(boolean multitasking) {
-        super.onPause(multitasking);
-        monitorPermissions();
-    }
 
     @Override
     public void onResume(boolean multitasking) {
         super.onResume(multitasking);
-        checkPermissionStatus();
+        if (cbcInstallSettings != null) {
+            canRequestPackageInstalls(cbcInstallSettings);
+            cbcInstallSettings = null;
+        }
     }
 
     private void canRequestPackageInstalls(CallbackContext callbackContext) {
@@ -202,35 +157,11 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void openInstallSetting(CallbackContext callbackContext) {
         try {
-            if (isWaitingForPermissionStatusChange()) {
+            if (cbcInstallSettings != null) {
                 throw new ActionInProgressException();
             }
             cbcInstallSettings = callbackContext;
             PermissionManager.openInstallSetting(cordova.getContext());
-        } catch (Exception e) {
-            callbackContext.error(StackExtractor.format(e));
-        }
-    }
-
-    private void isExternalStorageAuthorized(CallbackContext callbackContext) {
-        try {
-            callbackContext.success(toBit(PermissionManager.hasWritePermission(cordova.getContext())));
-        } catch (Exception e) {
-            callbackContext.error(StackExtractor.format(e));
-        }
-    }
-
-    private void requestExternalStorageAuthorization(CallbackContext callbackContext) {
-        try {
-            if (PermissionManager.hasWritePermission(cordova.getContext())) {
-                callbackContext.success(1);
-            } else {
-                if (isWaitingForPermissionStatusChange()) {
-                    throw new ActionInProgressException();
-                }
-                cbcStoragePermission = callbackContext;
-                PermissionManager.requestWritePermission(cordova.getContext());
-            }
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -338,12 +269,6 @@ public class ApkUpdater extends CordovaPlugin {
                 break;
             case "ownerInstall":
                 cordova.getThreadPool().execute(() -> ownerInstall(callbackContext));
-                break;
-            case "isExternalStorageAuthorized":
-                cordova.getThreadPool().execute(() -> isExternalStorageAuthorized(callbackContext));
-                break;
-            case "requestExternalStorageAuthorization":
-                cordova.getThreadPool().execute(() -> requestExternalStorageAuthorization(callbackContext));
                 break;
             default:
                 return false;
