@@ -10,21 +10,18 @@ public class Update {
 
     private final File update;
 
-    private final String checksum;
-
     private final AppInfo appInfo;
 
     private final File bundle;
 
     private final Map<String, File> updateData;
 
-    public Update(File update, String checksum, AppInfo appInfo) {
-        this(update, checksum, appInfo, null, null);
+    public Update(File update, AppInfo appInfo) {
+        this(update, appInfo, null, null);
     }
 
-    public Update(File update, String checksum, AppInfo appInfo, File bundle, Map<String, File> updateData) {
+    public Update(File update, AppInfo appInfo, File bundle, Map<String, File> updateData) {
         this.update = update;
-        this.checksum = checksum;
         this.appInfo = appInfo;
         this.bundle = bundle;
         this.updateData = updateData;
@@ -48,10 +45,6 @@ public class Update {
         result.put("name", update.getName());
         result.put("path", update.getParent());
         result.put("size", update.length());
-
-        if (checksum != null) {
-            result.put("checksum", checksum);
-        }
 
         if (appInfo != null) {
             result.put("app", appInfo.toJSON());

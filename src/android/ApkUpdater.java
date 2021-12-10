@@ -38,9 +38,9 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private Update getUpdate(boolean calcSum) throws Exception {
+    private Update getUpdate() throws Exception {
         checkIfRunning();
-        return updateManager.getUpdate(calcSum);
+        return updateManager.getUpdate();
     }
 
     private void pushProgressEvent(CallbackContext callbackContext, Progress progress) {
@@ -81,9 +81,8 @@ public class ApkUpdater extends CordovaPlugin {
             String url = parseString(data.getString(0));
             String basicAuth = parseString(data.getString(1));
             String zipPassword = parseString(data.getString(2));
-            boolean calculateChecksum = data.getBoolean(3);
 
-            Update update = updateManager.download(url, basicAuth, zipPassword, calculateChecksum);
+            Update update = updateManager.download(url, basicAuth, zipPassword);
             callbackContext.success(update.toJSON());
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
@@ -118,10 +117,9 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private void getDownloadedUpdate(JSONArray data, CallbackContext callbackContext) {
+    private void getDownloadedUpdate(CallbackContext callbackContext) {
         try {
-            boolean calculateChecksum = data.getBoolean(0);
-            callbackContext.success(getUpdate(calculateChecksum).toJSON());
+            callbackContext.success(getUpdate().toJSON());
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -169,7 +167,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void install(CallbackContext callbackContext) {
         try {
-            Update update = getUpdate(false);
+            Update update = getUpdate();
             updateManager.unzipBundle(update);
             ApkInstaller.install(cordova.getContext(), update.getUpdate());
             callbackContext.success();
@@ -196,7 +194,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void rootInstall(CallbackContext callbackContext) {
         try {
-            ApkInstaller.rootInstall(cordova.getContext(), getUpdate(false).getUpdate());
+            ApkInstaller.rootInstall(cordova.getContext(), getUpdate().getUpdate());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
@@ -213,7 +211,7 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void ownerInstall(CallbackContext callbackContext) {
         try {
-            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate(false).getUpdate());
+            ApkInstaller.ownerInstall(cordova.getContext(), getUpdate().getUpdate());
             callbackContext.success();
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
@@ -241,7 +239,7 @@ public class ApkUpdater extends CordovaPlugin {
                 cordova.getThreadPool().execute(() -> stop(callbackContext));
                 break;
             case "getDownloadedUpdate":
-                cordova.getThreadPool().execute(() -> getDownloadedUpdate(data, callbackContext));
+                cordova.getThreadPool().execute(() -> getDownloadedUpdate(callbackContext));
                 break;
             case "reset":
                 cordova.getThreadPool().execute(() -> reset(callbackContext));

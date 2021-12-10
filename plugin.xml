@@ -97,7 +97,6 @@
         <source-file src="src/android/tools/ApkInstaller.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/AppData.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/ArchiveManager.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
-        <source-file src="src/android/tools/ChecksumGenerator.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/DAReceiver.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/FileProvider.java" target-dir="src/de/kolbasa/apkupdater/tools"/>
         <source-file src="src/android/tools/FileTools.java" target-dir="src/de/kolbasa/apkupdater/tools"/>

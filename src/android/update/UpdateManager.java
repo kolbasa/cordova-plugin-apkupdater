@@ -25,7 +25,6 @@ import de.kolbasa.apkupdater.exceptions.MissingPermissionsException;
 import de.kolbasa.apkupdater.exceptions.UnzipException;
 import de.kolbasa.apkupdater.exceptions.UpdateNotFoundException;
 import de.kolbasa.apkupdater.tools.AppData;
-import de.kolbasa.apkupdater.tools.ChecksumGenerator;
 import de.kolbasa.apkupdater.tools.FileTools;
 import de.kolbasa.apkupdater.tools.PermissionManager;
 import de.kolbasa.apkupdater.tools.ArchiveManager;
@@ -193,7 +192,7 @@ public class UpdateManager {
         }
     }
 
-    private Update getBundleInfo(File manifest, boolean calcSum) throws JSONException,
+    private Update getBundleInfo(File manifest) throws JSONException,
             IOException, InvalidPackageException {
 
         File bundle = FileTools.findByFileType(downloadDir, BUNDLE).get(0);
@@ -219,18 +218,16 @@ public class UpdateManager {
         File update = new File(downloadDir, updatePath);
         data.put(updatePath, update);
 
-        String sum = calcSum ? ChecksumGenerator.getFileChecksum(bundle) : null;
-
         String name = obj.getString(MANIFEST_NAME);
         String packageName = obj.getString(MANIFEST_PACKAGE_NAME);
         String versionName = obj.getString(MANIFEST_VERSION_NAME);
         Integer versionCode = obj.getInt(MANIFEST_VERSION_CODE);
         AppInfo info = new AppInfo(name, packageName, versionName, versionCode, null);
 
-        return new Update(update, sum, info, bundle, data);
+        return new Update(update, info, bundle, data);
     }
 
-    private Update getApkInfo(boolean calcSum) throws UpdateNotFoundException, IOException,
+    private Update getApkInfo() throws UpdateNotFoundException, IOException,
             InvalidPackageException, PackageManager.NameNotFoundException {
 
         List<File> updateFiles = FileTools.findByFileType(downloadDir, APK);
@@ -244,22 +241,21 @@ public class UpdateManager {
         }
 
         File update = updateFiles.get(0);
-        String sum = calcSum ? ChecksumGenerator.getFileChecksum(update) : null;
         AppInfo info = AppData.getPackageInfo(context, update);
 
-        return new Update(update, sum, info);
+        return new Update(update, info);
     }
 
-    public Update getUpdate(boolean calcSum) throws IOException, UpdateNotFoundException, JSONException,
+    public Update getUpdate() throws IOException, UpdateNotFoundException, JSONException,
             InvalidPackageException, PackageManager.NameNotFoundException {
         File bundleManifest = new File(downloadDir, MANIFEST);
         if (bundleManifest.exists()) {
-            return getBundleInfo(bundleManifest, calcSum);
+            return getBundleInfo(bundleManifest);
         }
-        return getApkInfo(calcSum);
+        return getApkInfo();
     }
 
-    public Update download(String path, String basicAuth, String zipPassword, boolean calcSum) throws IOException,
+    public Update download(String path, String basicAuth, String zipPassword) throws IOException,
             UnzipException, DownloadFailedException, JSONException, UpdateNotFoundException,
             InvalidPackageException, PackageManager.NameNotFoundException {
 
@@ -270,7 +266,7 @@ public class UpdateManager {
             unzipUpdate(downloadedFile, zipPassword);
             unzipManifest();
 
-            return getUpdate(calcSum);
+            return getUpdate();
         } catch (Exception e) {
             try {
                 reset();
