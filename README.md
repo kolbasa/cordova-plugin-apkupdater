@@ -339,7 +339,12 @@ await ApkUpdater.requestRootAccess(); // -> true, false
 
 Unattended updates can also be used by apps that are registered as device owners
 ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).  
-Unlike root access, this can be easily set up on any Android device. Instructions can be found [here](doc/DeviceOwner.md).  
+
+```js
+await ApkUpdater.ownerInstall();
+```
+
+Unlike root access, this can be easily set up on any Android device. Instructions can be found [here](doc/DeviceOwner.md).
 
 ### isDeviceOwner()
 
