@@ -33,8 +33,6 @@ I actively maintain the plugin.
   - [install()](#install)
     - [canRequestPackageInstalls()](#canrequestpackageinstalls)
     - [openInstallSetting()](#openinstallsetting)
-    - [isExternalStorageAuthorized()](#isexternalstorageauthorized)
-    - [requestExternalStorageAuthorization()](#requestexternalstorageauthorization)
   - [rootInstall()](#rootinstall)
     - [isDeviceRooted()](#isdevicerooted)
     - [requestRootAccess()](#requestrootaccess)
@@ -113,8 +111,7 @@ ApkUpdater.download(
         onDownloadProgress: console.log
     },
     function () {
-        // Note here that the first parameter is used for configuration.
-        ApkUpdater.install({}, console.log, console.error);
+        ApkUpdater.install(console.log, console.error);
     },
     console.error
 );
@@ -143,12 +140,7 @@ This example...
 
 ```js
 try {
-    await ApkUpdater.download(
-        'https://your-update-server.com/encrypted-update.zip',
-        {
-            zipPassword: 'wrongPassword'
-        }
-    );
+    await ApkUpdater.download('https://wrong-url.com/update.apk');
 } catch (e) {
     console.error(e.message + '\n' + e.stack);
 }
@@ -157,30 +149,12 @@ try {
 ... leads to the following output:
 
 ```
-Unzip failed: Wrong password!
-de.kolbasa.apkupdater.exceptions.UnzipException
-  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:97)
-  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:123)
-  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:110)
-  at de.kolbasa.apkupdater.ApkUpdater.lambda$execute$3$ApkUpdater(ApkUpdater.java:243)
-  at de.kolbasa.apkupdater.-$$Lambda$ApkUpdater$i2uPxQeilYT0voSmjrvq6lzNQe0.run(Unknown Source:6)
-  at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1167)
-  at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:641)
-  at java.lang.Thread.run(Thread.java:920)
-Caused by: net.lingala.zip4j.exception.ZipException: Wrong password!
-  at net.lingala.zip4j.crypto.StandardDecrypter.init(StandardDecrypter.java:61)
-  at net.lingala.zip4j.crypto.StandardDecrypter.<init>(StandardDecrypter.java:31)
-  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:20)
-  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.initializeDecrypter(ZipStandardCipherInputStream.java:10)
-  at net.lingala.zip4j.io.inputstream.CipherInputStream.<init>(CipherInputStream.java:25)
-  at net.lingala.zip4j.io.inputstream.ZipStandardCipherInputStream.<init>(ZipStandardCipherInputStream.java:14)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeCipherInputStream(ZipInputStream.java:236)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.initializeEntryInputStream(ZipInputStream.java:223)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:113)
-  at net.lingala.zip4j.io.inputstream.ZipInputStream.getNextEntry(ZipInputStream.java:83)
-  at de.kolbasa.apkupdater.tools.Unzipper.unzip(Unzipper.java:51)
-  at de.kolbasa.apkupdater.update.UpdateManager.unzipFile(UpdateManager.java:92)
-  ... 7 more
+Download failed: Unable to resolve host "wrong-url.com": No address associated with hostname
+de.kolbasa.apkupdater.exceptions.DownloadFailedException
+  at de.kolbasa.apkupdater.downloader.FileDownloader.download(FileDownloader.java:111)
+  at de.kolbasa.apkupdater.update.UpdateManager.downloadFile(UpdateManager.java:77)
+  at de.kolbasa.apkupdater.update.UpdateManager.download(UpdateManager.java:133)
+  at de.kolbasa.apkupdater.ApkUpdater.download(ApkUpdater.java:85)
 ```
 
 <br>
@@ -200,7 +174,6 @@ Configuration (optional):
 ```js
 const options = {
     zipPassword: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
-    generateChecksum: true, // Generate an MD5 hash. Defaults to false.
     basicAuth: { // Basic access authentication
         user: 'username',
         password: 'JtE+es2GcHrjTAEU'
@@ -227,7 +200,6 @@ If the download is successful, you will receive detailed information about the u
   "name": "update.apk",
   "path": "/data/user/0/de.kolbasa.apkupdater.demo/files/update",
   "size": 1982411,
-  "checksum": "d90916f513b1226e246ecb4d64acffae",
   "app": {
     "name": "Apk Updater Demo",
     "package": "de.kolbasa.apkupdater.demo",
@@ -280,15 +252,7 @@ const result = {
 The downloaded update remains saved even after an app restart and can be queried as follows:
 
 ```js
-await ApkUpdater.getDownloadedUpdate(options);
-```
-
-Configuration (optional):
-
-```js
-const options = {
-    generateChecksum: true // Generate an MD5 hash. Defaults to false.
-}
+await ApkUpdater.getDownloadedUpdate();
 ```
 
 The result uses the same format as the output from the `download()` method.
@@ -299,7 +263,8 @@ The result uses the same format as the output from the `download()` method.
 
 The `reset` method deletes all downloaded files.
 
-It is mostly useful only for debugging purposes. The user himself has no access to the files. The plugin deletes old
+It is mostly useful only for debugging purposes. The user himself has no access to the files.   
+The plugin deletes old
 updates automatically.
 
 ```js
@@ -310,24 +275,10 @@ await ApkUpdater.reset();
 
 ## install()
 
-As soon as the download has been completed, you can use this method to ask the user to install the (X)APK.
+As soon as the download has been completed, you can use this method to ask the user to install the APK.
 
 ```js
-await ApkUpdater.install(options);
-```
-
-Configuration (optional):
-
-```js
-// Used only for extracting OBB data for XAPK updates.
-const options = {
-    onUnzipProgress: function (e) {
-        console.log(
-            'Unzipping: ' + e.progress + '%',
-            '(' + e.bytesWritten + '/' + e.bytes + ')'
-        );
-    }
-}
+await ApkUpdater.install();
 ```
 
 When the method is invoked for the first time, the user is asked to enable a setting for installing third-party
@@ -337,9 +288,6 @@ applications
 You may want to ask the user for this permission before installing the first update.  
 The following two methods `canRequestPackageInstalls` and `openInstallSetting` are intended for this purpose.
 
-If you are installing an **XAPK** file with **OBB** data, then you must also ask for the external storage permission.  
-The installation of OBB data is only possible if both calls `canRequestPackageInstalls()` and `isExternalStorageAuthorized()` return `true`.  
-If both permissions have been granted, the app will restart itself.
 
 ### canRequestPackageInstalls()
 
@@ -358,28 +306,13 @@ Opens the settings page
 await ApkUpdater.openInstallSetting(); // -> true, false
 ```
 
-### isExternalStorageAuthorized()
-
-```js
-await ApkUpdater.isExternalStorageAuthorized(); // -> true, false
-```
-
-### requestExternalStorageAuthorization()
-
-Not needed if you only install APK updates.
-
-```js
-await ApkUpdater.requestExternalStorageAuthorization(); // -> true, false
-```
-
 <br>
 
 ## rootInstall()
 
 If you have a rooted device, then you can even set up unattended app update installations
-([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).
-
-Supports APKs only, no XAPKs.
+([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/RootInstall.gif)).  
+If you want to test this on an emulator, I can recommend the following script: [rootAVD](https://github.com/newbit1/rootAVD)
 
 ```js
 await ApkUpdater.rootInstall();
@@ -406,28 +339,7 @@ await ApkUpdater.requestRootAccess(); // -> true, false
 
 Unattended updates can also be used by apps that are registered as device owners
 ([video](https://raw.githubusercontent.com/wiki/kolbasa/cordova-plugin-apkupdater-demo/Videos/OwnerInstall.gif)).  
-This can be achieved with `adb` if you have physical access to the device.
-
-Supports APKs only, no XAPKs.
-
-```js
-await ApkUpdater.ownerInstall();
-```
-
-To use this, the app must be declared as the device owner (replace the `your.app.id` appropriately):
-```
-adb shell dpm set-device-owner your.app.id/de.kolbasa.apkupdater.tools.DAReceiver
-```
-
-**Beware**, after executing this command, **the app can no longer be uninstalled**.  
-In this case, only the factory reset setting will help. So I wouldn't try this on your personal phone.
-
-If you want to remove the device owner with `adb` later, you have to declare the app as `testOnly` in `AndroidManifest.xml` ([doc](https://developer.android.com/guide/topics/manifest/application-element)).
-```
-adb shell dpm remove-active-admin your.app.id/de.kolbasa.apkupdater.tools.DAReceiver
-```
-
-The recommended way, however, is to reset to the factory settings.
+Unlike root access, this can be easily set up on any Android device. Instructions can be found [here](doc/DeviceOwner.md).  
 
 ### isDeviceOwner()
 

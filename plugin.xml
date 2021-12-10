@@ -27,7 +27,7 @@
     <platform name="android">
 
         <framework src="net.lingala.zip4j:zip4j:2.9.1"/>
-        <framework src="androidx.core:core:1.7.0"/>
+        <framework src="androidx.core:core:1.6.0"/>
         <framework src="com.scottyab:rootbeer-lib:0.1.0"/>
 
         <config-file target="config.xml" parent="/*">

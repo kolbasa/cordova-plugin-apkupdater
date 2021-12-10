@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 4.0.0 - 2021-12-10
+
+- [Fixed] `ownerInstall` did not restart the app correctly on Android versions below 10 ([#40](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/40)).
+
+**WARNING! Breaking Changes:**
+- [Removed] XAPK-Support. I don't have time to support XAPK.
+- [Removed] MD5 checksum is no longer offered. It is also no longer needed. The download method automatically checks if the package is valid.
+- [Changed] The `getDownloadedUpdate` and `install` methods now have no configuration parameter.
+
 ## 3.0.0 - 2021-11-01
 
 - [Added] XAPK-Support
