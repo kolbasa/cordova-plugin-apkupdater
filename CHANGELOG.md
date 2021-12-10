@@ -2,6 +2,7 @@
 
 ## 4.0.0 - 2021-12-10
 
+- [Added] Detailed documentation on how to configure the app as a device owner using a QR code.
 - [Fixed] `ownerInstall` did not restart the app correctly on Android versions below 10 ([#40](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/40)).
 
 **WARNING! Breaking Changes:**
