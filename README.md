@@ -7,10 +7,6 @@ This plugin enables you to update your Android app completely without the Google
 
 :point_right: **[DEMO APP](https://github.com/kolbasa/cordova-plugin-apkupdater-demo)** :point_left:
 
-If you have any problems or suggestions, just
-[write to me](https://github.com/kolbasa/cordova-plugin-apkupdater/issues).  
-I actively maintain the plugin.
-
 <br>
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
