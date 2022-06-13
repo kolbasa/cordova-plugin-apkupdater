@@ -57,7 +57,6 @@ This plugin enables you to update your Android app completely without the Google
 
 ### Ionic + Cordova
 
-    ionic cordova plugin add cordova-androidx-build
     ionic cordova plugin add cordova-plugin-apkupdater
 
 ### Capacitor
