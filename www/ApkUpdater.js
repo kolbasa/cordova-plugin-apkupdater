@@ -112,13 +112,27 @@ module.exports = {
      * @param {function=} success
      * @param {function=} failure
      *
-     * @returns {Promise<void>|void}
+     * @returns {Promise<boolean>|void}
      */
     install: function (success, failure) {
         if (success == null && failure == null) {
             return API.install();
         } else {
             API.install().then(success).catch(failure);
+        }
+    },
+
+    /**
+     * @param {function=} success
+     * @param {function=} failure
+     *
+     * @returns {Promise<boolean>|void}
+     */
+    installDebug: function (success, failure) {
+        if (success == null && failure == null) {
+            return API.installDebug();
+        } else {
+            API.installDebug().then(success).catch(failure);
         }
     },
 

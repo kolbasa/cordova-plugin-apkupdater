@@ -45,6 +45,11 @@ export default class ApkUpdater {
         return apkUpdater.install.apply(apkUpdater, arguments);
     }
 
+    static installDebug() {
+        let apkUpdater = plugin();
+        return apkUpdater.installDebug.apply(apkUpdater, arguments);
+    }
+
 
     static isDeviceRooted() {
         let apkUpdater = plugin();

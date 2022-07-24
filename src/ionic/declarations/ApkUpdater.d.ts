@@ -24,7 +24,9 @@ declare module 'cordova-plugin-apkupdater' {
 
         static openInstallSetting(success?: Function, failure?: Function): Promise<boolean>;
 
-        static install(success?: Function, failure?: Function): Promise<void>;
+        static install(success?: Function, failure?: Function): Promise<boolean>;
+
+        static installDebug(success?: Function, failure?: Function): Promise<boolean>;
 
 
         static isDeviceRooted(success?: Function, failure?: Function): Promise<boolean>;

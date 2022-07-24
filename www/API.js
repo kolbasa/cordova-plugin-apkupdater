@@ -88,7 +88,7 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     openInstallSetting: function () {
         return new Promise(function (resolve, reject) {
@@ -99,11 +99,24 @@ module.exports = {
     },
 
     /**
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     install: function () {
         return new Promise(function (resolve, reject) {
             exec(resolve, reject, PLUGIN, 'install', []);
+        }).then(function (resp) {
+            return resp === 1;
+        });
+    },
+
+    /**
+     * @returns {Promise<boolean>}
+     */
+    installDebug: function () {
+        return new Promise(function (resolve, reject) {
+            exec(resolve, reject, PLUGIN, 'installDebug', []);
+        }).then(function (resp) {
+            return resp === 1;
         });
     },
 

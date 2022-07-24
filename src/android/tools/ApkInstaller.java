@@ -1,5 +1,6 @@
 package de.kolbasa.apkupdater.tools;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
@@ -26,6 +27,8 @@ import de.kolbasa.apkupdater.exceptions.RootException;
 
 public class ApkInstaller {
 
+    public static final int INSTALL_REQUEST_CODE = 555;
+
     private static Uri getUpdate(Context context, File update) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             String fileProvider = context.getPackageName() + ".apkupdater.provider";
@@ -37,8 +40,9 @@ public class ApkInstaller {
         }
     }
 
-    public static void install(Context context, File update) throws IOException {
+    public static void install(Context context, File update, boolean newTask) throws IOException {
         Intent intent;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -47,12 +51,16 @@ public class ApkInstaller {
             intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(getUpdate(context, update), "application/vnd.android.package-archive");
         }
-        if (WindowStatus.isWindowed(context)) {
+
+        if (newTask) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            context.startActivity(intent);
+        } else {
+            intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
+            ((Activity) context).startActivityForResult(intent, INSTALL_REQUEST_CODE);
         }
-        context.startActivity(intent);
     }
 
     public static boolean isDeviceRooted(Context context) {

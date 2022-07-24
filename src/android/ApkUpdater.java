@@ -1,5 +1,8 @@
 package de.kolbasa.apkupdater;
 
+import android.app.Activity;
+import android.content.Intent;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -12,6 +15,7 @@ import de.kolbasa.apkupdater.downloader.Progress;
 import de.kolbasa.apkupdater.exceptions.ActionInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadInProgressException;
 import de.kolbasa.apkupdater.exceptions.DownloadNotRunningException;
+import de.kolbasa.apkupdater.exceptions.InstallationFailedException;
 import de.kolbasa.apkupdater.tools.ApkInstaller;
 import de.kolbasa.apkupdater.tools.AppData;
 import de.kolbasa.apkupdater.tools.PermissionManager;
@@ -30,6 +34,59 @@ public class ApkUpdater extends CordovaPlugin {
             File downloadDir = new File(cordova.getContext().getFilesDir(), UPDATE_DIR);
             updateManager = new UpdateManager(downloadDir, cordova.getContext());
         }
+    }
+
+    private CallbackContext cbcInstall;
+
+    private CallbackContext cbcDebugInstall;
+
+    private CallbackContext cbcInstallSettings;
+
+    @Override
+    public void onResume(boolean multitasking) {
+        super.onResume(multitasking);
+
+        if (cbcInstallSettings != null) {
+            canRequestPackageInstalls(cbcInstallSettings);
+            cbcInstallSettings = null;
+        }
+
+        if (cbcInstall != null) {
+            cbcInstall.success(0);
+            cbcInstall = null;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == ApkInstaller.INSTALL_REQUEST_CODE && cbcDebugInstall != null) {
+            if (resultCode == Activity.RESULT_OK) {
+                cbcDebugInstall.success(1);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                cbcDebugInstall.success(0);
+            } else {
+                String msg;
+                int code = intent.getIntExtra("android.intent.extra.INSTALL_RESULT", 99);
+
+                switch (code) {
+                    case -7: // ERROR_DOWNLOAD_NOT_PRESENT
+                        msg = "Verification failed. Check APK-Signature.";
+                        break;
+                    case -15: // INSTALL_FAILED_TEST_ONLY
+                        msg = "App is marked as 'test only'.";
+                        break;
+                    case -25: // INSTALL_FAILED_VERSION_DOWNGRADE
+                        msg = "Can't downgrade app version.";
+                        break;
+                    default:
+                        msg = "Unknown error with code: " + code;
+                }
+
+                cbcDebugInstall.error(StackExtractor.format(new InstallationFailedException(msg)));
+            }
+            cbcDebugInstall = null;
+        }
+        super.onActivityResult(requestCode, resultCode, intent);
     }
 
     private void checkIfRunning() throws DownloadInProgressException {
@@ -134,17 +191,6 @@ public class ApkUpdater extends CordovaPlugin {
         }
     }
 
-    private CallbackContext cbcInstallSettings;
-
-    @Override
-    public void onResume(boolean multitasking) {
-        super.onResume(multitasking);
-        if (cbcInstallSettings != null) {
-            canRequestPackageInstalls(cbcInstallSettings);
-            cbcInstallSettings = null;
-        }
-    }
-
     private void canRequestPackageInstalls(CallbackContext callbackContext) {
         try {
             callbackContext.success(toBit(PermissionManager.canRequestPackageInstalls(cordova.getContext())));
@@ -167,8 +213,24 @@ public class ApkUpdater extends CordovaPlugin {
 
     private void install(CallbackContext callbackContext) {
         try {
-            ApkInstaller.install(cordova.getContext(), getUpdate().getInstallFile());
-            callbackContext.success();
+            if (cbcInstall != null) {
+                throw new ActionInProgressException();
+            }
+            cbcInstall = callbackContext;
+            ApkInstaller.install(cordova.getContext(), getUpdate().getInstallFile(), true);
+        } catch (Exception e) {
+            callbackContext.error(StackExtractor.format(e));
+        }
+    }
+
+    private void installDebug(CallbackContext callbackContext) {
+        try {
+            if (cbcDebugInstall != null) {
+                throw new ActionInProgressException();
+            }
+            cbcDebugInstall = callbackContext;
+            cordova.setActivityResultCallback(this);
+            ApkInstaller.install(cordova.getContext(), getUpdate().getInstallFile(), false);
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
         }
@@ -250,6 +312,9 @@ public class ApkUpdater extends CordovaPlugin {
                 break;
             case "install":
                 cordova.getThreadPool().execute(() -> install(callbackContext));
+                break;
+            case "installDebug":
+                cordova.getThreadPool().execute(() -> installDebug(callbackContext));
                 break;
             case "isDeviceRooted":
                 cordova.getThreadPool().execute(() -> isDeviceRooted(callbackContext));

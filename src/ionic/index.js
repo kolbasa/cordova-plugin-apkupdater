@@ -36,6 +36,10 @@ var ApkUpdater = /** @class */ (function () {
         var apkUpdater = plugin();
         return apkUpdater.install.apply(apkUpdater, arguments);
     };
+    ApkUpdater.installDebug = function () {
+        var apkUpdater = plugin();
+        return apkUpdater.installDebug.apply(apkUpdater, arguments);
+    };
     ApkUpdater.isDeviceRooted = function () {
         var apkUpdater = plugin();
         return apkUpdater.isDeviceRooted.apply(apkUpdater, arguments);
