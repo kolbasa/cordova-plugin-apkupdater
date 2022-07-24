@@ -72,6 +72,9 @@ public class ApkUpdater extends CordovaPlugin {
                     case -7: // ERROR_DOWNLOAD_NOT_PRESENT
                         msg = "Verification failed. Check APK-Signature.";
                         break;
+                    case 3:
+                        msg = "Blocked by Play Protect";
+                        break;
                     case -15: // INSTALL_FAILED_TEST_ONLY
                         msg = "App is marked as 'test only'.";
                         break;
