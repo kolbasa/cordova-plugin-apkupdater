@@ -45,7 +45,7 @@
             <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="application" mode="merge">
+        <config-file target="AndroidManifest.xml" parent="application">
             <provider
                     android:name="de.kolbasa.apkupdater.tools.FileProvider"
                     android:authorities="${applicationId}.apkupdater.provider"
