@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.1 - 2022-11-23
+
+- [Fixed] Installation error with `cordova-common@4.1.0`
+
 ## 4.0.0 - 2021-12-10
 
 - [Added] Detailed documentation on how to configure the app as a device owner using a QR code.
