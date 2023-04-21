@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## 4.0.2 - 2023-04-21
+
+- [Fixed] Builds failed with Capacitor ([#45](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/45)).
+
 ## 4.0.1 - 2022-11-23
 
-- [Fixed] Installation error with `cordova-common@4.1.0`
+- [Fixed] Installation error with `cordova-common@4.1.0` ([#49](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/49)).
 
 ## 4.0.0 - 2021-12-10
 
