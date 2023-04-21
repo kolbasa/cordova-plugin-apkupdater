@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-apkupdater" version="4.0.2">
+        id="cordova-plugin-apkupdater" version="4.0.3">
 
     <name>Apk Updater</name>
     <license>MIT</license>
@@ -27,7 +27,7 @@
     <platform name="android">
 
         <framework src="net.lingala.zip4j:zip4j:2.11.5"/>
-        <framework src="androidx.core:core:1.7.0"/>
+        <framework src="androidx.core:core:1.6.0"/>
         <framework src="com.scottyab:rootbeer-lib:0.1.0"/>
 
         <config-file target="config.xml" parent="/*">
