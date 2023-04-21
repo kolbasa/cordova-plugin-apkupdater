@@ -2,7 +2,7 @@
 
 ## 4.0.3 - 2023-04-21
 
-- [Fixed] `androidx.core` version was lowered for the time being, as otherwise the compileSdkVersion requirements are too high.
+- [Fixed] `androidx.core` version was lowered for the time being, as otherwise the compileSdkVersion requirements are too high ([#52](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/52)).
 
 ## 4.0.2 - 2023-04-21
 
