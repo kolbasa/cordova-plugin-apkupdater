@@ -8,9 +8,9 @@ declare module 'cordova-plugin-apkupdater' {
         zipPassword?: string;
 
         /**
-         * HTTP basic access authentication.
+         * Header authorization request property.
          */
-        basicAuth?: AuthConfig;
+        authorization?: string;
 
         /**
          * Monitor download progress.

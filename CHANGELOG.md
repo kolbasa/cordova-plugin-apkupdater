@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 5.0.0 - 2024-07-01
+
+**WARNING! Breaking Changes:**
+- [Changed] `basicAuth` has been replaced by `authorization`, see [example](https://github.com/kolbasa/cordova-plugin-apkupdater#download) of download configuration. ([#54](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/54)).
+
 ## 4.0.3 - 2023-04-21
 
 - [Fixed] `androidx.core` version was lowered for the time being, as otherwise the compileSdkVersion requirements are too high ([#52](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/52)).

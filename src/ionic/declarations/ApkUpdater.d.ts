@@ -1,5 +1,4 @@
 /// <reference path="interfaces/App.d.ts" />
-/// <reference path="interfaces/AuthConfig.d.ts" />
 /// <reference path="interfaces/Config.d.ts" />
 /// <reference path="interfaces/Progress.d.ts" />
 /// <reference path="interfaces/Update.d.ts" />

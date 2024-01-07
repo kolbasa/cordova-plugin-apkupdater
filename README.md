@@ -168,11 +168,10 @@ Configuration (optional):
 
 ```js
 const options = {
-    zipPassword: 'aDzEsCceP3BPO5jy', // If an encrypted zip file is used.
-    basicAuth: { // Basic access authentication
-        user: 'username',
-        password: 'JtE+es2GcHrjTAEU'
-    },
+    // ↓↓↓ If an encrypted zip file is used.
+    zipPassword: 'aDzEsCceP3BPO5jy', 
+    // ↓↓↓ Authorization token
+    authorization: "Basic " + btoa('username:password'), // Example for basic access authentication
     onDownloadProgress: function (e) {
         console.log(
             'Downloading: ' + e.progress + '%',

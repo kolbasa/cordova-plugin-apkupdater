@@ -68,13 +68,13 @@ public class UpdateManager {
         }
     }
 
-    private File downloadFile(String path, String basicAuth) throws DownloadFailedException {
+    private File downloadFile(String path, String auth) throws DownloadFailedException {
         try {
             fileDownloader = new FileDownloader();
             if (downloadObserver != null) {
                 fileDownloader.addObserver(downloadObserver);
             }
-            return fileDownloader.download(path, downloadDir, basicAuth);
+            return fileDownloader.download(path, downloadDir, auth);
         } finally {
             fileDownloader = null;
         }
@@ -123,14 +123,14 @@ public class UpdateManager {
         return getApkInfo();
     }
 
-    public Update download(String path, String basicAuth, String zipPassword) throws IOException,
+    public Update download(String path, String auth, String zipPassword) throws IOException,
             UnzipException, DownloadFailedException, UpdateNotFoundException,
             InvalidPackageException, PackageManager.NameNotFoundException {
 
         try {
             reset();
 
-            File downloadedFile = downloadFile(path, basicAuth);
+            File downloadedFile = downloadFile(path, auth);
             unzipUpdate(downloadedFile, zipPassword);
 
             return getUpdate();

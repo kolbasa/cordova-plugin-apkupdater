@@ -79,10 +79,10 @@ public class ApkUpdater extends CordovaPlugin {
             checkIfRunning();
 
             String url = parseString(data.getString(0));
-            String basicAuth = parseString(data.getString(1));
+            String auth = parseString(data.getString(1));
             String zipPassword = parseString(data.getString(2));
 
-            Update update = updateManager.download(url, basicAuth, zipPassword);
+            Update update = updateManager.download(url, auth, zipPassword);
             callbackContext.success(update.toJSON());
         } catch (Exception e) {
             callbackContext.error(StackExtractor.format(e));
