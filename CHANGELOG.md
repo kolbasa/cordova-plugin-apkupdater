@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 5.0.0 - 2024-07-01
+## 5.0.1 - 2024-06-01
+
+- [Fixed] Internal notes accidentally pushed to npm.
+
+## 5.0.0 - 2024-01-07
 
 **WARNING! Breaking Changes:**
 - [Changed] `basicAuth` has been replaced by `authorization`, see [example](https://github.com/kolbasa/cordova-plugin-apkupdater#download) of download configuration. ([#54](https://github.com/kolbasa/cordova-plugin-apkupdater/issues/54)).
