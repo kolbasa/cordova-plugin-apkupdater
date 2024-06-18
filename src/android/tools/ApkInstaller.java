@@ -66,7 +66,7 @@ public class ApkInstaller {
     public static boolean requestRootAccess() throws RootException {
         Process process = null;
         try {
-            process = Runtime.getRuntime().exec(new String[]{"su", "-c", "id"});
+            process = Runtime.getRuntime().exec(new String[]{"su", "0", "id"});
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String output = in.readLine();
             return output != null && output.toLowerCase().contains("uid=0");
@@ -96,7 +96,7 @@ public class ApkInstaller {
 
         Process process = null;
         try {
-            process = Runtime.getRuntime().exec(new String[]{"su", "-c", command});
+            process = Runtime.getRuntime().exec(new String[]{"su", "0", command});
             StringBuilder builder = new StringBuilder();
 
             BufferedReader stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
