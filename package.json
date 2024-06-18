@@ -10,10 +10,6 @@
   },
   "main": "./src/ionic/index.js",
   "types": "./src/ionic/index.d.ts",
-  "scripts": {
-    "build": "tsc -p src/ionic",
-    "prepublish": "npm run build"
-  },
   "keywords": [
     "apk",
     "updater",
